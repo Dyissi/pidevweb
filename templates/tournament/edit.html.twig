@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Tournament{% endblock %}
+
+{% block content %}
+  <div class="page-title text-center py-5">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Edit Tournament</h1>
+    </div>
+  </div>
+
+  <section class="section py-5">
+    <div class="container" data-aos="fade-up">
+      <div class="card mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+          {{ include('tournament/_form.html.twig', {'button_label': 'Update'}) }}
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <a href="{{ path('app_tournament_index') }}" class="btn btn-secondary">Back to List</a>
+        {{ include('tournament/_delete_form.html.twig') }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

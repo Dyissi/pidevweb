@@ -31,10 +31,10 @@ class Tournament
     private string $tournamentTOS;
 
     #[ORM\Column(name: "tournamentNbteams", type: "integer")]
-    private int $tournamentNbteams;
+    private int $tournamentNbteams = 0; // Default to 0
 
-    #[ORM\Column(name: "tournamentWinner", type: "integer")]
-    private int $tournamentWinner;
+    #[ORM\Column(name: "tournamentWinner", type: "integer", nullable: true)]
+    private ?int $tournamentWinner = null;
 
     #[ORM\OneToMany(mappedBy: "tournament", targetEntity: Results::class, orphanRemoval: true)]
     private Collection $results;
@@ -115,12 +115,12 @@ class Tournament
         return $this;
     }
 
-    public function getTournamentWinner(): int
+    public function getTournamentWinner(): ?int
     {
         return $this->tournamentWinner;
     }
 
-    public function setTournamentWinner(int $tournamentWinner): self
+    public function setTournamentWinner(?int $tournamentWinner): self
     {
         $this->tournamentWinner = $tournamentWinner;
         return $this;

@@ -57,6 +57,18 @@
 
         {# COACH-ONLY LINKS #}
         {% if is_granted('ROLE_COACH') %}
+        <li class="dropdown"><a href="#"><span>Teams</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+                <li><a href="{{ path('app_team_index') }}">View All Teams</a></li>
+                <li><a href="{{ path('app_team_new') }}">Add New Team</a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#"><span>Tournaments</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+                <li><a href="{{ path('app_tournament_index') }}">View All Tournaments</a></li>
+                <li><a href="{{ path('app_tournament_new') }}">Add New Tournament</a></li>
+            </ul>
+          </li>
         <li class="dropdown"><a href="#"><span>Manage Athletes</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
                 <li><a href="{{ path('app_user_index') }}">View All Athletes</a></li>
@@ -66,6 +78,7 @@
         <li><a href="{{ path('app_claim_new') }}">Claims<br></a></li>
               <li class="dropdown"><a href="#"><span>Insights</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
           <ul>
+          
           <li class="dropdown"><a href="#"><span>Performance Data</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
                 <li><a href="{{ path('app_data_index') }}">View All</a></li>
@@ -77,6 +90,7 @@
                 <li><a href="{{ path('app_training_session_index') }}">View All</a></li>
                 <li><a href="{{ path('app_training_session_new') }}">Add New</a></li>
             </ul>
+
         </li>
         {% endif %}
 

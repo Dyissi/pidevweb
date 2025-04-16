@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Team Details{% endblock %}
+{% block description %}Details for {{ team.teamName }} in the SPIIN Sports system{% endblock %}
+{% block keywords %}team, {{ team.teamName }}, sports, SPIIN{% endblock %}
+
+{% block body_class %}team-show-page{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <h1 class="mb-4">Team: {{ team.teamName }}</h1>
+    <p><strong>Sport:</strong> {{ team.teamTypeOfSport }}</p>
+    <p><strong>Number of Athletes:</strong> {{ team.teamNbAthletes }}</p>
+    <p><strong>Wins:</strong> {{ team.teamWins }}</p>
+    <p><strong>Losses:</strong> {{ team.teamLosses }}</p>
+
+    <h3 class="mt-4">Tournaments Won</h3>
+    <ul class="list-group">
+      {% for result in team.results %}
+        <li class="list-group-item">
+          <a href="{{ path('app_tournament_show', {'id': result.tournament.id}) }}">
+            {{ result.tournament.tournamentName }}
+          </a>
+        </li>
+      {% else %}
+        <li class="list-group-item text-muted">No tournaments won yet.</li>
+      {% endfor %}
+    </ul>
+
+    <a href="{{ path('app_team_index') }}" class="btn btn-secondary mt-4">Back to List</a>
+  </div>
+{% endblock %}

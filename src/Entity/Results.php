@@ -10,22 +10,12 @@ class Results
 {
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Tournament::class, inversedBy: "results")]
-    #[ORM\JoinColumn(
-        name: "tournamentId", 
-        referencedColumnName: "tournamentId",
-        nullable: false,
-        onDelete: "CASCADE"
-    )]
+    #[ORM\JoinColumn(name: "tournamentId", referencedColumnName: "tournamentId", nullable: false, onDelete: "CASCADE")]
     private Tournament $tournament;
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: "results")]
-    #[ORM\JoinColumn(
-        name: "teamId", 
-        referencedColumnName: "teamId",
-        nullable: false,
-        onDelete: "CASCADE"
-    )]
+    #[ORM\JoinColumn(name: "teamId", referencedColumnName: "teamId", nullable: false, onDelete: "CASCADE")]
     private Team $team;
 
     public function getTeam(): Team
