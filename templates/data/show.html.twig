@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ data.userId }}'s Performance - {{ data.performanceDateRecorded|date('M d, Y') }}{% endblock %}
+
+{% block main %}
+    <div class="container performance-detail">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">
+                <i class="bi bi-graph-up"></i> Performance Details
+                <small class="text-muted">#{{ data.performanceId }}</small>
+            </h1>
+            <div class="action-buttons">
+                <a href="{{ path('app_data_index') }}" class="btn btn-secondary-light">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">
+                    <i class="bi bi-person"></i> User #{{ data.userId }}
+                    <span class="float-end">{{ data.performanceDateRecorded|date('F j, Y') }}</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="performance-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Speed</span>
+                                <span class="stat-value">{{ data.performanceSpeed }} <small>km/h</small></span>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {{ (data.performanceSpeed/100)*100 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Agility</span>
+                                <span class="stat-value">{{ data.performanceAgility }} <small>pts</small></span>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-info" 
+                                         style="width: {{ (data.performanceAgility/10)*100 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Goals</span>
+                                <span class="stat-value {{ data.performanceNbrGoals > 2 ? 'text-success fw-bold' : '' }}">
+                                    {{ data.performanceNbrGoals }}
+                                </span>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Assists</span>
+                                <span class="stat-value">{{ data.performanceAssists }}</span>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Fouls</span>
+                                <span class="stat-value {{ data.performanceNbrFouls > 3 ? 'text-danger fw-bold' : '' }}">
+                                    {{ data.performanceNbrFouls }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="performance-visual text-center">
+                            <div class="radial-progress mb-3" 
+                                 data-value="{{ (data.performanceSpeed + data.performanceAgility)/2 }}">
+                                <span class="progress-value"></span>
+                            </div>
+                            <h4>Overall Performance</h4>
+                            <p class="text-muted">Combined speed and agility</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{{ path('app_data_edit', {'performanceId': data.performanceId}) }}" 
+               class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            {{ include('data/_delete_form.html.twig', {
+    'button_attr': {
+        'class': 'btn btn-error'
+    }
+}) }}
+        </div>
+    </div>
+{% endblock %}

@@ -50,6 +50,9 @@
         ]
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
     "symfony/asset-mapper": {
         "version": "6.4",
         "recipe": {
@@ -67,10 +70,13 @@
     },
     "symfony/console": {
         "version": "6.4",
+<<<<<<< HEAD
 =======
     "symfony/console": {
         "version": "6.1",
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -83,10 +89,14 @@
     },
     "symfony/debug-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "6.4",
 =======
         "version": "6.1",
 >>>>>>> health
+=======
+        "version": "6.4",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -112,12 +122,16 @@
     },
     "symfony/framework-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
         "version": "6.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.4",
             "ref": "32126346f25e1cee607cc4aa6783d46034920554"
+<<<<<<< HEAD
 =======
         "version": "6.1",
         "recipe": {
@@ -126,6 +140,8 @@
             "version": "5.4",
             "ref": "3cd216a4d007b78d8554d44a5b1c0a446dab24fb"
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
         },
         "files": [
             "./config/packages/cache.yaml",
@@ -140,10 +156,14 @@
     },
     "symfony/mailer": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "6.4",
 =======
         "version": "6.1",
 >>>>>>> health
+=======
+        "version": "6.4",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -156,10 +176,14 @@
     },
     "symfony/maker-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "1.62",
 =======
         "version": "1.50",
 >>>>>>> health
+=======
+        "version": "1.62",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -169,10 +193,14 @@
     },
     "symfony/messenger": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "6.4",
 =======
         "version": "6.1",
 >>>>>>> health
+=======
+        "version": "6.4",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -197,10 +225,14 @@
     },
     "symfony/notifier": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "6.4",
 =======
         "version": "6.1",
 >>>>>>> health
+=======
+        "version": "6.4",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -228,12 +260,16 @@
     },
     "symfony/routing": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
         "version": "6.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.2",
             "ref": "e0a11b4ccb8c9e70b574ff5ad3dfdcd41dec5aa6"
+<<<<<<< HEAD
 =======
         "version": "6.1",
         "recipe": {
@@ -242,6 +278,8 @@
             "version": "6.1",
             "ref": "a44010c0d06989bd4f154aa07d2542d47caf5b83"
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
         },
         "files": [
             "./config/packages/routing.yaml",
@@ -250,6 +288,9 @@
     },
     "symfony/security-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
         "version": "6.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
@@ -282,6 +323,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.3",
+<<<<<<< HEAD
 =======
         "version": "6.1",
         "recipe": {
@@ -301,6 +343,8 @@
             "branch": "main",
             "version": "5.3",
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
             "ref": "e28e27f53663cc34f0be2837aba18e3a1bef8e7b"
         },
         "files": [
@@ -310,12 +354,16 @@
     },
     "symfony/twig-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
         "version": "6.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.4",
             "ref": "cab5fd2a13a45c266d45a7d9337e28dee6272877"
+<<<<<<< HEAD
 =======
         "version": "6.1",
         "recipe": {
@@ -324,6 +372,8 @@
             "version": "5.4",
             "ref": "bb2178c57eee79e6be0b297aa96fc0c0def81387"
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
         },
         "files": [
             "./config/packages/twig.yaml",
@@ -331,6 +381,9 @@
         ]
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> training_and_data_mgnt
     "symfony/ux-turbo": {
         "version": "2.23",
         "recipe": {
@@ -342,10 +395,13 @@
     },
     "symfony/validator": {
         "version": "6.4",
+<<<<<<< HEAD
 =======
     "symfony/validator": {
         "version": "6.1",
 >>>>>>> health
+=======
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -358,10 +414,14 @@
     },
     "symfony/web-profiler-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "6.4",
 =======
         "version": "6.1",
 >>>>>>> health
+=======
+        "version": "6.4",
+>>>>>>> training_and_data_mgnt
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -375,9 +435,13 @@
     },
     "twig/extra-bundle": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "version": "v3.20.0"
 =======
         "version": "v3.8.0"
 >>>>>>> health
+=======
+        "version": "v3.20.0"
+>>>>>>> training_and_data_mgnt
     }
 }

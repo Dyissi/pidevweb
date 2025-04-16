@@ -85,7 +85,6 @@ class Injury
         return $this;
     }
 
-<<<<<<< HEAD
     public function getInjuryDate(): \DateTimeInterface
     {
         return $this->injuryDate;
@@ -96,23 +95,6 @@ class Injury
         $this->injuryDate = $injuryDate;
         return $this;
     }
-=======
-    
-    public function setInjuryDate(\DateTimeInterface $injuryDate): self
-{
-    $this->injury_date = $injuryDate;
-    return $this;
-}
-
-    
-    public function getInjuryDate(): ?\DateTimeInterface
-{
-    return $this->injury_date;
-}
-
-
-
->>>>>>> health
 
     public function getInjurySeverity(): string
     {
@@ -135,60 +117,4 @@ class Injury
         $this->injury_description = $injury_description;
         return $this;
     }
-<<<<<<< HEAD
 }
-=======
-
-    public function getImagePath(): ?string
-    {
-        return $this->imagePath;
-    }
-
-    public function setImagePath(?string $imagePath): self
-    {
-        $this->imagePath = $imagePath;
-        return $this;
-    }
-
-    /**
-     * Get all recovery plans associated with the injury.
-     *
-     * @return Collection<int, Recoveryplan>
-     */
-    public function getRecoveryplans(): Collection
-    {
-        return $this->recoveryplans;
-    }
-
-    /**
-     * Add a recovery plan to the injury.
-     *
-     * @param Recoveryplan $recoveryplan
-     * @return self
-     */
-    public function addRecoveryplan(Recoveryplan $recoveryplan): self
-    {
-        if (!$this->recoveryplans->contains($recoveryplan)) {
-            $this->recoveryplans[] = $recoveryplan;
-            $recoveryplan->setInjury($this); // Set the injury on the recovery plan
-        }
-        return $this;
-    }
-
-    /**
-     * Remove a recovery plan from the injury.
-     *
-     * @param Recoveryplan $recoveryplan
-     * @return self
-     */
-    public function removeRecoveryplan(Recoveryplan $recoveryplan): self
-    {
-        if ($this->recoveryplans->removeElement($recoveryplan)) {
-            if ($recoveryplan->getInjury() === $this) {
-                $recoveryplan->setInjury(null); // Unlink recovery plan from injury
-            }
-        }
-        return $this;
-    }
-}
->>>>>>> health

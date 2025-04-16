@@ -1,0 +1,53 @@
+:root {
+    /* Override the template's root variables */
+    --primary-dark: #463F3A;
+    --primary-accent: #D68C45;
+    --secondary-light: #BCCCE0;
+    
+    /* Map template variables to your palette */
+    --accent-color: var(--primary-accent);
+    --heading-color: var(--primary-dark);
+    --nav-hover-color: var(--primary-accent);
+    
+    /* Add any other variables the template uses */
+  }
+  
+  .header {
+    background-color: var(--background-color);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-accent);
+  }
+  
+  /* Apply colors to specific components */
+  .header {
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--secondary-light);
+  }
+  
+  .header .logo h1 {
+    color: var(--primary-accent);
+  }
+  
+  .navmenu a {
+    color: var(--primary-dark);
+  }
+  
+  .navmenu a:hover,
+  .navmenu .active {
+    color: var(--primary-accent);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-accent);
+    border-color: var(--primary-accent);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+  }
+  
+  /* Add other component-specific overrides as needed */

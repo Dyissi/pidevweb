@@ -73,11 +73,7 @@
 }
 
 .col {
-<<<<<<< HEAD
   flex: 1 0 0;
-=======
-  flex: 1 0 0%;
->>>>>>> health
 }
 
 .row-cols-auto > * {
@@ -286,11 +282,7 @@
 
 @media (min-width: 576px) {
   .col-sm {
-<<<<<<< HEAD
     flex: 1 0 0;
-=======
-    flex: 1 0 0%;
->>>>>>> health
   }
   .row-cols-sm-auto > * {
     flex: 0 0 auto;
@@ -459,11 +451,7 @@
 }
 @media (min-width: 768px) {
   .col-md {
-<<<<<<< HEAD
     flex: 1 0 0;
-=======
-    flex: 1 0 0%;
->>>>>>> health
   }
   .row-cols-md-auto > * {
     flex: 0 0 auto;
@@ -632,11 +620,7 @@
 }
 @media (min-width: 992px) {
   .col-lg {
-<<<<<<< HEAD
     flex: 1 0 0;
-=======
-    flex: 1 0 0%;
->>>>>>> health
   }
   .row-cols-lg-auto > * {
     flex: 0 0 auto;
@@ -805,11 +789,7 @@
 }
 @media (min-width: 1200px) {
   .col-xl {
-<<<<<<< HEAD
     flex: 1 0 0;
-=======
-    flex: 1 0 0%;
->>>>>>> health
   }
   .row-cols-xl-auto > * {
     flex: 0 0 auto;
@@ -978,11 +958,7 @@
 }
 @media (min-width: 1400px) {
   .col-xxl {
-<<<<<<< HEAD
     flex: 1 0 0;
-=======
-    flex: 1 0 0%;
->>>>>>> health
   }
   .row-cols-xxl-auto > * {
     flex: 0 0 auto;
