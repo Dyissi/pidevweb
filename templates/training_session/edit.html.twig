@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Training Session{% endblock %}
+
+{% block main %}
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary-dark text-tertiary-light py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h4 mb-0">
+                            <i class="bi bi-calendar2-plus me-2"></i>Edit Training Session
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    {# Flash Messages #}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success alert-dismissible fade show mb-4">
+                            <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+
+                    {# Form #}
+                    <div class="form-content">
+                        {{ include('training_session/_form.html.twig', {
+                            'button_label': 'Update Session',
+                            'button_attr': {
+                                'class': 'btn btn-accent w-100 py-2'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
