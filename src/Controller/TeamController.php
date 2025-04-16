@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Team;
 use App\Form\TeamType;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +16,7 @@ use Dompdf\Options;
 final class TeamController extends AbstractController
 {
     #[Route(path: '/', name: 'app_team_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         // Get sorting and filter parameters from query
         $sort = $request->query->get('sort', 'id');
@@ -53,15 +52,12 @@ final class TeamController extends AbstractController
 
         $queryBuilder->orderBy('t.' . $sort, $direction);
 
-        // Paginate results
-        $pagination = $paginator->paginate(
-            $queryBuilder,
-            $request->query->getInt('page', 1),
-            10 // Items per page
-        );
+        // Execute the query
+        $teams = $queryBuilder->getQuery()->getResult();
 
+        // Render the index page with the filtered teams
         return $this->render('team/index.html.twig', [
-            'teams' => $pagination,
+            'teams' => $teams, // Pass the teams variable to the template
             'sort' => $sort,
             'direction' => $direction,
             'searchTerm' => $searchTerm,
@@ -70,7 +66,7 @@ final class TeamController extends AbstractController
     }
 
     #[Route(path: '/search', name: 'app_team_search', methods: ['GET'])]
-    public function searchTeams(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+    public function searchTeams(Request $request, EntityManagerInterface $entityManager): Response
     {
         $searchTerm = trim($request->query->get('search', ''));
         $filterTeamSport = $request->query->get('sport', '');
@@ -105,16 +101,8 @@ final class TeamController extends AbstractController
 
         $queryBuilder->orderBy('t.' . $sort, $direction);
 
-        // Paginate results
-        $pagination = $paginator->paginate(
-            $queryBuilder,
-            $request->query->getInt('page', 1),
-            10 // Items per page
-        );
-
         // Render the index page with the filtered teams
         return $this->render('team/index.html.twig', [
-            'teams' => $pagination,
             'sort' => $sort,
             'direction' => $direction,
             'searchTerm' => $searchTerm,

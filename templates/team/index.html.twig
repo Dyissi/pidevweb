@@ -6,7 +6,7 @@
 
 {% block body_class %}teams-page{% endblock %}
 
-{% block content %}
+{% block main %}
   <style>
     .teams-page {
       background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
@@ -219,11 +219,7 @@
                 </tbody>
               </table>
             </div>
-            {% if teams is iterable %}
-              <div class="navigation p-4">
-                {{ knp_pagination_render(teams) }}
-              </div>
-            {% endif %}
+          
           </div>
         </div>
       </div>

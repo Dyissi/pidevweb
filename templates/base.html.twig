@@ -100,7 +100,7 @@
         {% endif %}
 
         {# MEDICAL TEAM LINKS #}
-        {% if is_granted('ROLE_MEDICAL') %}
+        {% if is_granted('ROLE_MED_STAFF') %}
         <li><a href="{{ path('app_claim_new') }}">Claims<br></a></li>
 
         <li class="dropdown"><a href="#"><span>Health</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
