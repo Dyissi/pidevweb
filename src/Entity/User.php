@@ -77,9 +77,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private Collection $injuries;
 
+     #[ORM\OneToMany(
+        mappedBy: "user",
+        targetEntity: Recoveryplan::class,
+        orphanRemoval: true
+    )]
+    private Collection $recoveryplans;  
+
     public function __construct()
     {
         $this->injuries = new ArrayCollection();
+         $this->recoveryplans = new ArrayCollection();
         $this->submittedClaims = new ArrayCollection();
         $this->receivedClaims = new ArrayCollection();
     }
@@ -302,6 +310,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /*Beshbesh*/
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Claim::class)]
     private Collection $submittedClaims;
 
@@ -361,6 +370,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     
             return $this;
         }
+
+          /*Lyna*/
+    public function getRecoveryplans(): Collection
+    {
+    return $this->recoveryplans;
+    }
+
+    public function addRecoveryplan(Recoveryplan $recoveryplan): self
+    {
+    if (!$this->recoveryplans->contains($recoveryplan)) {
+        $this->recoveryplans[] = $recoveryplan;
+        $recoveryplan->setUser($this);
+    }
+    return $this;
+    }
+
+    public function removeRecoveryplan(Recoveryplan $recoveryplan): self
+    {
+    if ($this->recoveryplans->removeElement($recoveryplan)) {
+        // Set the owning side to null (unless already changed)
+        if ($recoveryplan->getUser() === $this) {
+            $recoveryplan->setUser(null);
+        }
+    }
+    return $this;
+}
 
      
 }

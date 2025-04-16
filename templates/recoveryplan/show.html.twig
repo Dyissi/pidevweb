@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block hero %}
+{% block body %}
+<section id="recoveryplan-details" class="py-5">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-header">
+      <h2>Recovery Plan Details</h2>
+      <p>View all the information for this recovery plan</p>
+    </div>
+
+    <div class="card shadow-sm p-4 rounded-4">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Recovery ID</th>
+            <td>{{ recoveryplan.recoveryId }}</td>
+          </tr>
+          <tr>
+            <th>Start Date</th>
+            <td>{{ recoveryplan.recoveryStartDate ? recoveryplan.recoveryStartDate|date('Y-m-d') : '' }}</td>
+          </tr>
+          <tr>
+            <th>End Date</th>
+            <td>{{ recoveryplan.recoveryEndDate ? recoveryplan.recoveryEndDate|date('Y-m-d') : '' }}</td>
+          </tr>
+          <tr>
+            <th>Goal</th>
+            <td>{{ recoveryplan.recoveryGoal }}</td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td>{{ recoveryplan.recoveryDescription }}</td>
+          </tr>
+          <tr>  
+            <th>Injury</th>
+            <td>{{ recoveryplan.injury ? recoveryplan.injury.injuryType : 'No injury associated' }}</td>
+          </tr>
+          <tr>
+            <th>User</th>
+            <td>{{ recoveryplan.user ? recoveryplan.user.getUserFname() ~ ' ' ~ recoveryplan.user.getUserLname() : 'No user associated' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ path('app_recoveryplan_index') }}" class="btn btn-outline-secondary">Back to List</a>
+        <a href="{{ path('app_recoveryplan_edit', {'id': recoveryplan.recoveryId}) }}" class="btn btn-warning">Edit</a>
+        {{ include('recoveryplan/delete_form.html.twig') }}
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+{% endblock %}

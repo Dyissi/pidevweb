@@ -1,0 +1,6 @@
+{# templates/recoveryplan/delete_form.html.twig #}
+
+<form method="post" action="{{ path('app_recoveryplan_delete', {'id': recoveryplan.recoveryId}) }}" onsubmit="return confirm('Are you sure you want to delete this recovery plan?');" style="display: inline;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recoveryplan.recoveryId) }}">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>

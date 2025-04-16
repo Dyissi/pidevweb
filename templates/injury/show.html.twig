@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block hero %}
+
+
+{% block title %}Injury Details{% endblock %}
+
+{% block body %}
+<section id="injury-details" class="py-5">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-header">
+      <h2>Injury Details</h2>
+      <p>View all the information for this injury</p>
+    </div>
+
+    <div class="card shadow-sm p-4 rounded-4">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>ID</th>
+            <td>{{ injury.injuryId }}</td>
+          </tr>
+          <tr>
+            <th>Date</th>
+            <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : '' }}</td>
+          </tr>
+          <tr>
+            <th>Severity</th>
+            <td>{{ injury.injurySeverity }}</td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td>{{ injury.injuryDescription }}</td>
+          </tr>
+          <tr>
+            <th>Type</th>
+            <td>{{ injury.injuryType }}</td>
+          </tr>
+          <tr>
+            <th>Injury Image</th>
+            <td>
+              {% if injury.imagePath %}
+<img src="{{ asset('frontOffice/img/' ~ injury.imagePath) }}" class="img-thumbnail" style="max-height: 200px;" alt="Current Image">
+              {% else %}
+                <span class="text-muted">No image uploaded</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ path('app_injury_index') }}" class="btn btn-outline-secondary">Back to List</a>
+        <a href="{{ path('app_injury_edit', {'id': injury.injuryId}) }}" class="btn btn-warning">Edit</a>
+        {{ include('injury/delete_form.html.twig') }}
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+{% endblock %}
+

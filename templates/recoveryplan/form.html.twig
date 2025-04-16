@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recovery Plan Form{% endblock %}
+
+{% block body %}
+<section id="recoveryplan-form" class="py-5">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header text-center mb-4">
+      <h2>Recovery Plan Form</h2>
+      <p>Please fill out the form below</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card p-4 shadow-sm rounded-4">
+          {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+          <!-- Recovery Goal Field -->
+          <div class="mb-3">
+            {{ form_label(form.recoveryGoal, 'Recovery Goal', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.recoveryGoal, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.recoveryGoal) }}
+          </div>
+
+          <!-- Recovery Description Field -->
+          <div class="mb-3">
+            {{ form_label(form.recoveryDescription, 'Recovery Description', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.recoveryDescription, { 'attr': { 'class': 'form-control', 'rows': '4' } }) }}
+            {{ form_errors(form.recoveryDescription) }}
+          </div>
+
+          <!-- Recovery Start Date Field -->
+          <div class="mb-3">
+            {{ form_label(form.recoveryStartDate, 'Recovery Start Date', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.recoveryStartDate, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.recoveryStartDate) }}
+          </div>
+
+          <!-- Recovery End Date Field -->
+          <div class="mb-3">
+            {{ form_label(form.recoveryEndDate, 'Recovery End Date', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.recoveryEndDate, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.recoveryEndDate) }}
+          </div>
+
+          <!-- Recovery Status Field -->
+          <div class="mb-3">
+            {{ form_label(form.recoveryStatus, 'Recovery Status', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.recoveryStatus, { 'attr': { 'class': 'form-select' } }) }}
+            {{ form_errors(form.recoveryStatus) }}
+          </div>
+
+          <!-- Injury Field -->
+          <div class="mb-3">
+            {{ form_label(form.injury, 'Injury', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.injury, { 'attr': { 'class': 'form-select', 'id': 'recoveryplan_injury_id' } }) }}
+            {{ form_errors(form.injury) }}
+          </div>
+
+          <!-- User Field -->
+          <div class="mb-3">
+            {{ form_label(form.user_id, 'User', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.user_id, { 'attr': { 'class': 'form-select', 'id': 'recoveryplan_user_id' } }) }}
+            {{ form_errors(form.user_id) }}
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{{ path('app_recoveryplan_index') }}" class="btn btn-secondary">Back to List</a>
+          </div>
+
+          {{ form_end(form) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const userSelect = document.getElementById('recoveryplan_user_id');
+    const injurySelect = document.getElementById('recoveryplan_injury_id');
+
+    // Listen for change on user selection
+    userSelect.addEventListener('change', function () {
+      const userId = this.value;
+
+      // Clear previous injuries
+      injurySelect.innerHTML = '<option value="">Select Injury</option>';
+
+      if (!userId) {
+        return;
+      }
+
+      // Fetch injuries for selected user
+      fetch(`/injury/by-user/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Fetched Injuries:', data); // Debugging
+
+          if (data.length > 0) {
+            data.forEach(injury => {
+              const option = document.createElement('option');
+              option.value = injury.id;
+              option.text = injury.injuryType;
+              injurySelect.appendChild(option);
+            });
+          } else {
+            injurySelect.innerHTML = '<option value="">No injuries found</option>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching injuries:', error); // Debugging
+        });
+    });
+  });
+</script>
+{% endblock %}

@@ -3,112 +3,144 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
+use App\Entity\Injury;
 
 #[ORM\Entity]
 class Recoveryplan
 {
-    #[ORM\Id]
-    #[ORM\Column(name: "recovery_id", type: "integer")]
-    private int $recovery_id;
+   #[ORM\Id]
+#[ORM\GeneratedValue(strategy: 'AUTO')]
+#[ORM\Column(name: 'recovery_id', type: 'integer')]
+private ?int $recoveryId = null;
 
-    #[ORM\Column(name: "user_id", type: "integer")]
-    private int $user_id;
 
-    #[ORM\Column(name: "injury_id", type: "integer")]
-    private int $injury_id;
+    #[ORM\ManyToOne(targetEntity: Injury::class, inversedBy: "recoveryplans")]
+    #[ORM\JoinColumn(name: 'injury_id', referencedColumnName: 'injury_id', onDelete: 'CASCADE', nullable: true)]
+    private ?Injury $injury = null;
 
-    #[ORM\Column(name: "recovery_Goal", type: "string")]
-    private string $recovery_Goal;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "recoveryplans")]
+    #[Assert\NotBlank(message: "user should not be blank.")]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', onDelete: 'CASCADE')]
+    private ?User $user = null;
 
-    #[ORM\Column(name: "recovery_Description", type: "text")]
-    private string $recovery_Description;
+    #[ORM\Column(name: 'recovery_goal', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Recovery goal should not be blank.")]
+    private string $recoveryGoal; 
 
-    #[ORM\Column(name: "recovery_StartDate", type: "date")]
-    private \DateTimeInterface $recovery_StartDate;
+    #[ORM\Column(name: 'recovery_description', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Recovery description must not be blank")]
+    private string $recoveryDescription; 
 
-    #[ORM\Column(name: "recovery_EndDate", type: "date")]
-    private \DateTimeInterface $recovery_EndDate;
 
-    #[ORM\Column(name: "Recovery_Status", type: "string")]
-    private string $Recovery_Status;
+    #[ORM\Column(name: 'recovery_StartDate', type: 'date')]
+    #[Assert\NotBlank(message: "Start date is required.")]
+    #[Assert\Type("\DateTimeInterface")]
+    private \DateTimeInterface $recoveryStartDate; 
 
-    public function getRecovery_id()
+    #[ORM\Column(name: 'recovery_EndDate', type: 'date')]
+#[Assert\NotBlank(message: "Start date is required.")]
+private ?\DateTimeInterface $recoveryEndDate = null;
+
+
+    
+    #[ORM\Column(name: 'recovery_Status', type: 'string', length: 255)]
+    #[Assert\NotBlank(message: "Recovery status must be selected.")]
+    private string $recoveryStatus; 
+
+    
+    public function __construct()
     {
-        return $this->recovery_id;
+        
+        $this->user = null;
+    }
+    public function getRecoveryId(): int
+    {
+        return $this->recoveryId;
     }
 
-    public function setRecovery_id($value)
+    public function setRecoveryId(int $value): self
     {
-        $this->recovery_id = $value;
+        $this->recoveryId = $value;
+        return $this;
     }
 
-    public function getUser_id()
+    public function getInjury(): ?Injury
     {
-        return $this->user_id;
+        return $this->injury;
     }
 
-    public function setUser_id($value)
+    public function setInjury(?Injury $injury): self
     {
-        $this->user_id = $value;
+        $this->injury = $injury;
+        return $this;
     }
 
-    public function getInjury_id()
+    public function getUser(): ?User 
     {
-        return $this->injury_id;
+        return $this->user;
     }
 
-    public function setInjury_id($value)
+
+    public function setUser(?User $user): self
     {
-        $this->injury_id = $value;
+        $this->user = $user;
+        return $this;
     }
 
-    public function getRecovery_Goal()
+    public function getRecoveryGoal(): ?string
+{
+    return $this->recoveryGoal;
+}
+
+public function setRecoveryGoal(string $recoveryGoal): self
+{
+    $this->recoveryGoal = $recoveryGoal;
+    return $this;
+}
+
+    public function getRecoveryDescription(): string
     {
-        return $this->recovery_Goal;
+        return $this->recoveryDescription;
     }
 
-    public function setRecovery_Goal($value)
+    public function setRecoveryDescription(string $value): self
     {
-        $this->recovery_Goal = $value;
+        $this->recoveryDescription = $value;
+        return $this;
     }
 
-    public function getRecovery_Description()
+    public function getRecoveryStartDate(): \DateTimeInterface
     {
-        return $this->recovery_Description;
+        return $this->recoveryStartDate;
     }
 
-    public function setRecovery_Description($value)
+    public function setRecoveryStartDate(\DateTimeInterface $value): self
     {
-        $this->recovery_Description = $value;
+        $this->recoveryStartDate = $value;
+        return $this;
     }
 
-    public function getRecovery_StartDate()
+    public function getRecoveryEndDate(): \DateTimeInterface
     {
-        return $this->recovery_StartDate;
+        return $this->recoveryEndDate;
     }
 
-    public function setRecovery_StartDate($value)
+    public function setRecoveryEndDate(\DateTimeInterface $value): self
     {
-        $this->recovery_StartDate = $value;
+        $this->recoveryEndDate = $value;
+        return $this;
     }
 
-    public function getRecovery_EndDate()
+    public function getRecoveryStatus(): string
     {
-        return $this->recovery_EndDate;
+        return $this->recoveryStatus;
     }
 
-    public function setRecovery_EndDate($value)
+    public function setRecoveryStatus(string $value): self
     {
-        $this->recovery_EndDate = $value;
-    }
-
-    public function getRecovery_Status()
-    {
-        return $this->Recovery_Status;
-    }
-
-    public function setRecovery_Status($value)
-    {
-        $this->Recovery_Status = $value;
+        $this->recoveryStatus = $value;
+        return $this;
     }
 }

@@ -1,0 +1,176 @@
+/* Center the form section and add some padding */
+#injury-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #eef0f2; /* Light blue-gray background */
+  padding: 2rem;
+}
+
+/* Style the container */
+.container {
+  max-width: 800px; /* Increased width for better spacing */
+  width: 100%;
+}
+
+/* Style the section header */
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  color: #463F3A; /* Dark brown color for the title */
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.section-header p {
+  color: #463F3A;
+  font-size: 1.2rem;
+}
+
+/* Style the card */
+.card {
+  background-color: #fff;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+}
+
+/* Style form labels */
+.form-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #463F3A; /* Dark brown for labels */
+  margin-bottom: 0.5rem;
+}
+
+/* Enlarge and style form inputs, selects, and textareas */
+.card .form-control,
+.card .form-select {
+  font-size: 1.2rem !important; /* Larger font size */
+  padding: 0.75rem 3rem !important; /* Even longer padding */
+  border-radius: 8px !important;
+  border: 1px solid #BCCCE0 !important; /* Light blue-gray border */
+  background-color: #f8f9fa !important;
+  color: #463F3A !important;
+  height: 60px !important; /* Taller fields */
+  max-width: 1000px !important; /* Even longer horizontally */
+  width: 100% !important; /* Ensure full width */
+  box-sizing: border-box !important;
+}
+
+/* Style the textarea specifically */
+.card textarea.form-control {
+  font-size: 1.2rem !important;
+  padding: 0.75rem 3rem !important;
+  border-radius: 8px !important;
+  border: 1px solid #BCCCE0 !important;
+  background-color: #f8f9fa !important;
+  color: #463F3A !important;
+  min-height: 180px !important; /* Updated height */
+  max-width: 1000px !important; /* Even longer horizontally */
+  width: 100% !important;
+}
+
+/* Style the file input */
+.card input[type="file"] {
+  font-size: 1.2rem !important; /* Match font size */
+  padding: 0.75rem 3rem !important; /* Match padding */
+  border-radius: 8px !important;
+  border: 1px solid #BCCCE0 !important;
+  background-color: #f8f9fa !important;
+  max-width: 500px !important; /* Slightly larger image field */
+  height: 50px !important; /* Updated height */
+  width: 100% !important;
+  box-sizing: border-box !important;
+  line-height: normal !important;
+}
+
+/* Ensure the file input wrapper matches */
+.card .custom-file-input,
+.card .custom-file-label {
+  font-size: 1.2rem !important;
+  padding: 0.75rem 3rem !important;
+  max-width: 500px !important; /* Slightly larger image field */
+  height: 50px !important;
+  border-radius: 8px !important;
+  border: 1px solid #BCCCE0 !important;
+  background-color: #f8f9fa !important;
+  line-height: normal !important;
+}
+
+/* Focus styles */
+.card .form-control:focus,
+.card .form-select:focus,
+.card input[type="file"]:focus {
+  border-color: #709775 !important; /* Green border on focus */
+  box-shadow: 0 0 5px rgba(112, 151, 117, 0.3) !important;
+  outline: none !important;
+}
+
+/* Style the buttons */
+.btn-primary {
+  background-color: #709775; /* Green button */
+  border: none;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #5a7a5f; /* Darker green on hover */
+}
+
+.btn-secondary {
+  background-color: #D68C45; /* Orange button */
+  border: none;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #b37438; /* Darker orange on hover */
+}
+
+/* Style the image preview */
+.img-thumbnail {
+  border-radius: 10px;
+  border: 1px solid #BCCCE0;
+}
+
+/* Add spacing between form elements */
+.mb-3,
+.mb-4 {
+  margin-bottom: 1.5rem !important; /* Increased spacing */
+}
+
+/* Center the buttons */
+.text-center {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Space between buttons */
+}
+
+/* Style flash messages */
+.alert {
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-success {
+  background-color: #709775;
+  color: #fff;
+}
+
+.alert-danger {
+  background-color: #D68C45;
+  color: #fff;
+}
