@@ -1,0 +1,49 @@
+{% extends 'baseB.html.twig' %}
+
+{% block title %}Claim{% endblock %}
+
+{% block main %}
+    
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Claim N°{{ claim.claimId }}
+    </div>
+
+    <div class="card-body">
+        <table class="table table-striped mt-3"> {# Add margin top for spacing #}
+            <tbody>
+                <tr>
+                    <th>Claim Description</th>
+                    <td>{{ claim.claimDescription }}</td>
+                </tr>
+                <tr>
+                    <th>Claim Status</th>
+                    <td>{{ claim.claimStatus }}</td>
+                </tr>
+                <tr>
+                    <th>Claim Date</th>
+                    <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Claim Category</th>
+                    <td>{{ claim.claimCategory }}</td>
+                </tr>
+                <tr>
+                    <th>Submitter</th>
+                    <td>{{ claim.idUser ? claim.idUser.user_fname ~ ' ' ~ claim.idUser.user_lname : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Target</th>
+                    <td>{{ claim.idUserToClaim ? claim.idUserToClaim.user_fname ~ ' ' ~ claim.idUserToClaim.user_lname : '' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('app_claim_index') }}" class="link-secondary">Back to list</a>
+            <a href="{{ path('app_claim_edit', {'claimId': claim.claimId}) }}">Edit</a>
+            <a href="{{ path('app_claim_delete', {'claimId': claim.claimId}) }}" class="link-danger">Delete</a>
+        </div>
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends 'baseB.html.twig' %}
+
+{% block title %}Create New Claim Action{% endblock %}
+
+{% block main %}
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-12">
+            <div class="card custom-card">
+                <div class="card-header bg-gradient-primary text-white py-2 px-3">
+                    <h2 class="h6 mb-0">
+                        <i class="bi bi-file-earmark-plus me-2"></i>New Claim Action
+                    </h2>
+                </div>
+
+                <div class="card-body px-3 py-2">
+
+                    {# ✅ Modal for form-level errors without duplicates #}
+                    {% if form.vars.errors|length > 0 %}
+                        {% set displayed_errors = [] %}
+                        <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-danger">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="validationModalLabel">Form Error</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% for error in form.vars.errors %}
+                                            {% if error.message not in displayed_errors %}
+                                                <p class="mb-0">{{ error.message }}</p>
+                                                {% set displayed_errors = displayed_errors|merge([error.message]) %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            window.addEventListener('load', function () {
+                                var errorModal = new bootstrap.Modal(document.getElementById('validationModal'));
+                                errorModal.show();
+                            });
+                        </script>
+                    {% endif %}
+
+                    {{ form_start(form) }}
+                        <div class="mb-2">
+                            <h6 class="section-title">📝 Claim Action Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {% if form.claim is defined %}
+                                        {{ form_row(form.claim) }}
+                                    {% endif %}
+                                    {{ form_row(form.claimActionStartDate) }}
+                                    {{ form_row(form.claimActionEndDate) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.claimActionType) }}
+                                    {{ form_row(form.claimActionNotes) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <a href="{{ path('app_claim_index') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">
+                                <i class="bi bi-save me-1"></i>Submit
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheet %}
+{{ parent() }}
+<style>
+    .custom-card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-input {
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.4rem;
+        border: 1px solid #ccc;
+        font-size: 0.92rem;
+    }
+
+    .custom-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.2);
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-primary:hover {
+        background-color: #1e40af;
+        border-color: #1e40af;
+    }
+
+    .container.mt-2 {
+        margin-top: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .px-3 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .py-2 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.75rem !important;
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.75rem;
+    }
+</style>
+{% endblock %}

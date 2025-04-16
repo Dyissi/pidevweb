@@ -1,0 +1,66 @@
+{% extends 'baseB.html.twig' %}
+
+{% block title %}Claim Actions{% endblock %}
+
+{% block main %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        List of Claim Actions
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Notes</th>
+                    <th>Related Claim</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Notes</th>
+                    <th>Related Claim</th>
+                    <th>Actions</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% for claimaction in claimactions %}
+                <tr>
+                    <td>{{ claimaction.claimActionId }}</td>
+                    <td>{{ claimaction.claimActionType }}</td>
+                    <td>{{ claimaction.claimActionStartDate ? claimaction.claimActionStartDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ claimaction.claimActionEndDate ? claimaction.claimActionEndDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ claimaction.claimActionNotes }}</td>
+                    <td>
+                        {{ claimaction.claim ? claimaction.claim.claimDescription : 'N/A' }}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_claimaction_show', {'claimActionId': claimaction.claimActionId}) }}" class="btn btn-sm btn-primary">Show</a>
+                        <a href="{{ path('app_claimaction_edit', {'claimActionId': claimaction.claimActionId}) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <form method="post" action="{{ path('app_claimaction_delete', {'claimActionId': claimaction.claimActionId}) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this action?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ claimaction.claimActionId) }}">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">No claim actions found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+<form method="post" action="{{ path('app_claim_delete', {'claimId': claim.claimId}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');" class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ claim.claimId) }}">
+    <button class="btn btn-danger" type="submit">Delete</button>
+</form>

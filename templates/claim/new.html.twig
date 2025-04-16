@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Claim{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <h2 class="mb-4">Create New Claim</h2>
+
+    <div class="card">
+        <div class="card-header bg-gradient-primary text-white">
+            <h5 class="mb-0">Claim Information</h5>
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                <div class="mb-3">
+                    <h6 class="section-title">📝 Claim Details</h6>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            {{ form_row(form.claimStatus, {
+                                'label': 'Status',
+                                'attr': {'class': 'form-select'}
+                            }) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.claimDate, {
+                                'label': 'Date',
+                                'attr': {'class': 'form-control'}
+                            }) }}
+                        </div>
+                    </div>
+                    {{ form_row(form.claimCategory, {
+                        'label': 'Category',
+                        'attr': {'class': 'form-select'}
+                    }) }}
+                    {{ form_row(form.claimDescription, {
+                        'label': 'Description',
+                        'attr': {
+                            'class': 'form-control',
+                            'rows': 4,
+                            'placeholder': 'Please provide detailed information...'
+                        }
+                    }) }}
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="section-title">👥 Involved Parties</h6>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            {{ form_row(form.id_user, {
+                                'label': 'Submitted By',
+                                'attr': {'class': 'form-select'}
+                            }) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.id_user_to_claim, {
+                                'label': 'Claim Against',
+                                'attr': {'class': 'form-select'}
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{{ path('app_claim_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-save me-1"></i>Submit
+                    </button>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
