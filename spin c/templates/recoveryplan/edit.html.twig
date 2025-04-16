@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Recovery Plan{% endblock %}
+
+{% block hero %}
+{% block body %}
+<section id="edit-recoveryplan" class="py-5">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header text-center mb-4">
+      <h2>Edit Recovery Plan</h2>
+      <p>Update the recovery plan details below</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card p-4 shadow-sm rounded-4">
+          {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+            <div class="mb-3">
+              {{ form_label(form.recoveryStartDate, 'Recovery Start Date', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.recoveryStartDate, { 'attr': { 'class': 'form-control' } }) }}
+              {{ form_errors(form.recoveryStartDate) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.recoveryEndDate, 'Recovery End Date', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.recoveryEndDate, { 'attr': { 'class': 'form-control' } }) }}
+              {{ form_errors(form.recoveryEndDate) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.recoveryGoal, 'Recovery Goal', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.recoveryGoal, { 'attr': { 'class': 'form-control' } }) }}
+              {{ form_errors(form.recoveryGoal) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.recoveryDescription, 'Recovery Description', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.recoveryDescription, { 'attr': { 'class': 'form-control', 'rows': '4' } }) }}
+              {{ form_errors(form.recoveryDescription) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.recoveryStatus, 'Recovery Status', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.recoveryStatus, { 'attr': { 'class': 'form-select' } }) }}
+              {{ form_errors(form.recoveryStatus) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.injury, 'Injury', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.injury, { 'attr': { 'class': 'form-select' } }) }}
+              {{ form_errors(form.injury) }}
+            </div>
+            <div class="mb-3">
+              {{ form_label(form.user, 'User', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.user, { 'attr': { 'class': 'form-select' } }) }}
+              {{ form_errors(form.user) }}
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+              <button type="submit" class="btn btn-warning">Update Recovery Plan</button>
+              <a href="{{ path('app_recoveryplan_index') }}" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+          {{ form_end(form) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% endblock %}

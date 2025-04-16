@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.MyInjuriesController">
+
+    <!-- Sidebar Menu from Second File -->
+    <VBox prefHeight="600.0" prefWidth="157.0" style="-fx-background-color: #709775;">
+        <VBox alignment="CENTER" prefHeight="91.0" prefWidth="230.0">
+            <ImageView fitHeight="87.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@logo.png" />
+            </ImageView>
+        </VBox>
+
+        <HBox alignment="CENTER" prefHeight="38.0" prefWidth="157.0" />
+        <HBox alignment="CENTER" prefHeight="38.0" prefWidth="157.0">
+         <children>
+               <Label prefHeight="38.0" prefWidth="110.0" style="-fx-font-size: 20px; -fx-font-family: 'Calibri Bold';" text="View Team" textAlignment="RIGHT" textFill="WHITE" />
+         </children>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="38.0" prefWidth="157.0">
+         <children>
+               <Label prefHeight="38.0" prefWidth="139.0" style="-fx-font-size: 19px; -fx-font-family: 'Calibri Bold';" text="Training Sessions" textFill="WHITE" />
+         </children>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="38.0" prefWidth="157.0">
+         <children>
+               <Label prefHeight="38.0" prefWidth="130.0" style="-fx-font-size: 19px; -fx-font-family: 'Calibri Bold';" text="Performance Data" textFill="WHITE" />
+         </children>
+        </HBox>
+        <Label fx:id="claimButton" prefHeight="34.0" prefWidth="149.0" style="-fx-font-size: 18px; -fx-font-family: 'Calibri Bold'; -fx-background-radius: 10; -fx-alignment: center;" text="Claims" textFill="WHITE" />
+
+        <Label fx:id="backToDashboardButton" alignment="CENTER" style="-fx-font-size: 16px; -fx-font-family: 'Calibri Bold'; -fx-background-radius: 10; -fx-padding: 10;" text="Back to Dashboard" textFill="WHITE" />
+
+    </VBox>
+
+    <!-- Injury List Section -->
+    <VBox layoutX="198.0" layoutY="144.0" prefHeight="405.0" prefWidth="559.0" spacing="20.0">
+        <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </VBox.margin>
+
+        <!-- Injury 1 -->
+        <HBox alignment="CENTER_LEFT" prefHeight="114.0" prefWidth="446.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 30px; -fx-padding: 10;">
+            <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@injuryIcon1.png" />
+            </ImageView>
+            <VBox spacing="5.0">
+                <Label style="-fx-font-size: 16px; -fx-font-family: 'Calibri'; -fx-font-weight: bold;" text="Injury Type: Torn Ligament" />
+                <Label style="-fx-font-size: 14px;" text="Date: 2025-02-10" />
+                <Label style="-fx-font-size: 14px;" text="Status: In Recovery" />
+                <Label style="-fx-font-size: 14px; -fx-text-fill: #D68C45;" text="In Progress" />
+            </VBox>
+        </HBox>
+
+        <!-- Injury 2 -->
+        <HBox alignment="CENTER_LEFT" prefHeight="110.0" prefWidth="500.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 30px; -fx-padding: 10;">
+            <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@injuryIcon2.png" />
+            </ImageView>
+            <VBox spacing="5.0">
+                <Label style="-fx-font-size: 16px; -fx-font-family: 'Calibri'; -fx-font-weight: bold;" text="Injury Type: Broken Wrist" />
+                <Label style="-fx-font-size: 14px;" text="Date: 2025-02-25" />
+                <Label style="-fx-font-size: 14px;" text="Status: Recovering" />
+                <Label style="-fx-font-size: 14px; -fx-text-fill: #D68C45;" text="Completed" />
+            </VBox>
+        </HBox>
+
+        <!-- Injury 3 -->
+        <HBox alignment="CENTER_LEFT" prefHeight="110.0" prefWidth="500.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 30px; -fx-padding: 10;">
+            <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@injuryIcon3.png" />
+            </ImageView>
+            <VBox spacing="5.0">
+                <Label style="-fx-font-size: 16px; -fx-font-family: 'Calibri'; -fx-font-weight: bold;" text="Injury Type: Sprained Ankle" />
+                <Label style="-fx-font-size: 14px;" text="Date: 2025-01-20" />
+                <Label style="-fx-font-size: 14px;" text="Status: Healing" />
+                <Label style="-fx-font-size: 14px; -fx-text-fill: #D68C45;" text="Pending" />
+            </VBox>
+        </HBox>
+
+    </VBox>
+
+    <!-- Header Section -->
+    <VBox alignment="CENTER" layoutX="332.0" layoutY="65.0" prefHeight="50.0" prefWidth="291.0" style="-fx-background-color: #D57F4F; -fx-background-radius: 15px;">
+        <Label style="-fx-font-size: 24px; -fx-font-family: 'Calibri'; -fx-font-weight: bold;" text="My Injuries" textFill="WHITE" />
+    </VBox>
+
+
+</AnchorPane>

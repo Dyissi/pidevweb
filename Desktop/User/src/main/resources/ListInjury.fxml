@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="412.0" prefWidth="904.0" style="-fx-background-color: #709775;"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controllers.ListInjuryController">
+    <VBox prefHeight="400.0" prefWidth="157.0">
+        <VBox prefHeight="91.0" prefWidth="157.0"/>
+        <HBox alignment="CENTER" prefHeight="57.0" prefWidth="157.0">
+            <VBox.margin>
+                <Insets top="5.0"/>
+            </VBox.margin>
+            <Button fx:id="AddInjuryButton" prefHeight="40.0" prefWidth="140.0"
+                    style="-fx-background-color: #D68C45; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10;"
+                    text="Add Injuries"/>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="57.0" prefWidth="157.0">
+            <VBox.margin>
+                <Insets top="5.0"/>
+            </VBox.margin>
+            <Button fx:id="UpdateInjuryButton" prefHeight="40.0" prefWidth="140.0"
+                    style="-fx-background-color: #D68C45; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10;"
+                    text="Update Injury"/>
+        </HBox>
+        <HBox alignment="CENTER" prefHeight="57.0" prefWidth="157.0">
+            <VBox.margin>
+                <Insets top="5.0"/>
+            </VBox.margin>
+            <Button fx:id="BackButton" prefHeight="40.0" prefWidth="140.0"
+                    style="-fx-background-color: #D68C45; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10;"
+                    text="Back"/>
+        </HBox>
+    </VBox>
+    <VBox layoutX="157.0" layoutY="5.0" prefHeight="406.0" prefWidth="831.0">
+        <VBox prefHeight="402.0" prefWidth="804.0" style="-fx-background-color: white; -fx-background-radius: 25;">
+            <HBox alignment="CENTER" prefHeight="99.0" prefWidth="429.0"
+                  style="-fx-background-color: D68C45; -fx-background-radius: 25;">
+                <VBox.margin>
+                    <Insets left="5.0"/>
+                </VBox.margin>
+                <VBox prefHeight="99.0" prefWidth="305.0">
+                    <Label prefHeight="30.0" prefWidth="263.0" textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" size="18.0"/>
+                        </font>
+                    </Label>
+                    <Label prefHeight="26.0" prefWidth="263.0" text="List of Injuries" textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" size="18.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+                <ImageView fitHeight="100.0" fitWidth="101.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@vector.png"/>
+                </ImageView>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10" style="-fx-padding: 10;">
+                <TextField fx:id="searchField" prefHeight="26.0" prefWidth="555.0" promptText="Search..."/>
+                <Button fx:id="sortBySeverityButton" style="-fx-background-color: #D68C45; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10;" text="Sort by Severity"/>
+            </HBox>
+            <HBox prefHeight="260.0" prefWidth="439.0">
+                <TableView fx:id="tableView_id" prefHeight="250.0" prefWidth="706.0"
+                           style="-fx-background-radius: 15;">
+                    <columns>
+                        <TableColumn fx:id="Injuryid" text="id"/>
+                        <TableColumn fx:id="user_fname" text="Athlete First Name"/>
+                        <TableColumn fx:id="user_lname" text="Athlete Last Name"/>
+                        <TableColumn fx:id="InjuryType" text="InjuryType"/>
+                        <TableColumn fx:id="Severity" text="Severity"/>
+                        <TableColumn fx:id="InjuryDate" text="InjuryDate"/>
+                        <TableColumn fx:id="Description" text="Description"/>
+                        <TableColumn fx:id="action_id" text="Action"/>
+                    </columns>
+                </TableView>
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>

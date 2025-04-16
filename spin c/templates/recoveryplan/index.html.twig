@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+{% block hero %}
+{% block body %}
+<section id="recoveryplan-index" class="py-5">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-header">
+      <h2>Recovery Plan List</h2>
+      <p>Browse and manage all recovery plans</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Search and Sort -->
+    <form method="get" action="{{ path('app_recoveryplan_index') }}" class="mb-4 d-flex flex-column flex-md-row align-items-md-center gap-3" id="searchForm">
+      <div class="input-group flex-grow-1">
+        <input type="text" name="search" class="form-control" placeholder="Search by Recovery Goal or User" value="{{ app.request.query.get('search') }}" id="searchInput">
+      </div>
+      <button type="submit" name="sort" value="{{ sort == 'status_asc' ? 'status_desc' : 'status_asc' }}" class="btn btn-success">
+        Sort by Status {% if sort == 'status_asc' %} ↓ {% else %} ↑ {% endif %}
+      </button>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive shadow-sm rounded-4">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Recovery ID</th>
+            <th>Recovery Goal</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>User</th>
+            <th>Injury</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for plan in recoveryplans %}
+          <tr>
+            <td>{{ plan.recoveryId }}</td>
+            <td>{{ plan.recoveryGoal }}</td>
+            <td>{{ plan.recoveryStartDate ? plan.recoveryStartDate|date('Y-m-d') : 'N/A' }}</td>
+            <td>{{ plan.recoveryEndDate ? plan.recoveryEndDate|date('Y-m-d') : 'N/A' }}</td>
+            <td>{{ plan.recoveryStatus }}</td>
+            <td>{{ plan.recoveryDescription}}</td>
+
+            <td>
+              {% if plan.user %}
+                {{ plan.user.userfname }} {{ plan.user.userlname }}
+              {% else %}
+                No user
+              {% endif %}
+            </td>
+            <td>
+              {% if plan.injury %}
+                {{ plan.injury.injuryType }}
+              {% else %}
+                No injury
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ path('app_recoveryplan_show', {'id': plan.recoveryId}) }}" class="btn btn-sm btn-info">Show</a>
+              <a href="{{ path('app_recoveryplan_edit', {'id': plan.recoveryId}) }}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center">No recovery plans found</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add New Button -->
+    <div class="text-center mt-4">
+      <a href="{{ path('app_recoveryplan_new') }}" class="btn btn-primary">
+        Create New Recovery Plan
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+{% endblock %}

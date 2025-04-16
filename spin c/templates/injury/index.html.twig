@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block hero %}
+  
+
+{% block body %}
+<section id="injury-index" class="py-5">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-header">
+      <h2>Injury List</h2>
+      <p>Browse and manage all injuries</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Search and Sort -->
+    <form method="get" action="{{ path('app_injury_index') }}" class="mb-4 d-flex flex-column flex-md-row align-items-md-center gap-3" id="searchForm">
+      <div class="input-group flex-grow-1">
+        <input type="text" name="search" class="form-control" placeholder="Search by Injury Type or User" value="{{ app.request.query.get('search') }}" id="searchInput">
+      </div>
+      <button type="submit" name="sort" value="{{ sort == 'asc' ? 'desc' : 'asc' }}" class="btn btn-success">
+        Sort by Severity {% if sort == 'asc' %} ↓ {% else %} ↑ {% endif %}
+      </button>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive shadow-sm rounded-4">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Injury ID</th>
+            <th>Injury Date</th>
+            <th>Injury Severity</th>
+            <th>Injury Description</th>
+            <th>Injury Type</th>
+            <th>User</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for injury in injuries %}
+          <tr>
+            <td>{{ injury.injuryId }}</td>
+<td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}</td>
+            <td>{{ injury.injurySeverity }}</td>
+            <td>{{ injury.injuryDescription }}</td>
+            <td>{{ injury.injuryType }}</td>
+            <td>
+              {% if injury.user %}
+                {{ injury.user.userfname }} {{ injury.user.userlname }}
+              {% else %}
+                No user associated
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ path('app_injury_show', {'id': injury.injuryId}) }}" class="btn btn-sm btn-info">Show</a>
+              <a href="{{ path('app_injury_edit', {'id': injury.injuryId}) }}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center">No records found</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add New Button -->
+    <div class="text-center mt-4">
+      <a href="{{ path('app_injury_new') }}" class="btn btn-primary">
+        Create New Injury
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const searchForm = document.getElementById('searchForm');
+
+  searchInput.addEventListener('input', function() {
+    searchForm.submit();
+  });
+</script>
+{% endblock %}
+{% endblock %}

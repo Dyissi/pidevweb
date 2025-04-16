@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Injury Form{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('frontOffice/css/HealthFormStyle.css') }}">
+{% endblock %}
+
+{% block body %}
+<section id="injury-form" class="py-5">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header text-center mb-4">
+      <h2>Injury Form</h2>
+      <p>Please fill out the form below</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card p-4 shadow-sm rounded-4">
+          {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+          <!-- Injury Date Field -->
+          <div class="mb-3">
+            {{ form_label(form.injury_date, 'Injury Date', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.injury_date, { 'attr': { 'class': 'form-control', 'style': 'width: 70%; max-width: 1000px; height: 50px; padding: 0.75rem 2rem; border-radius: 8px;' } }) }}
+            {{ form_errors(form.injury_date) }}
+          </div>
+
+          <!-- Injury Severity Field -->
+          <div class="mb-3">
+            {{ form_label(form.injury_severity, 'Injury Severity', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.injury_severity, { 'attr': { 'class': 'form-select' } }) }}
+            {{ form_errors(form.injury_severity) }}
+          </div>
+
+          <!-- Injury Description Field -->
+          <div class="mb-3">
+            {{ form_label(form.injury_description, 'Injury Description', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.injury_description, { 'attr': { 'class': 'form-control', 'rows': '4' } }) }}
+            {{ form_errors(form.injury_description) }}
+          </div>
+
+          <!-- Injury Type Field -->
+          <div class="mb-3">
+            {{ form_label(form.injuryType, 'Injury Type', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.injuryType, { 'attr': { 'class': 'form-select' } }) }}
+            {{ form_errors(form.injuryType) }}
+          </div>
+
+          <!-- User Field -->
+          <div class="mb-3">
+            {{ form_label(form.user_id, 'User', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.user_id, { 'attr': { 'class': 'form-select' } }) }}
+            {{ form_errors(form.user_id) }}
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{{ path('app_injury_index') }}" class="btn btn-secondary">Back to List</a>
+          </div>
+
+          {{ form_end(form) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

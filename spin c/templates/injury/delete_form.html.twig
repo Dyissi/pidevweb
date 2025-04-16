@@ -1,0 +1,6 @@
+{# templates/injury/delete_form.html.twig #}
+
+<form method="post" action="{{ path('app_injury_delete', {'id': injury.injuryId}) }}" onsubmit="return confirm('Are you sure you want to delete this injury?');" style="display: inline;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ injury.injuryId) }}">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
