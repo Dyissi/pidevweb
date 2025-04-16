@@ -1,0 +1,76 @@
+{% extends 'baseB.html.twig' %}
+
+{% block title %}Claim index{% endblock %}
+
+{% block main %}
+     
+
+    <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                     List of claims
+            </div>
+        <div class="card-body">
+            <table id="datatablesSimple">
+        <thead>
+            <tr>
+                <th>Claim Description</th>
+                <th>Claim Status</th>
+                <th>Claim Date</th>
+                <th>Claim Category</th>
+                <th>Submitter</th>
+                <th>Target</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tfoot>
+             <tr>
+                <th>Claim Description</th>
+                <th>Claim Status</th>
+                <th>Claim Date</th>
+                <th>Claim Category</th>
+                <th>Submitter</th>
+                <th>Target</th>
+                <th>Actions</th>
+            </tr>
+        </tfoot>
+        <tbody>
+        {% for claim in claims %}
+            <tr>
+                <td>{{ claim.claimDescription }}</td>
+                <td>{{ claim.claimStatus }}</td>
+                <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
+                <td>{{ claim.claimCategory }}</td>
+                <td>{{ claim.idUser ? claim.idUser.user_fname ~ ' ' ~ claim.idUser.user_lname : '' }}</td>
+                <td>{{ claim.idUserToClaim ? claim.idUserToClaim.user_fname ~ ' ' ~ claim.idUserToClaim.user_lname : '' }}</td>
+
+                <td>
+    <a href="{{ path('app_claim_show', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-primary">Show</a>
+    <a href="{{ path('app_claim_edit', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-warning">Edit</a>
+    
+    <form method="post" action="{{ path('app_claim_delete', {'claimId': claim.claimId}) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ claim.claimId) }}">
+        <button class="btn btn-sm btn-danger">Delete</button>
+    </form>
+
+    {% if claim.hasActionSubmitted() %}
+        <span class="badge bg-success">Action Submitted</span>
+    {% else %}
+        <a href="{{ path('app_claimaction_new') }}?claimId={{ claim.claimId }}" class="btn btn-sm btn-outline-success">
+            <i class="fas fa-plus-circle"></i> Add Action
+        </a>
+    {% endif %}
+</td>
+
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+    </div>
+
+{% endblock %}

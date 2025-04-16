@@ -80,6 +80,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->injuries = new ArrayCollection();
+        $this->submittedClaims = new ArrayCollection();
+        $this->receivedClaims = new ArrayCollection();
     }
 
     public function getId(): int
@@ -299,4 +301,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->injuries->removeElement($injury);
         return $this;
     }
+
+    #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Claim::class)]
+    private Collection $submittedClaims;
+
+        public function getSubmittedClaims(): Collection
+        {
+            return $this->submittedClaims;
+        }
+    
+        public function addSubmittedClaim(Claim $claim): self
+        {
+            if (!$this->submittedClaims->contains($claim)) {
+                $this->submittedClaims[] = $claim;
+                $claim->setIdUser($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeSubmittedClaim(Claim $claim): self
+        {
+            if ($this->submittedClaims->removeElement($claim)) {
+                // set the owning side to null (unless already changed)
+                if ($claim->getIdUser() === $this) {
+                    $claim->setIdUser(null);
+                }
+            }
+    
+            return $this;
+        }
+
+    #[ORM\OneToMany(mappedBy: "id_user_to_claim", targetEntity: Claim::class)]
+    private Collection $receivedClaims;
+
+        public function getReceivedClaims(): Collection
+        {
+            return $this->receivedClaims;
+        }
+    
+        public function addReceivedClaim(Claim $claim): self
+        {
+            if (!$this->receivedClaims->contains($claim)) {
+                $this->receivedClaims[] = $claim;
+                $claim->setIdUserToClaim($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeReceivedClaim(Claim $claim): self
+        {
+            if ($this->receivedClaims->removeElement($claim)) {
+                // set the owning side to null (unless already changed)
+                if ($claim->getIdUserToClaim() === $this) {
+                    $claim->setIdUserToClaim(null);
+                }
+            }
+    
+            return $this;
+        }
+
+     
 }

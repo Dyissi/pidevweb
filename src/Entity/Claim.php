@@ -3,36 +3,44 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-#[ORM\Table(name: "claim")]
 class Claim
 {
     #[ORM\Id]
     #[ORM\Column(name: "claimId", type: "integer")]
-    #[ORM\GeneratedValue]
-    private int $id;
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    private int $claimId;
 
     #[ORM\Column(name: "claimDescription", type: "string", length: 200)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 200)]
     private string $claimDescription;
 
-    #[ORM\Column(name: "claimStatus", type: "string")]
+    #[ORM\Column(name: "claimStatus", type: "string", length: 20)]
+    #[Assert\NotBlank]
     private string $claimStatus;
 
     #[ORM\Column(name: "claimDate", type: "date")]
+    #[Assert\NotBlank]
     private \DateTimeInterface $claimDate;
 
-    #[ORM\Column(name: "claimCategory", type: "string")]
+    #[ORM\Column(name: "claimCategory", type: "string", length: 20)]
+    #[Assert\NotBlank]
     private string $claimCategory;
 
-    #[ORM\OneToMany(
-        mappedBy: "claim", 
-        targetEntity: Claimaction::class,
-        cascade: ["persist"],
-        orphanRemoval: true
-    )]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsSubmitter")]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "user_id", nullable: false)]
+    private User $id_user;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsTarget")]
+    #[ORM\JoinColumn(name: "id_user_to_claim", referencedColumnName: "user_id", nullable: false)]
+    private User $id_user_to_claim;
+
+    #[ORM\OneToMany(mappedBy: "claim", targetEntity: Claimaction::class)]
     private Collection $claimactions;
 
     public function __construct()
@@ -40,9 +48,16 @@ class Claim
         $this->claimactions = new ArrayCollection();
     }
 
-    public function getId(): int
+    // Getters and Setters
+    public function getClaimId(): int
     {
-        return $this->id;
+        return $this->claimId;
+    }
+
+    public function setClaimId(int $claimId): self
+    {
+        $this->claimId = $claimId;
+        return $this;
     }
 
     public function getClaimDescription(): string
@@ -89,9 +104,28 @@ class Claim
         return $this;
     }
 
-    /**
-     * @return Collection|Claimaction[]
-     */
+    public function getIdUser(): User
+    {
+        return $this->id_user;
+    }
+
+    public function setIdUser(User $id_user): self
+    {
+        $this->id_user = $id_user;
+        return $this;
+    }
+
+    public function getIdUserToClaim(): User
+    {
+        return $this->id_user_to_claim;
+    }
+
+    public function setIdUserToClaim(User $id_user_to_claim): self
+    {
+        $this->id_user_to_claim = $id_user_to_claim;
+        return $this;
+    }
+
     public function getClaimactions(): Collection
     {
         return $this->claimactions;
@@ -108,7 +142,18 @@ class Claim
 
     public function removeClaimaction(Claimaction $claimaction): self
     {
-        $this->claimactions->removeElement($claimaction);
+        if ($this->claimactions->removeElement($claimaction)) {
+            // set the owning side to null (unless already changed)
+            if ($claimaction->getClaim() === $this) {
+                $claimaction->setClaim(null);
+            }
+        }
         return $this;
     }
+
+    public function hasActionSubmitted(): bool
+    {
+        return !$this->claimactions->isEmpty();
+    }
+
 }
