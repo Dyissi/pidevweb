@@ -1,0 +1,103 @@
+{% extends 'baseB.html.twig' %}
+
+{% block title %}
+  {% if role == 'coach' %}Coach Management{% elseif role == 'med_staff' %}Medical Staff Management{% else %}Athlete Management{% endif %} | SPIIN Sports
+{% endblock %}
+{% block description %}
+  View all {% if role == 'coach' %}coaches{% elseif role == 'med_staff' %}medical staff{% else %}athletes{% endif %} in the SPIIN Sports system
+{% endblock %}
+{% block keywords %}
+  {% if role == 'coach' %}coaches{% elseif role == 'med_staff' %}medical staff{% else %}athletes{% endif %}, sports, management, SPIIN
+{% endblock %}
+
+{% block main %}
+  <div class="container-fluid px-4">
+    <h1 class="mt-4">{% if role == 'coach' %}Coach Management{% elseif role == 'med_staff' %}Medical Staff Management{% else %}Athlete Management{% endif %}</h1>
+    <ol class="breadcrumb mb-4">
+      <li class="breadcrumb-item"><a href="{{ path('app_admin_dashboard') }}">Dashboard</a></li>
+      <li class="breadcrumb-item active">{% if role == 'coach' %}Coaches{% elseif role == 'med_staff' %}Medical Staff{% else %}Athletes{% endif %}</li>
+    </ol>
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        All {% if role == 'coach' %}Coaches{% elseif role == 'med_staff' %}Medical Staff{% else %}Athletes{% endif %}
+      </div>
+      <div class="card-body">
+        <div class="text-end mb-3">
+          <a href="{{ path('app_user_new', {'context': 'back', 'role': role}) }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Add New {% if role == 'coach' %}Coach{% elseif role == 'med_staff' %}Medical Staff{% else %}Athlete{% endif %}
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                {% if role == 'athlete' %}
+                  <th>Date of Birth</th>
+                  <th>Gender</th>
+                  <th>Height (cm)</th>
+                  <th>Weight (kg)</th>
+                  <th>Injury Status</th>
+                {% elseif role == 'coach' %}
+                  <th>Number of Teams</th>
+                {% elseif role == 'med_staff' %}
+                  <th>Medical Specialty</th>
+                {% endif %}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+                <tr>
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.userFname }}</td>
+                  <td>{{ user.userLname }}</td>
+                  <td>{{ user.userEmail }}</td>
+                  <td>{{ user.userNbr ?: 'N/A' }}</td>
+                  {% if role == 'athlete' %}
+                    <td>{{ user.athleteDoB ? user.athleteDoB|date('Y-m-d') : 'N/A' }}</td>
+                    <td>{{ user.athleteGender ?: 'N/A' }}</td>
+                    <td>{{ user.athleteHeight ?: 'N/A' }}</td>
+                    <td>{{ user.athleteWeight ?: 'N/A' }}</td>
+                    <td>
+                      {% if user.isInjured %}
+                        <span class="badge bg-danger">Injured</span>
+                      {% else %}
+                        <span class="badge bg-success">Healthy</span>
+                      {% endif %}
+                    </td>
+                  {% elseif role == 'coach' %}
+                    <td>{{ user.nbTeams ?: 'N/A' }}</td>
+                  {% elseif role == 'med_staff' %}
+                    <td>{{ user.medSpecialty ?: 'N/A' }}</td>
+                  {% endif %}
+                  <td>
+                    {% set showRole = role == 'coach' ? 'coach' : (role == 'med_staff' ? 'med_staff' : role) %}
+<a href="{{ path('app_user_show', {'context': 'back', 'id': user.id, 'role': showRole}) }}" class="btn btn-sm btn-outline-primary">
+    <i class="fas fa-eye"></i> Show
+</a>
+                    <a href="{{ path('app_user_edit', {'context': 'back', 'id': user.id}) }}" class="btn btn-sm btn-outline-secondary">
+                      <i class="fas fa-pencil-alt"></i> Edit
+                    </a>
+                    {{ include('user/_delete_form.html.twig', {'context': 'back'}) }}
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="{% if role == 'athlete' %}11{% else %}7{% endif %}" class="text-center">
+                    No {% if role == 'coach' %}coaches{% elseif role == 'med_staff' %}medical staff{% else %}athletes{% endif %} found
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
