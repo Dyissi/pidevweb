@@ -38,7 +38,7 @@ final class ClaimController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Claim created successfully!');
-            return $this->redirectToRoute('app_claim_index');
+            return $this->redirectToRoute('app_user_index');
         }
 
         return $this->render('claim/new.html.twig', [

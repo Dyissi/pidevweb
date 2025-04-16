@@ -76,7 +76,7 @@ class ClaimType extends AbstractType
             ->add('id_user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => function(User $user) {
-                    return $user->getUser_fname() . ' ' . $user->getUser_lname(); 
+                    return $user->getUserFname() . ' ' . $user->getUserLname(); 
                 },
                 'label' => 'Submitted By',
                 'placeholder' => 'Select a user',
@@ -85,7 +85,7 @@ class ClaimType extends AbstractType
             ->add('id_user_to_claim', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => function(User $user) {
-                    return $user->getUser_fname() . ' ' . $user->getUser_lname();
+                    return $user->getUserFname() . ' ' . $user->getUserLname();
                 },
                 'label' => 'Claim Against',
                 'placeholder' => 'Select a user',

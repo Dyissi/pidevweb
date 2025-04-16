@@ -31,14 +31,15 @@ class Claim
     #[ORM\Column(name: "claimCategory", type: "string", length: 20)]
     #[Assert\NotBlank]
     private string $claimCategory;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsSubmitter")]
+    
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "submittedClaims")]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "user_id", nullable: false)]
     private User $id_user;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsTarget")]
+    
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "receivedClaims")]
     #[ORM\JoinColumn(name: "id_user_to_claim", referencedColumnName: "user_id", nullable: false)]
     private User $id_user_to_claim;
+    
 
     #[ORM\OneToMany(mappedBy: "claim", targetEntity: Claimaction::class)]
     private Collection $claimactions;
