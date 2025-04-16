@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Tournament{% endblock %}
+
+{% block content %}
+  <div class="page-title text-center py-5">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Create New Tournament</h1>
+    </div>
+  </div>
+
+  <section class="section py-5">
+    <div class="container" data-aos="fade-up">
+      <div class="card mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+          {{ include('tournament/_form.html.twig', {'button_label': 'Create'}) }}
+          <a href="{{ path('app_tournament_index') }}" class="btn btn-secondary mt-3">Back to List</a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,51 @@
+<div class="card shadow-sm">
+  <div class="card-body">
+    {{ form_start(form) }}
+      <div class="row g-3">
+        <div class="col-md-6">
+          {{ form_label(form.tournamentName, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentName, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.tournamentName) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.tournamentLocation, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentLocation, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.tournamentLocation) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.tournamentStartDate, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentStartDate, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.tournamentStartDate) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.tournamentEndDate, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentEndDate, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.tournamentEndDate) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.tournamentTOS, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentTOS, {'attr': {'class': 'form-select'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.tournamentTOS) }}
+          </small>
+        </div>
+        <div class="col-12 text-center">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> {{ button_label|default('Save') }}
+          </button>
+          <a href="{{ path('app_tournament_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Cancel
+          </a>
+        </div>
+      </div>
+    {{ form_end(form) }}
+  </div>
+</div>
