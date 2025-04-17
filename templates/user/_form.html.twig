@@ -4,7 +4,7 @@
     {% if is_granted('ROLE_ADMIN') %}
     
     {% endif %}
-    {{ form_start(form) }}
+    {{ form_start(form,{'attr':{'novalidate' : 'novalidate'} } )  }}
        <div class="row g-3">
       <div class="col-md-6">
         {{ form_label(form.userFname, null, {'label_attr': {'class': 'form-label'}}) }}

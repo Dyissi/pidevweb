@@ -47,6 +47,7 @@ class Claim
     public function __construct()
     {
         $this->claimactions = new ArrayCollection();
+        $this->claimStatus = 'In Review';
     }
 
     // Getters and Setters
