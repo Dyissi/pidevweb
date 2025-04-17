@@ -12,7 +12,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'data')]
 class Data
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
@@ -49,19 +48,14 @@ class Data
     #[Assert\PositiveOrZero(message: "Number of fouls must be zero or positive")]
     private ?int $performanceNbrFouls = null;
 
-    #[ORM\Column(type: "integer")]
-    private ?int $userId = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'data')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: true)]
+    private ?User $user = null;
 
     public function getPerformanceId(): ?int
     {
         return $this->performanceId;
     }
-
-    // public function setPerformanceId(?int $performanceId): static
-    // {
-    //     $this->performanceId = $performanceId;
-    //     return $this;
-    // }
 
     public function getPerformanceSpeed(): ?float
     {
@@ -129,14 +123,14 @@ class Data
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(?int $userId): static
+    public function setUser(?User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
         return $this;
     }
 }

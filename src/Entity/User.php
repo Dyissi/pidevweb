@@ -77,17 +77,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private Collection $injuries;
 
-     #[ORM\OneToMany(
+    #[ORM\OneToMany(
         mappedBy: "user",
         targetEntity: Recoveryplan::class,
         orphanRemoval: true
     )]
-    private Collection $recoveryplans;  
+    private Collection $recoveryplans;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Data::class, orphanRemoval: true)]
+    private Collection $data;
 
     public function __construct()
     {
+        $this->data = new ArrayCollection();
         $this->injuries = new ArrayCollection();
-         $this->recoveryplans = new ArrayCollection();
+        $this->recoveryplans = new ArrayCollection();
         $this->submittedClaims = new ArrayCollection();
         $this->receivedClaims = new ArrayCollection();
     }
@@ -395,7 +399,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
     }
     return $this;
-}
+    }
 
-     
+    public function getData(): Collection
+    {
+        return $this->data;
+    }
+
+    public function addData(Data $data): self
+    {
+        if (!$this->data->contains($data)) {
+            $this->data[] = $data;
+            $data->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeData(Data $data): self
+    {
+        if ($this->data->removeElement($data)) {
+            // Set the owning side to null (unless already changed)
+            if ($data->getUser() === $this) {
+                $data->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getFullName(): string
+    {
+        return $this->user_fname . ' ' . $this->user_lname;
+    }
 }

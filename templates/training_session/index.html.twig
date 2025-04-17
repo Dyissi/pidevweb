@@ -53,7 +53,7 @@
                         <td>{{ session.sessionStartTime|date('H:i') }}</td>
                         <td>{{ session.sessionDuration }} <small>mins</small></td>
                         <td>{{ session.Location.locationName }}</td>
-                        <td>Team #{{ session.teamId }}</td>
+                        <td>{{ session.team ? session.team.teamName : 'N/A' }}</td>
                         <td>
                             {% if session.sessionNotes %}
                                 {{ session.sessionNotes }}

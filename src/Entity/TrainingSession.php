@@ -8,17 +8,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-#[ORM\Entity(repositoryClass: 'App\Repository\TrainingSessionRepository')]
-
-
+#[ORM\Entity(repositoryClass: TrainingSessionRepository::class)]
 class TrainingSession
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private ?int $sessionId = null;
+
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: "Session focus cannot be blank")]
     #[Assert\Choice(
@@ -29,7 +26,7 @@ class TrainingSession
 
     #[ORM\Column(type: "time")]
     #[Assert\NotBlank(message: "Start time cannot be blank")]
-    private ?\DateTimeInterface  $sessionStartTime = null;
+    private ?\DateTimeInterface $sessionStartTime = null;
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(message: "Duration cannot be blank")]
@@ -44,7 +41,6 @@ class TrainingSession
     #[ORM\JoinColumn(name: 'session_location', referencedColumnName: 'id')]
     #[Assert\NotBlank(message: "Location cannot be blank")]
     private ?Location $location = null;
-  
 
     #[ORM\Column(type: "string", length: 1250)]
     #[Assert\NotBlank(message: "Notes cannot be blank")]
@@ -54,19 +50,14 @@ class TrainingSession
     )]
     private ?string $sessionNotes = null;
 
-    #[ORM\Column(type: "integer")]
-    private ?int $teamId = null;
+    #[ORM\ManyToOne(targetEntity: Team::class)]
+    #[ORM\JoinColumn(name: 'team_id', referencedColumnName: 'teamId', nullable: true)]
+    private ?Team $team = null;
 
     public function getSessionId(): ?int
     {
         return $this->sessionId;
     }
-
-    // public function setSessionId(?int $sessionId): static
-    // {
-    //     $this->sessionId = $sessionId;
-    //     return $this;
-    // }
 
     public function getSessionFocus(): ?string
     {
@@ -83,12 +74,13 @@ class TrainingSession
     {
         return $this->sessionStartTime;
     }
-    
+
     public function setSessionStartTime(?\DateTimeInterface $time): self
     {
         $this->sessionStartTime = $time;
         return $this;
     }
+
     public function getSessionDuration(): ?int
     {
         return $this->sessionDuration;
@@ -104,7 +96,7 @@ class TrainingSession
     {
         return $this->location;
     }
-    
+
     public function setLocation(?Location $location): static
     {
         $this->location = $location;
@@ -122,14 +114,14 @@ class TrainingSession
         return $this;
     }
 
-    public function getTeamId(): ?int
+    public function getTeam(): ?Team
     {
-        return $this->teamId;
+        return $this->team;
     }
 
-    public function setTeamId(?int $teamId): static
+    public function setTeam(?Team $team): static
     {
-        $this->teamId = $teamId;
+        $this->team = $team;
         return $this;
     }
 }

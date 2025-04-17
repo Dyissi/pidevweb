@@ -79,7 +79,7 @@
                             <td class="{{ item.performanceNbrFouls > 3 ? 'text-danger' : '' }}">
                                 {{ item.performanceNbrFouls }}
                             </td>
-                            <td>User #{{ item.userId }}</td>
+                            <td>{{ item.user ? item.user.fullName : 'N/A' }}</td>
                             <td class="actions">
                                 <div class="btn-group" role="group">
                                     <a href="{{ path('app_data_show', {'performanceId': item.performanceId}) }}" 
