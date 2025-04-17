@@ -65,6 +65,14 @@
             {{ form_errors(form.user_id) }}
           </div>
 
+          <!-- Injury Image Field -->
+          <div class="mb-3">
+            {{ form_label(form.imagePath, 'Upload Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.imagePath, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.imagePath) }}
+          </div>
+
+
           <!-- Buttons -->
           <div class="d-flex justify-content-end gap-2">
             <button type="submit" class="btn btn-primary">Submit</button>

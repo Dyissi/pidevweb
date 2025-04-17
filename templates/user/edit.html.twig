@@ -30,12 +30,12 @@
 
   <section class="section">
     <div class="container" data-aos="fade-up">
-      {{ include('user/_form.html.twig', {'button_label': 'Update', 'role': role, 'context': context}) }}
+      {{ include('user/_form.html.twig', {'button_label': 'Update', 'role': user.userRole|lower, 'context': context, 'is_new': false}) }}
       <div class="d-flex gap-2 mt-3">
-        <a href="{{ path('app_user_index', {'context': context, 'role': role}) }}" class="btn btn-outline-secondary">
+        <a href="{{ path('app_user_index', {'context': context, 'role': user.userRole|lower}) }}" class="btn btn-outline-secondary">
           <i class="bi bi-arrow-left"></i> Back to List
         </a>
-        {{ include('user/_delete_form.html.twig', {'context': context, 'role': role}) }}
+        {{ include('user/_delete_form.html.twig', {'context': context, 'role': user.userRole|lower}) }}
       </div>
     </div>
   </section>
