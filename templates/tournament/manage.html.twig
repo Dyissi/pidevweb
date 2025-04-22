@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Tournament{% endblock %}
+
+{% block main %}
+  <div class="container py-5">
+    <h1 class="mb-4">Manage Tournament: {{ tournament.tournamentName }}</h1>
+    <p><strong>Number of Teams:</strong> {{ tournament.tournamentNbteams }}</p>
+    <p><strong>Type of Sport:</strong> {{ tournament.tournamentTOS }}</p>
+    <p><strong>Winner:</strong> 
+      {% if tournament.tournamentWinner %}
+        {{ allTeams|filter(t => t.id == tournament.tournamentWinner)|first.teamName }}
+      {% else %}
+        Not assigned
+      {% endif %}
+    </p>
+    <p><strong>Status:</strong> {{ isLocked ? 'Locked' : 'Open' }}</p>
+
+    {% if not isLocked %}
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Teams in Tournament</h3>
+          <ul class="list-group">
+            {% for teamId in teamsInTournament %}
+              {% set team = allTeams|filter(t => t.id == teamId)|first %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ team.teamName }}
+                <form method="post" style="margin: 0;">
+                  <input type="hidden" name="remove_team" value="{{ team.id }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="list-group-item text-muted">No teams in this tournament.</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="col-md-6">
+          <h3>Available Teams</h3>
+          <ul class="list-group">
+            {% for team in allTeams %}
+              {% if team.id not in teamsInTournament %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  {{ team.teamName }}
+                  <form method="post" style="margin: 0;">
+                    <input type="hidden" name="add_team" value="{{ team.id }}">
+                    <button type="submit" class="btn btn-success btn-sm">Add</button>
+                  </form>
+                </li>
+              {% endif %}
+            {% else %}
+              <li class="list-group-item text-muted">No available teams to add.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3>Assign Winner</h3>
+        <form method="post">
+          <select name="assign_winner" class="form-select mb-3">
+            <option value="" disabled selected>Select a winner</option>
+            {% for teamId in teamsInTournament %}
+              {% set team = allTeams|filter(t => t.id == teamId)|first %}
+              <option value="{{ team.id }}">{{ team.teamName }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary">Assign Winner</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="alert alert-info mt-4">
+        This tournament has ended and a winner has been assigned. No further changes can be made.
+      </div>
+    {% endif %}
+
+    <a href="{{ path('app_tournament_show', {'id': tournament.id}) }}" class="btn btn-secondary mt-4">Back to Tournament</a>
+  </div>
+{% endblock %}

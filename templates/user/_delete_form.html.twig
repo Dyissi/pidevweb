@@ -1,5 +1,6 @@
 <form method="post" action="{{ path('app_user_delete', {'context': context, 'id': user.id}) }}" onsubmit="return confirm('Are you sure you want to delete this {% if user.userRole == 'coach' %}coach{% elseif user.userRole == 'med_staff' %}medical staff{% else %}athlete{% endif %}?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+    <input type="hidden" name="role" value="{{ user.userRole|lower }}"> {# Ensure role is lowercase #}
     <button type="submit" class="btn btn-sm btn-outline-danger">
         <i class="bi bi-trash"></i> Delete
     </button>

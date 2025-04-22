@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome to SPIIN Sports{% endblock %}
+{% block description %}Your ultimate sports team and tournament management system{% endblock %}
+{% block keywords %}sports, team, tournament, SPIIN Sports{% endblock %}
+
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+  <div class="page-title py-5">
+    <div class="container">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <h1 class="display-4 fw-bold">Welcome to SPIIN Sports</h1>
+          <p class="lead">Manage your teams and tournaments with ease.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section py-5">
+    <div class="container" data-aos="fade-up">
+      <div class="row g-4 justify-content-center">
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 shadow-lg border-0">
+            <div class="card-body text-center">
+              <i class="bi bi-people-fill display-4 mb-3 text-primary"></i>
+              <h3 class="card-title fw-bold">Teams</h3>
+              <p class="card-text">Create and manage your sports teams.</p>
+              <a href="{{ path('app_team_index') }}" class="btn btn-primary btn-lg mt-3">View Teams</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 shadow-lg border-0">
+            <div class="card-body text-center">
+              <i class="bi bi-trophy-fill display-4 mb-3 text-warning"></i>
+              <h3 class="card-title fw-bold">Tournaments</h3>
+              <p class="card-text">Organize and track tournaments.</p>
+              <a href="{{ path('app_tournament_index') }}" class="btn btn-warning btn-lg mt-3">View Tournaments</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

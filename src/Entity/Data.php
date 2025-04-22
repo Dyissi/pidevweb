@@ -2,102 +2,135 @@
 
 namespace App\Entity;
 
+use App\Repository\DataRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
-
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: DataRepository::class)]
+#[ORM\Table(name: 'data')]
 class Data
 {
-
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
-    private int $performance_id;
+    private ?int $performanceId = null;
 
     #[ORM\Column(type: "float")]
-    private float $performance_speed;
+    #[Assert\NotBlank(message: "Speed cannot be blank")]
+    #[Assert\PositiveOrZero(message: "Speed must be zero or positive")]
+    #[Assert\LessThanOrEqual(100, message: "Speed cannot exceed 100 km/h")]
+    private ?float $performanceSpeed = null;
 
     #[ORM\Column(type: "float")]
-    private float $performance_agility;
+    #[Assert\NotBlank(message: "Agility cannot be blank")]
+    #[Assert\PositiveOrZero(message: "Agility must be zero or positive")]
+    private ?float $performanceAgility = null;
 
     #[ORM\Column(type: "integer")]
-    private int $performance_nbr_goals;
+    #[Assert\NotBlank(message: "Number of goals cannot be blank")]
+    #[Assert\PositiveOrZero(message: "Number of goals must be zero or positive")]
+    private ?int $performanceNbrGoals = null;
 
     #[ORM\Column(type: "integer")]
-    private int $performance_assists;
+    #[Assert\NotBlank(message: "Assists cannot be blank")]
+    #[Assert\PositiveOrZero(message: "Assists must be zero or positive")]
+    private ?int $performanceAssists = null;
 
     #[ORM\Column(type: "date")]
-    private \DateTimeInterface $performance_date_recorded;
+    #[Assert\NotBlank(message: "Date cannot be blank")]
+    #[Assert\LessThanOrEqual("today", message: "Date cannot be in the future")]
+    private ?\DateTimeInterface $performanceDateRecorded = null;
 
     #[ORM\Column(type: "integer")]
-    private int $performance_nbr_fouls;
+    #[Assert\NotBlank(message: "Number of fouls cannot be blank")]
+    #[Assert\PositiveOrZero(message: "Number of fouls must be zero or positive")]
+    private ?int $performanceNbrFouls = null;
 
-    public function getPerformance_id()
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'data')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: true)]
+    private ?User $user = null;
+
+    public function getPerformanceId(): ?int
     {
-        return $this->performance_id;
+        return $this->performanceId;
     }
 
-    public function setPerformance_id($value)
+    public function getPerformanceSpeed(): ?float
     {
-        $this->performance_id = $value;
+        return $this->performanceSpeed;
     }
 
-    public function getPerformance_speed()
+    public function setPerformanceSpeed(?float $performanceSpeed): static
     {
-        return $this->performance_speed;
+        $this->performanceSpeed = $performanceSpeed;
+        return $this;
     }
 
-    public function setPerformance_speed($value)
+    public function getPerformanceAgility(): ?float
     {
-        $this->performance_speed = $value;
+        return $this->performanceAgility;
     }
 
-    public function getPerformance_agility()
+    public function setPerformanceAgility(?float $performanceAgility): static
     {
-        return $this->performance_agility;
+        $this->performanceAgility = $performanceAgility;
+        return $this;
     }
 
-    public function setPerformance_agility($value)
+    public function getPerformanceNbrGoals(): ?int
     {
-        $this->performance_agility = $value;
+        return $this->performanceNbrGoals;
     }
 
-    public function getPerformance_nbr_goals()
+    public function setPerformanceNbrGoals(?int $performanceNbrGoals): static
     {
-        return $this->performance_nbr_goals;
+        $this->performanceNbrGoals = $performanceNbrGoals;
+        return $this;
     }
 
-    public function setPerformance_nbr_goals($value)
+    public function getPerformanceAssists(): ?int
     {
-        $this->performance_nbr_goals = $value;
+        return $this->performanceAssists;
     }
 
-    public function getPerformance_assists()
+    public function setPerformanceAssists(?int $performanceAssists): static
     {
-        return $this->performance_assists;
+        $this->performanceAssists = $performanceAssists;
+        return $this;
     }
 
-    public function setPerformance_assists($value)
+    public function getPerformanceDateRecorded(): ?\DateTimeInterface
     {
-        $this->performance_assists = $value;
+        return $this->performanceDateRecorded;
     }
 
-    public function getPerformance_date_recorded()
+    public function setPerformanceDateRecorded(?\DateTimeInterface $performanceDateRecorded): static
     {
-        return $this->performance_date_recorded;
+        $this->performanceDateRecorded = $performanceDateRecorded;
+        return $this;
     }
 
-    public function setPerformance_date_recorded($value)
+    public function getPerformanceNbrFouls(): ?int
     {
-        $this->performance_date_recorded = $value;
+        return $this->performanceNbrFouls;
     }
 
-    public function getPerformance_nbr_fouls()
+    public function setPerformanceNbrFouls(?int $performanceNbrFouls): static
     {
-        return $this->performance_nbr_fouls;
+        $this->performanceNbrFouls = $performanceNbrFouls;
+        return $this;
     }
 
-    public function setPerformance_nbr_fouls($value)
+    public function getUser(): ?User
     {
-        $this->performance_nbr_fouls = $value;
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+        return $this;
     }
 }

@@ -31,14 +31,15 @@ class Claim
     #[ORM\Column(name: "claimCategory", type: "string", length: 20)]
     #[Assert\NotBlank]
     private string $claimCategory;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsSubmitter")]
-    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "user_id", nullable: false)]
+    
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "submittedClaims")]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "user_id", nullable: true)]
     private User $id_user;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "claimsAsTarget")]
-    #[ORM\JoinColumn(name: "id_user_to_claim", referencedColumnName: "user_id", nullable: false)]
+    
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "receivedClaims")]
+    #[ORM\JoinColumn(name: "id_user_to_claim", referencedColumnName: "user_id", nullable: true)]
     private User $id_user_to_claim;
+    
 
     #[ORM\OneToMany(mappedBy: "claim", targetEntity: Claimaction::class)]
     private Collection $claimactions;
@@ -46,6 +47,7 @@ class Claim
     public function __construct()
     {
         $this->claimactions = new ArrayCollection();
+        $this->claimStatus = 'In Review';
     }
 
     // Getters and Setters
@@ -104,23 +106,23 @@ class Claim
         return $this;
     }
 
-    public function getIdUser(): User
+    public function getIdUser(): ?User
     {
         return $this->id_user;
     }
 
-    public function setIdUser(User $id_user): self
+    public function setIdUser(?User $id_user): self
     {
         $this->id_user = $id_user;
         return $this;
     }
 
-    public function getIdUserToClaim(): User
+    public function getIdUserToClaim(): ?User
     {
         return $this->id_user_to_claim;
     }
 
-    public function setIdUserToClaim(User $id_user_to_claim): self
+    public function setIdUserToClaim(?User $id_user_to_claim): self
     {
         $this->id_user_to_claim = $id_user_to_claim;
         return $this;

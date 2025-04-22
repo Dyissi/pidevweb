@@ -1,107 +1,111 @@
 <div class="card shadow-sm">
   <div class="card-body">
-    {{ form_start(form) }}
-      <div class="row g-3">
-        <div class="col-md-6">
-          {{ form_label(form.userFname, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.userFname, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-danger">
-            {{ form_errors(form.userFname) }}
-          </small>
-        </div>
-        <div class="col-md-6">
-          {{ form_label(form.userLname, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.userLname, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-danger">
-            {{ form_errors(form.userLname) }}
-          </small>
-        </div>
-        <div class="col-md-6">
-          {{ form_label(form.userEmail, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.userEmail, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-danger">
-            {{ form_errors(form.userEmail) }}
-          </small>
-        </div>
-        <div class="col-md-6">
-          {{ form_label(form.userNbr, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.userNbr, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-danger">
-            {{ form_errors(form.userNbr) }}
-          </small>
-        </div>
-        <div class="col-md-6">
-          {{ form_label(form.user_pwd, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.user_pwd, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-muted">
-            {{ form.user_pwd.vars.required ? 'Required for new users' : 'Leave blank to keep current password' }}
-          </small>
-          <small class="form-text text-danger">
-            {{ form_errors(form.user_pwd) }}
-          </small>
-        </div>
-        {% if role == 'athlete' %}
-          <div class="col-md-6">
-            {{ form_label(form.athleteDoB, 'Date of Birth', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.athleteDoB, {'attr': {'class': 'form-control'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.athleteDoB) }}
-            </small>
-          </div>
-          <div class="col-md-6">
-            {{ form_label(form.athleteGender, null, {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.athleteGender, {'attr': {'class': 'form-select'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.athleteGender) }}
-            </small>
-          </div>
-          <div class="col-md-6">
-            {{ form_label(form.athleteHeight, 'Height (cm)', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.athleteHeight, {'attr': {'class': 'form-control'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.athleteHeight) }}
-            </small>
-          </div>
-          <div class="col-md-6">
-            {{ form_label(form.athleteWeight, 'Weight (kg)', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.athleteWeight, {'attr': {'class': 'form-control'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.athleteWeight) }}
-            </small>
-          </div>
-          <div class="col-md-6">
-            {{ form_label(form.isInjured, 'Injured', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.isInjured, {'attr': {'class': 'form-check-input'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.isInjured) }}
-            </small>
-          </div>
-        {% elseif role == 'coach' %}
-          <div class="col-md-6">
-            {{ form_label(form.nbTeams, 'Number of Teams', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.nbTeams, {'attr': {'class': 'form-control'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.nbTeams) }}
-            </small>
-          </div>
-        {% elseif role == 'med_staff' %}
-          <div class="col-md-6">
-            {{ form_label(form.medSpecialty, 'Medical Specialty', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.medSpecialty, {'attr': {'class': 'form-control'}}) }}
-            <small class="form-text text-danger">
-              {{ form_errors(form.medSpecialty) }}
-            </small>
-          </div>
-        {% endif %}
-        <div class="col-12 text-center mt-4">
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> {{ button_label|default('Save') }}
-          </button>
-          <a href="{{ path('app_user_index', {'context': context, 'role': role}) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Cancel
-          </a>
-        </div>
+    {# Debug: Log form parameters #}
+    {% if is_granted('ROLE_ADMIN') %}
+    
+    {% endif %}
+    {{ form_start(form,{'attr':{'novalidate' : 'novalidate'} } )  }}
+       <div class="row g-3">
+      <div class="col-md-6">
+        {{ form_label(form.userFname, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.userFname, {'attr': {'class': 'form-control'}}) }}
+        <small class="form-text text-danger">
+          {{ form_errors(form.userFname) }}
+        </small>
       </div>
+      <div class="col-md-6">
+        {{ form_label(form.userLname, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.userLname, {'attr': {'class': 'form-control'}}) }}
+        <small class="form-text text-danger">
+          {{ form_errors(form.userLname) }}
+        </small>
+      </div>
+      <div class="col-md-6">
+        {{ form_label(form.userEmail, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.userEmail, {'attr': {'class': 'form-control'}}) }}
+        <small class="form-text text-danger">
+          {{ form_errors(form.userEmail) }}
+        </small>
+      </div>
+      <div class="col-md-6">
+        {{ form_label(form.userNbr, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.userNbr, {'attr': {'class': 'form-control'}}) }}
+        <small class="form-text text-danger">
+          {{ form_errors(form.userNbr) }}
+        </small>
+      </div>
+      <div class="col-md-6">
+        {{ form_label(form.user_pwd, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.user_pwd, {'attr': {'class': 'form-control'}}) }}
+        <small class="form-text text-muted">
+          {{ form.user_pwd.vars.required ? 'Required for new users' : 'Leave blank to keep current password' }}
+        </small>
+        <small class="form-text text-danger">
+          {{ form_errors(form.user_pwd) }}
+        </small>
+      </div>
+      {% if role|lower == 'athlete' %}
+        <div class="col-md-6">
+          {{ form_label(form.athleteDoB, 'Date of Birth', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.athleteDoB, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.athleteDoB) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.athleteGender, null, {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.athleteGender, {'attr': {'class': 'form-select'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.athleteGender) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.athleteHeight, 'Height (cm)', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.athleteHeight, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.athleteHeight) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.athleteWeight, 'Weight (kg)', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.athleteWeight, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.athleteWeight) }}
+          </small>
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.isInjured, 'Injured', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.isInjured, {'attr': {'class': 'form-check-input'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.isInjured) }}
+          </small>
+        </div>
+      {% elseif role|lower == 'coach' %}
+        <div class="col-md-6">
+          {{ form_label(form.nbTeams, 'Number of Teams', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.nbTeams, {'attr': {'class': 'form-control'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.nbTeams) }}
+          </small>
+        </div>
+      {% elseif role|lower == 'med_staff' %}
+        <div class="col-md-6">
+          {{ form_label(form.medSpecialty, 'Medical Specialty', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.medSpecialty, {'attr': {'class': 'form-select'}}) }}
+          <small class="form-text text-danger">
+            {{ form_errors(form.medSpecialty) }}
+          </small>
+        </div>
+      {% endif %}
+      <div class="col-12 text-center mt-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save"></i> {{ button_label|default('Save') }}
+        </button>
+        <a href="{{ path('app_user_index', {'context': context|default('front'), 'role': role|lower}) }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+      </div>
+    </div>
     {{ form_end(form) }}
   </div>
 </div>

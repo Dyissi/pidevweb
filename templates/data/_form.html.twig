@@ -1,0 +1,132 @@
+{% block main %}
+<div class="container mt-3">
+    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate',   'autocomplete': 'off'}}) }}
+    
+    {# Speed Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceSpeed, "Speed (km/h)", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceSpeed, {
+            'attr': {
+                'class': 'form-control' ~ (form.performanceSpeed.vars.valid ? '' : ' is-invalid'),
+                'step': '0.1'
+            }
+        }) }}
+        {{ form_errors(form.performanceSpeed, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# Agility Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceAgility, "Agility Score", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceAgility, {
+            'attr': {
+                'class': 'form-control' ~ (form.performanceAgility.vars.valid ? '' : ' is-invalid'),
+                'step': '0.1'
+            }
+        }) }}
+        {{ form_errors(form.performanceAgility, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# Goals Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceNbrGoals, "Number of Goals", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceNbrGoals, {
+            'attr': {
+                'class': 'form-control' ~ (form.performanceNbrGoals.vars.valid ? '' : ' is-invalid'),
+                'min': '0'
+            }
+        }) }}
+        {{ form_errors(form.performanceNbrGoals, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# Assists Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceAssists, "Assists", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceAssists, {
+            'attr': {
+                'class': 'form-control' ~ (form.performanceAssists.vars.valid ? '' : ' is-invalid'),
+                'min': '0'
+            }
+        }) }}
+        {{ form_errors(form.performanceAssists, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# Date Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceDateRecorded, "Date Recorded", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceDateRecorded, {
+            'attr': {
+                'class': 'form-control datepicker' ~ (form.performanceDateRecorded.vars.valid ? '' : ' is-invalid')
+            }
+        }) }}
+        {{ form_errors(form.performanceDateRecorded, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# Fouls Field #}
+    <div class="mb-3">
+        {{ form_label(form.performanceNbrFouls, "Number of Fouls", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.performanceNbrFouls, {
+            'attr': {
+                'class': 'form-control' ~ (form.performanceNbrFouls.vars.valid ? '' : ' is-invalid'),
+                'min': '0'
+            }
+        }) }}
+        {{ form_errors(form.performanceNbrFouls, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    {# User ID Field (if needed) #}
+    {% if form.userId is defined %}
+    <div class="mb-3">
+        {{ form_label(form.userId, "User ID", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.userId, {
+            'attr': {
+                'class': 'form-control' ~ (form.userId.vars.valid ? '' : ' is-invalid')
+            }
+        }) }}
+        {{ form_errors(form.userId, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+    {% endif %}
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="submit" class="btn btn-primary me-md-2">
+            <i class="bi bi-save"></i> {{ button_label|default('Save Performance Data') }}
+        </button>
+        <a href="{{ path('app_data_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    
+    {{ form_end(form) }}
+</div>
+
+{% if not form.vars.valid %}
+<script>
+    // Scroll to first invalid field
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus();
+        }
+    });
+</script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('performanceForm');
+        if (form) {
+            form.reset();
+        }
+    });
+</script>
+{% endif %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }} alert-dismissible fade show mt-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

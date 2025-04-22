@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_data_delete', {'performanceId': data.performanceId}) }}" onsubmit="return confirm('Are you sure?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ data.performanceId) }}">
+    <button class="{{ button_attr.class|default('btn btn-error') }}">
+        <i class="bi bi-trash"></i> Delete
+    </button>
+</form>

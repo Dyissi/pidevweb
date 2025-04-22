@@ -1,0 +1,106 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+{# Session Focus #}
+<div class="mb-3">
+    {{ form_label(form.sessionFocus, 'Session Focus') }}
+    <div class="d-flex flex-wrap gap-3">
+        {% for focus in form.sessionFocus %}
+            <div class="form-check">
+                {{ form_widget(focus, {
+                    'attr': {'class': 'form-check-input'},
+                    'label_attr': {'class': 'form-check-label'}
+                }) }}
+                {{ form_label(focus) }}
+            </div>
+        {% endfor %}
+    </div>
+    {{ form_errors(form.sessionFocus) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.sessionStartTime) }}
+    {{ form_widget(form.sessionStartTime, {
+        'attr': {
+            'class': 'form-control',
+            'placeholder': 'HH:MM',
+            'value': form.sessionStartTime.vars.value is defined 
+                ? form.sessionStartTime.vars.value|date('H:i') 
+                : ''
+        }
+    }) }}
+    {{ form_errors(form.sessionStartTime) }}
+</div>
+
+
+
+{# Duration #}
+<div class="mb-3">
+    {{ form_label(form.sessionDuration, 'Duration') }}
+    <div class="d-flex flex-wrap gap-3">
+        {% for duration in form.sessionDuration %}
+            <div class="form-check">
+                {{ form_widget(duration, {
+                    'attr': {'class': 'form-check-input'},
+                    'label_attr': {'class': 'form-check-label'}
+                }) }}
+                {{ form_label(duration) }}
+            </div>
+        {% endfor %}
+    </div>
+    {{ form_errors(form.sessionDuration) }}
+</div>
+
+{# Location #}
+<div class="mb-3">
+    {{ form_label(form.location, 'Location') }}
+    {{ form_widget(form.location, {
+        'attr': {
+            'class': 'form-control',
+            'placeholder': 'Select a location'
+        }
+    }) }}
+    {{ form_errors(form.location) }}
+</div>
+
+{# Notes #}
+<div class="mb-3">
+    {{ form_label(form.sessionNotes, 'Notes') }}
+    {{ form_widget(form.sessionNotes, {
+        'attr': {
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Additional notes'
+        }
+    }) }}
+    {{ form_errors(form.sessionNotes) }}
+</div>
+
+{# Team ID #}
+<div class="mb-3">
+    {{ form_label(form.team, 'Team ID') }}
+    {{ form_widget(form.team) }}
+    
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+    <a href="{{ path('app_training_session_index') }}" class="btn btn-secondary">
+        ← Back to List
+    </a>
+<button type="submit" class="btn btn-primary">
+    {{ button_label|default('Save') }}
+</button>
+</div>
+
+{{ form_end(form) }}
+
+
+<script>
+document.getElementById('training-session-form').addEventListener('submit', function(e) {
+    console.log('Form submitted!'); // Check browser console for this
+    
+    // Optional: Add loading state
+    const button = document.getElementById('submit-button');
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+});
+</script>

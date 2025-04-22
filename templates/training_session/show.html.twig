@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ training_session.team ? training_session.team.teamName : 'N/A' }}'s Training Session - {{ training_session.sessionStartTime|date('M d, Y') }}{% endblock %}
+
+{% block main %}
+    <div class="container training-session-detail">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">
+                <i class="bi bi-calendar2-event"></i> Training Session Details
+                <small class="text-muted">#{{ training_session.sessionId }}</small>
+            </h1>
+            <div class="action-buttons">
+                <a href="{{ path('app_training_session_index') }}" class="btn btn-secondary-light">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">
+                    <i class="bi bi-people-fill"></i> Team: {{ training_session.team ? training_session.team.teamName : 'N/A' }}
+                    <span class="float-end">{{ training_session.sessionStartTime|date('F j, Y') }}</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="session-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Session Focus</span>
+                                <span class="stat-value badge bg-info">
+                                    {{ training_session.sessionFocus }}
+                                </span>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Start Time</span>
+                                <span class="stat-value">
+                                    {{ training_session.sessionStartTime|date('H:i') }}
+                                </span>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Duration</span>
+                                <span class="stat-value">
+                                    {{ training_session.sessionDuration }} mins
+                                </span>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-primary" 
+                                         style="width: {{ (training_session.sessionDuration/120)*100 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">Location</span>
+                                <span class="stat-value">
+                                    {{ training_session.location.locationName }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="session-visual text-center">
+                            <div class="focus-indicator mb-3">
+                                <i class="bi bi-{{ training_session.sessionFocus|lower }} display-4 text-primary"></i>
+                            </div>
+                            <h4>Focus Area</h4>
+                            <p class="text-muted">{{ training_session.sessionFocus }} Training</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% if training_session.sessionNotes %}
+                <div class="session-notes mt-4">
+                    <h5><i class="bi bi-journal-text"></i> Coach's Notes</h5>
+                    <div class="notes-content p-3 bg-light rounded">
+                        {{ training_session.sessionNotes }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{{ path('app_training_session_edit', {'sessionId': training_session.sessionId}) }}" 
+               class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit Session
+            </a>
+            {{ include('training_session/_delete_form.html.twig', {
+                'button_attr': {
+                    'class': 'btn btn-error'
+                }
+            }) }}
+        </div>
+    </div>
+{% endblock %}

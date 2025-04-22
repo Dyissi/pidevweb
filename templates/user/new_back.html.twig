@@ -20,7 +20,7 @@
     </ol>
     <div class="card mb-4">
       <div class="card-body">
-        {{ include('user/_form.html.twig', {'button_label': 'Save', 'role': role, 'context': 'back'}) }}
+        {{ include('user/_form.html.twig', {'button_label': 'Save', 'role': role, 'context': 'back', 'is_new': true}) }}
       </div>
     </div>
     <a href="{{ path('app_user_index', {'context': 'back', 'role': role}) }}" class="btn btn-outline-secondary">

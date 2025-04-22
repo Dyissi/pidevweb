@@ -2,16 +2,16 @@
 
 namespace App\Repository;
 
-use App\Entity\Training_session;
+use App\Entity\TrainingSession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class Training_sessionRepository extends ServiceEntityRepository
+class TrainingSessionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Training_session::class);
+        parent::__construct($registry, TrainingSession::class);
     }
 
-    // Add custom methods as needed
+    // Add your custom repository methods here
 }

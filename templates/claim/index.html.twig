@@ -41,8 +41,8 @@
                 <td>{{ claim.claimStatus }}</td>
                 <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
                 <td>{{ claim.claimCategory }}</td>
-                <td>{{ claim.idUser ? claim.idUser.user_fname ~ ' ' ~ claim.idUser.user_lname : '' }}</td>
-                <td>{{ claim.idUserToClaim ? claim.idUserToClaim.user_fname ~ ' ' ~ claim.idUserToClaim.user_lname : '' }}</td>
+                <td>{{ claim.idUser ? claim.idUser.userFname ~ ' ' ~ claim.idUser.userLname : '' }}</td>
+                <td>{{ claim.idUserToClaim ? claim.idUserToClaim.userFname ~ ' ' ~ claim.idUserToClaim.userLname : '' }}</td>
 
                 <td>
     <a href="{{ path('app_claim_show', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-primary">Show</a>

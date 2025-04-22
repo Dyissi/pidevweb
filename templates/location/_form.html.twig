@@ -1,0 +1,114 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="form-floating mb-3">
+            {{ form_widget(form.locationName, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': ' ',
+                    'id': 'floatingName'
+                }
+            }) }}
+            {{ form_label(form.locationName, 'Location Name', {
+                'label_attr': {'for': 'floatingName'}
+            }) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.locationName)|striptags }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-floating mb-3">
+            {{ form_widget(form.locationCity, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': ' ',
+                    'id': 'floatingCity'
+                }
+            }) }}
+            {{ form_label(form.locationCity, 'City', {
+                'label_attr': {'for': 'floatingCity'}
+            }) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.locationCity)|striptags }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="form-floating mb-3">
+            {{ form_widget(form.locationAddress, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': ' ',
+                    'id': 'floatingAddress'
+                }
+            }) }}
+            {{ form_label(form.locationAddress, 'Full Address', {
+                'label_attr': {'for': 'floatingAddress'}
+            }) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.locationAddress)|striptags }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-floating mb-3">
+            {{ form_widget(form.locationCapacity, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': ' ',
+                    'id': 'floatingCapacity',
+                    'min': '1'
+                }
+            }) }}
+            {{ form_label(form.locationCapacity, 'Maximum Capacity', {
+                'label_attr': {'for': 'floatingCapacity'}
+            }) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.locationCapacity)|striptags }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="mb-3">
+            {{ form_label(form.locationType) }}
+            {{ form_widget(form.locationType) }}
+            <div class="invalid-feedback d-block">
+                {{ form_errors(form.locationType)|striptags }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+    <button type="submit" class="btn btn-primary btn-lg px-4">
+        <i class="fas fa-save me-2"></i> {{ button_label|default('Save Location') }}
+    </button>
+</div>
+
+{{ form_end(form) }}
+
+<style>
+    /* Style the radio buttons as toggle buttons */
+    .btn-group.btn-group-toggle {
+        width: 100%;
+    }
+    .btn-group-toggle .btn {
+        border: 1px solid #dee2e6;
+    }
+    .btn-group-toggle .btn.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .form-floating > label {
+        padding: 1rem 1.25rem;
+    }
+    .invalid-feedback {
+        display: block;
+    }
+</style>

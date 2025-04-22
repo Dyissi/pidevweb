@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Team {{ team.teamName }} | SPIIN Sports{% endblock %}
+{% block description %}Edit {{ team.teamName }} in the SPIIN Sports system{% endblock %}
+{% block keywords %}edit team, {{ team.teamName }}, sports, SPIIN{% endblock %}
+
+{% block body_class %}team-edit-page{% endblock %}
+
+{% block main %}
+  <div class="page-title" data-aos="fade">
+    <div class="heading">
+      <div class="container">
+        <div class="row d-flex justify-content-center text-center">
+          <div class="col-lg-8">
+            <h1>Edit Team</h1>
+            <p class="mb-0">Update details for {{ team.teamName }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container" data-aos="fade-up">
+      {{ include('team/_form.html.twig', {'button_label': 'Update'}) }}
+      <div class="d-flex gap-2 mt-3">
+        <a href="{{ path('app_team_index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+        {{ include('team/_delete_form.html.twig') }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

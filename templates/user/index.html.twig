@@ -36,7 +36,7 @@
         <h2 class="text-center">All {% if role == 'coach' %}Coaches{% elseif role == 'med_staff' %}Medical Staff{% else %}Athletes{% endif %}</h2>
       </div>
       <div class="text-center mb-4">
-        <a href="{{ path('app_user_new', {'context': context, 'role': role}) }}" class="btn btn-primary btn-lg">
+        <a href="{{ path('app_user_new', {'context': context|default('front'), 'role': role|lower}) }}" class="btn btn-primary btn-lg">
           <i class="bi bi-plus-circle me-1"></i> Add New {% if role == 'coach' %}Coach{% elseif role == 'med_staff' %}Medical Staff{% else %}Athlete{% endif %}
         </a>
       </div>
@@ -92,13 +92,13 @@
                     {% endif %}
                     <td>
                       <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ path('app_user_show', {'context': context, 'id': user.id, 'role': role}) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ path('app_user_show', {'context': context|default('front'), 'id': user.id, 'role': user.userRole|lower}) }}" class="btn btn-sm btn-outline-primary">
                           <i class="bi bi-eye"></i> Show
                         </a>
-                        <a href="{{ path('app_user_edit', {'context': context, 'id': user.id, 'role': role}) }}" class="btn btn-sm btn-outline-secondary">
+                        <a href="{{ path('app_user_edit', {'context': context|default('front'), 'id': user.id}) }}" class="btn btn-sm btn-outline-secondary">
                           <i class="bi bi-pencil"></i> Edit
                         </a>
-                        {{ include('user/_delete_form.html.twig', {'context': context, 'role': role}) }}
+                        {{ include('user/_delete_form.html.twig', {'context': context|default('front'), 'role': user.userRole|lower}) }}
                       </div>
                     </td>
                   </tr>

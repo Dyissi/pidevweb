@@ -25,12 +25,14 @@ security:
         - { path: ^/create-test-user, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
-        - { path: ^/user/front/athlete, roles: [ROLE_COACH, ROLE_ADMIN] }
+        - { path: ^/user/new/front/athlete, roles: [ROLE_COACH, ROLE_ADMIN, ROLE_MED_STAFF] }
+        - { path: ^/user/front/[0-9]+/edit, roles: [ROLE_COACH, ROLE_ADMIN, ROLE_MED_STAFF] }
+        - { path: ^/user/front/athlete, roles: [ROLE_COACH, ROLE_ADMIN, ROLE_MED_STAFF] }
         - { path: ^/user/back/(coach|med_staff), roles: ROLE_ADMIN }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/coach, roles: ROLE_COACH }
         - { path: ^/athlete, roles: ROLE_ATHLETE }
-        - { path: ^/medical, roles: ROLE_MEDICAL }
+        - { path: ^/medical, roles: ROLE_MED_STAFF }
         - { path: ^/$, roles: PUBLIC_ACCESS }
 
 when@test:
