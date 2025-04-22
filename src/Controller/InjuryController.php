@@ -87,7 +87,7 @@ final class InjuryController extends AbstractController
 
                 try {
                     // Define the directory directly in the controller
-                    $imageDirectory = 'C:/Users/Lyna Mbarky/spin/public/frontOffice/img';
+                    $imageDirectory = 'C:\Users\Lyna Mbarky\Desktop\push\public\frontOffice\img';
 
                     // Move the file to the directory where images are stored
                     $imageFile->move(
@@ -156,7 +156,7 @@ public function edit(Request $request, int $id, InjuryRepository $injuryReposito
 
             try {
                 // Move the uploaded image to the public folder
-                $imageDirectory = 'C:/Users/Lyna Mbarky/spin/public/frontOffice/img';
+                $imageDirectory = 'C:\Users\Lyna Mbarky\Desktop\push\public\frontOffice\img';
                 $imageFile->move($imageDirectory, $newFilename);
                 $injury->setImagePath($newFilename);
             } catch (FileException $e) {
