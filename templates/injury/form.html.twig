@@ -60,18 +60,32 @@
 
           <!-- User Field -->
           <div class="mb-3">
-            {{ form_label(form.user_id, 'User', { 'label_attr': { 'class': 'form-label' } }) }}
-            {{ form_widget(form.user_id, { 'attr': { 'class': 'form-select' } }) }}
-            {{ form_errors(form.user_id) }}
+            {{ form_label(form.user, 'User', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.user, { 'attr': { 'class': 'form-select' } }) }}
+            {{ form_errors(form.user) }}
           </div>
 
-          <!-- Injury Image Field -->
+          <!-- Image Preview (for existing images when editing) -->
+          {% if form.vars.value.image %}
+            <div class="mb-3">
+              <label class="form-label">Current Injury Image</label>
+              <img src="{{ asset('frontOffice/img/' ~ form.vars.value.image) }}" 
+                   class="img-thumbnail" 
+                   style="max-height: 200px; display: block;" 
+                   alt="Current injury image">
+              <div class="form-check mt-2">
+                {{ form_widget(form.deleteImage, { attr: { class: 'form-check-input' } }) }}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- New Image Upload Field -->
           <div class="mb-3">
-            {{ form_label(form.imagePath, 'Upload Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
-            {{ form_widget(form.imagePath, { 'attr': { 'class': 'form-control' } }) }}
-            {{ form_errors(form.imagePath) }}
+            {{ form_label(form.imageFile, 'Upload Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.imageFile, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.imageFile) }}
+            <small class="text-muted">Allowed formats: JPG, PNG, GIF (Max 5MB)</small>
           </div>
-
 
           <!-- Buttons -->
           <div class="d-flex justify-content-end gap-2">

@@ -97,6 +97,7 @@
         {# ATHLETE-ONLY LINKS #}
         {% if is_granted('ROLE_ATHLETE') %}
         <li><a href="{{ path('app_claim_new') }}">Claims<br></a></li>
+        <li><a href="{{ path('app_injury_Myhealth') }}">My Health<br></a></li>
         {% endif %}
 
         {# MEDICAL TEAM LINKS #}

@@ -54,10 +54,30 @@
               {{ form_widget(form.user, { 'attr': { 'class': 'form-select' } }) }}
               {{ form_errors(form.user) }}
             </div>
-            <div class="mb-3">
-              {{ form_label(form.imagePath, 'Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
-              {{ form_widget(form.imagePath, { 'attr': { 'class': 'form-control' } }) }}
-              {{ form_errors(form.imagePath) }}
+
+            <!-- Image Preview and Upload Section -->
+           {% if injury.image %}
+    <div class="mb-3">
+        <label class="form-label">Current Image: </label>
+        <img src="{{ asset('frontOffice/img/' ~ injury.image) }}" 
+             class="img-thumbnail" 
+             style="max-height: 200px;">
+        <div class="form-check mt-2">
+            <input type="checkbox" 
+                   id="{{ form.deleteImage.vars.id }}" 
+                   name="{{ form.deleteImage.vars.full_name }}"
+                   class="form-check-input">
+            <label for="{{ form.deleteImage.vars.id }}" class="form-check-label">
+                Delete this image
+            </label>
+        </div>
+    </div>
+{% endif %}
+
+              {{ form_label(form.imageFile, 'Update Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
+              {{ form_widget(form.imageFile, { 'attr': { 'class': 'form-control' } }) }}
+              {{ form_errors(form.imageFile) }}
+              <small class="text-muted">Leave blank to keep current image. Allowed formats: JPG, PNG, GIF (Max 5MB)</small>
             </div>
 
             <!-- Buttons -->

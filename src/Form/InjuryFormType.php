@@ -4,17 +4,20 @@ namespace App\Form;
 
 use App\Entity\Injury;
 use App\Entity\User;
+use App\Repository\UserRepository;
+use Vich\UploaderBundle\Form\Type\VichFileType;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\LessThan;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+
 
 class InjuryFormType extends AbstractType
 {
@@ -60,22 +63,27 @@ class InjuryFormType extends AbstractType
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getUserFname() . ' ' . $user->getUserLname();
-                },
+                'choice_label' => fn(User $user) => $user->getUserFname() . ' ' . $user->getUserLname(),
                 'placeholder' => 'Choose a user',
                 'required' => true,
-            ])
-            ->add('imagePath', FileType::class, [
-                'label' => 'Injury Image',
-                'mapped' => false,
+                'query_builder' => function (EntityRepository $repo) {
+                    return $repo->createQueryBuilder('u')
+                        ->where('u.user_role = :role') 
+                        ->setParameter('role', 'ATHLETE') 
+                        ->orderBy('u.user_fname', 'ASC');
+                },
+            ])            
+            ->add('imageFile', VichFileType::class, [
                 'required' => false,
-                'constraints' => [
-                    new File([
-                        'mimeTypes' => ['image/jpeg', 'image/png'],
-                        'mimeTypesMessage' => 'Please upload a valid image (JPEG or PNG)',
-                    ])
-                ],
+                'allow_delete' => false, // We handle deletion separately
+                'download_uri' => false,
+                'label' => 'Update Injury Image',
+                'delete_label' => false,
+            ])
+            ->add('deleteImage', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false, 
+                'attr' => ['class' => 'form-check-input']
             ]);
     }
 

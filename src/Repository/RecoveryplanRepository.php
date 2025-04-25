@@ -27,15 +27,16 @@ class RecoveryplanRepository extends ServiceEntityRepository
      * @param int $userId
      * @return Recoveryplan[] 
      */
-    public function findByUserId(int $userId): array
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.user_id = :userId')
-            ->setParameter('userId', $userId)
-            ->orderBy('r.recovery_StartDate', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+    // RecoveryplanRepository
+public function findByUserId($userId): array
+{
+    return $this->createQueryBuilder('r')
+        ->andWhere('r.user = :user')
+        ->setParameter('user', $userId)
+        ->getQuery()
+        ->getResult();
+}
+
 
     /**
      * Search recovery plans by goal or description.

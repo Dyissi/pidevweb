@@ -32,7 +32,7 @@
               <!-- Injury Date Field -->
               <div class="mb-3">
                 {{ form_label(form.injury_date, 'Injury Date', { 'label_attr': { 'class': 'form-label' } }) }}
-                {{ form_widget(form.injury_date, { 'attr': { 'class': 'form-control', 'style': 'width: 70%; max-width: 1000px; height: 50px; padding: 0.75rem 2rem; border-radius: 8px;' } }) }}
+                {{ form_widget(form.injury_date, { 'attr': { 'class': 'form-control' } }) }}
                 {{ form_errors(form.injury_date) }}
               </div>
 
@@ -43,15 +43,12 @@
                 {{ form_errors(form.injurySeverity) }}
               </div>
 
-    <!-- Injury Description Field -->
-<div class="mb-3">
-    {{ form_label(form.injuryDescription, 'Injury Description', { 'label_attr': { 'class': 'form-label' } }) }}
-    {{ form_widget(form.injuryDescription, { 'attr': { 'class': 'form-control', 'rows': '4' } }) }}
- {{ form_errors(form.injuryDescription) }}
-
-</div>
-
-
+              <!-- Injury Description Field -->
+              <div class="mb-3">
+                {{ form_label(form.injuryDescription, 'Injury Description', { 'label_attr': { 'class': 'form-label' } }) }}
+                {{ form_widget(form.injuryDescription, { 'attr': { 'class': 'form-control', 'rows': '4' } }) }}
+                {{ form_errors(form.injuryDescription) }}
+              </div>
 
               <!-- Injury Type Field -->
               <div class="mb-3">
@@ -68,18 +65,26 @@
               </div>
 
               <!-- Image Preview (Only for editing an existing injury) -->
-              {% if form.vars.value.imagePath is not empty %}
+              {% if form.vars.value.image %}
                 <div class="mb-3">
                   <label class="form-label">Current Injury Image</label>
-                  <img src="{{ asset('Uploads/imagery/' ~ form.vars.value.imagePath) }}" class="img-thumbnail" style="max-height: 200px;" alt="Current Injury Image">
+                  <img src="{{ asset('frontOffice/img/' ~ form.vars.value.image) }}" 
+                       class="img-thumbnail" 
+                       style="max-height: 200px;" 
+                       alt="Current Injury Image">
+                  <div class="form-check mt-2">
+                    {{ form_widget(form.deleteImage, { attr: { class: 'form-check-input' } }) }}
+                    {{ form_label(form.deleteImage, 'Delete this image', { label_attr: { class: 'form-check-label' } }) }}
+                  </div>
                 </div>
               {% endif %}
 
-              <!-- Image Upload Field -->
+              <!-- New Image Upload Field -->
               <div class="mb-3">
-                {{ form_label(form.imagePath, 'Upload Image (Optional)', { 'label_attr': { 'class': 'form-label' } }) }}
-                {{ form_widget(form.imagePath, { 'attr': { 'class': 'form-control' } }) }}
-                {{ form_errors(form.imagePath) }}
+                {{ form_label(form.imageFile, 'Injury Image', { 'label_attr': { 'class': 'form-label' } }) }}
+                {{ form_widget(form.imageFile, { 'attr': { 'class': 'form-control' } }) }}
+                {{ form_errors(form.imageFile) }}
+                <small class="text-muted">Allowed formats: JPG, PNG, GIF (Max 5MB)</small>
               </div>
 
               <!-- Buttons -->

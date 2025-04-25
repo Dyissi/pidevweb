@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block hero %}
-
 {% block body %}
 <section id="injury-details" class="py-5">
   <div class="container" data-aos="fade-up">
@@ -35,12 +34,19 @@
             <td>{{ injury.injuryType }}</td>
           </tr>
           <tr>
+            <th>User</th>
+            <td>{{ injury.user.userFname }} {{ injury.user.userLname }}</td>
+          </tr>
+          <tr>
             <th>Injury Image</th>
             <td>
-              {% if injury.imagePath %}
-<img src="{{ asset('frontOffice/img/' ~ injury.imagePath) }}" class="img-thumbnail" style="max-height: 200px;" alt="Current Image">
+              {% if injury.image %}
+                <img src="{{ asset('frontOffice/img/' ~ injury.image) }}" 
+                     class="img-thumbnail" 
+                     style="max-height: 200px;" 
+                     alt="Injury Image">
               {% else %}
-                <span class="text-muted">No image uploaded</span>
+                <span class="text-muted">No image available</span>
               {% endif %}
             </td>
           </tr>
@@ -58,4 +64,3 @@
 </section>
 {% endblock %}
 {% endblock %}
-

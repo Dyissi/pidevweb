@@ -256,7 +256,7 @@ public function edit(string $context, Request $request, User $user, EntityManage
             throw $this->createAccessDeniedException('Invalid context or user role.');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             $entityManager->remove($user);
             $entityManager->flush();
         }

@@ -6,6 +6,7 @@ use App\Entity\Recoveryplan;
 use App\Form\RecoveryplanFormType;
 use App\Repository\RecoveryplanRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\TwilioService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/recoveryplan')]
 class RecoveryplanController extends AbstractController
 {
+    public function __construct(private TwilioService $twilio) {}
+
     #[Route('/', name: 'app_recoveryplan_index', methods: ['GET'])]
     public function index(Request $request, RecoveryplanRepository $recoveryplanRepository): Response
     {
@@ -61,6 +64,14 @@ class RecoveryplanController extends AbstractController
             $em->persist($recoveryplan);
             $em->flush();
 
+            // Send SMS after successful creation
+            $this->twilio->sendSms(
+                $recoveryplan->getUser()->getUserNbr(), // Assuming phone is stored in user_nbr
+                "New recovery plan created: {$recoveryplan->getRecoveryGoal()}\n" .
+                "Start Date: {$recoveryplan->getRecoveryStartDate()->format('Y-m-d')}\n" .
+                "End Date: {$recoveryplan->getRecoveryEndDate()->format('Y-m-d')}"
+            );
+
             $this->addFlash('success', 'Recovery Plan created successfully!');
             return $this->redirectToRoute('app_recoveryplan_index');
         }
@@ -70,6 +81,7 @@ class RecoveryplanController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_recoveryplan_show', methods: ['GET'])]
     public function show(int $id, RecoveryplanRepository $recoveryplanRepository): Response
@@ -99,6 +111,14 @@ class RecoveryplanController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
+
+            // Send SMS after successful update
+            $this->twilio->sendSms(
+                $recoveryplan->getUser()->getUserNbr(),
+                "Your recovery plan has been updated:\n" .
+                "New goal: {$recoveryplan->getRecoveryGoal()}\n" .
+                "Status: {$recoveryplan->getRecoveryStatus()}"
+            );
 
             $this->addFlash('success', 'Recovery Plan updated successfully!');
             return $this->redirectToRoute('app_recoveryplan_index');

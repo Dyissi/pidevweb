@@ -6,6 +6,7 @@ use App\Entity\Recoveryplan;
 use App\Entity\User;
 use App\Entity\Injury;
 use Symfony\Component\Form\AbstractType;
+use App\Repository\UserRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -16,8 +17,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 
+
 class RecoveryplanFormType extends AbstractType
 {
+    private $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -74,12 +83,16 @@ class RecoveryplanFormType extends AbstractType
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getUserFname() . ' ' . $user->getUserLname();
+                'query_builder' => function () {
+                    return $this->userRepository->createQueryBuilder('u')
+                        ->where('u.user_role = :role')
+                        ->setParameter('role', 'athlete');
                 },
-                'placeholder' => 'Select User',
-                'label' => 'User',
-                'required' => true,  
+                'choice_label' => fn(User $user) => $user->getUserFname() . ' ' . $user->getUserLname(),
+                'placeholder' => 'Choose an athlete',
+                'required' => true,
+                'attr' => ['data-ajax-url' => '/injury/by-user'],
+                'choice_value' => 'id',
             ]);
     }
 

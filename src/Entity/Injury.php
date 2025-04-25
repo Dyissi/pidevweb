@@ -8,8 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Recoveryplan;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity]
+#[Vich\Uploadable] 
 class Injury
 {
     #[ORM\Id]
@@ -37,8 +40,15 @@ class Injury
     #[Assert\NotBlank(message: "Injury description must not be blank")]
     private string $injury_description;
 
+    #[Vich\UploadableField(
+        mapping: "injury_images",
+        fileNameProperty: "image", 
+        
+    )]
+    private ?File $imageFile = null;
+
     #[ORM\Column(name: "image", type: "string", length: 255, nullable: true)]
-    private ?string $imagePath = null;
+    private ?string $image = null;  
 
     #[ORM\OneToMany(targetEntity: Recoveryplan::class, mappedBy: 'injury')]
     private Collection $recoveryplans;
@@ -109,17 +119,26 @@ class Injury
         return $this;
     }
 
-    public function getImagePath(): ?string
+    public function setImageFile(?File $imageFile = null): void
     {
-        return $this->imagePath;
+        $this->imageFile = $imageFile;
+      
     }
 
-    public function setImagePath(?string $imagePath): self
+    public function getImageFile(): ?File
     {
-        $this->imagePath = $imagePath;
-        return $this;
+        return $this->imageFile;
     }
 
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
+    }
     /**
      * @return Collection<int, Recoveryplan>
      */

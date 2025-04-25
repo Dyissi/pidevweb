@@ -56,7 +56,7 @@ class InjuryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByUserId($userId): array
+public function findByUserId($userId): array
 {
     return $this->createQueryBuilder('i')
         ->andWhere('i.user = :user')
@@ -64,4 +64,5 @@ class InjuryRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
 }
+
 }

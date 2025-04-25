@@ -1,6 +1,5 @@
 # config/services.yaml
 parameters:
-    
 
 services:
     _defaults:
@@ -15,7 +14,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # Twilio Service
+    App\Service\TwilioService:
+        arguments:
+            $sid: '%env(TWILIO_SID)%'
+            $token: '%env(TWILIO_AUTH_TOKEN)%'
+
     # Explicit Finder service configuration
     Symfony\Component\Finder\Finder:
         class: Symfony\Component\Finder\Finder
-        shared: false  # Important: creates new instance each time
+        shared: false
