@@ -97,7 +97,14 @@
         {# ATHLETE-ONLY LINKS #}
         {% if is_granted('ROLE_ATHLETE') %}
         <li><a href="{{ path('app_claim_new') }}">Claims<br></a></li>
-        <li><a href="{{ path('app_injury_Myhealth') }}">My Health<br></a></li>
+       <li class="dropdown">
+    <a href="#"><span>My Health</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+    <ul>
+        <li><a href="{{ path('app_injury_Myhealth') }}"><span>Status</span></a></li>
+        <li><a href="{{ path('calendar_show') }}"><span>Calendar</span></a></li>
+         <li><a href="{{ path('chatbot_show') }}"><span>ChatBot</span></a></li>
+    </ul>
+</li>
         {% endif %}
 
         {# MEDICAL TEAM LINKS #}

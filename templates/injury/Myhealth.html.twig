@@ -2,8 +2,6 @@
 
 {% block hero %}
 
-
-
 {% block body %}
     <div style="max-width: 800px; margin: 2rem auto; padding: 2rem; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); background-color: #f9f9f9;">
 
@@ -20,9 +18,12 @@
                     <p><strong>Severity:</strong> {{ injury.injurySeverity }}</p>
                     <p><strong>Date:</strong> {{ injury.injuryDate|date('Y-m-d') }}</p>
                 </div>
-                {% if injury.imagePath %}
-                    <img src="{{ asset('frontOffice/img/' ~ injury.imagePath) }}" alt="Injury Image" width="120" style="border-radius: 8px; object-fit: cover;" />
-                {% endif %}
+               {% if injury.image %}
+    <img src="{{ asset('frontOffice/img/' ~ injury.image) }}" 
+         alt="Injury Image" 
+         width="120" 
+         style="border-radius: 8px; object-fit: cover;" />
+{% endif %}
             </li>
         {% endfor %}
     </ul>

@@ -24,3 +24,12 @@ services:
     Symfony\Component\Finder\Finder:
         class: Symfony\Component\Finder\Finder
         shared: false
+
+    # Google calendar service 
+
+    App\Service\GoogleCalendarService:
+        arguments:
+            $clientId: '%env(GOOGLE_CLIENT_ID)%'
+            $clientSecret: '%env(GOOGLE_CLIENT_SECRET)%'
+            $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
+            $logger: '@logger'
