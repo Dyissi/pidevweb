@@ -23,13 +23,13 @@ class RecoveryPhaseService
             return 'Invalid recovery period';
         }
 
-        $progress = ($daysPassed / $totalDays) * 100;
+        $progress = ($daysPassed / $totalDays) * 10;
 
-        if ($progress < 33) {
+        if ($progress < 2) {
             return 'Early Phase';
-        } elseif ($progress < 66) {
+        } elseif ($progress < 5) {
             return 'Mid Phase';
-        } elseif ($progress <= 100) {
+        } elseif ($progress <= 10) {
             return 'Late Phase';
         } else {
             return 'Recovery Complete';
