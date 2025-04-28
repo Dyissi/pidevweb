@@ -1,6 +1,6 @@
 {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
 
-{# Session Focus #}
+{# Session Focus - No changes #}
 <div class="mb-3">
     {{ form_label(form.sessionFocus, 'Session Focus') }}
     <div class="d-flex flex-wrap gap-3">
@@ -17,23 +17,24 @@
     {{ form_errors(form.sessionFocus) }}
 </div>
 
+{# Date & Time Picker - Minimal changes #}
 <div class="mb-3">
-    {{ form_label(form.sessionStartTime) }}
+    <label class="form-label">
+        <i class="fas fa-calendar-alt me-2"></i> Session Date & Time
+    </label>
     {{ form_widget(form.sessionStartTime, {
         'attr': {
-            'class': 'form-control',
-            'placeholder': 'HH:MM',
-            'value': form.sessionStartTime.vars.value is defined 
-                ? form.sessionStartTime.vars.value|date('H:i') 
-                : ''
-        }
+            'class': 'form-control datetime-picker',
+            'placeholder': 'Select date and time...'
+        },
+        'html5': false,
+        'widget': 'single_text'
     }) }}
+    <small class="text-muted">Example: 2023-09-15 14:30</small>
     {{ form_errors(form.sessionStartTime) }}
 </div>
 
-
-
-{# Duration #}
+{# Duration - No changes #}
 <div class="mb-3">
     {{ form_label(form.sessionDuration, 'Duration') }}
     <div class="d-flex flex-wrap gap-3">
@@ -50,7 +51,7 @@
     {{ form_errors(form.sessionDuration) }}
 </div>
 
-{# Location #}
+{# Location - No changes #}
 <div class="mb-3">
     {{ form_label(form.location, 'Location') }}
     {{ form_widget(form.location, {
@@ -62,7 +63,7 @@
     {{ form_errors(form.location) }}
 </div>
 
-{# Notes #}
+{# Notes - No changes #}
 <div class="mb-3">
     {{ form_label(form.sessionNotes, 'Notes') }}
     {{ form_widget(form.sessionNotes, {
@@ -75,32 +76,46 @@
     {{ form_errors(form.sessionNotes) }}
 </div>
 
-{# Team ID #}
+{# Team - No changes #}
 <div class="mb-3">
-    {{ form_label(form.team, 'Team ID') }}
+    {{ form_label(form.team, 'Team') }}
     {{ form_widget(form.team) }}
-    
 </div>
 
+{# Buttons - No changes #}
 <div class="d-flex justify-content-between mt-4">
     <a href="{{ path('app_training_session_index') }}" class="btn btn-secondary">
         ← Back to List
     </a>
-<button type="submit" class="btn btn-primary">
-    {{ button_label|default('Save') }}
-</button>
+    <button type="submit" class="btn btn-primary">
+        {{ button_label|default('Save') }}
+    </button>
 </div>
 
 {{ form_end(form) }}
 
-
+{# Add these at the bottom - Simple Flatpickr implementation #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-document.getElementById('training-session-form').addEventListener('submit', function(e) {
-    console.log('Form submitted!'); // Check browser console for this
-    
-    // Optional: Add loading state
-    const button = document.getElementById('submit-button');
-    button.disabled = true;
-    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr('.datetime-picker', {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true
+    });
 });
 </script>
+
+<style>
+/* Simple styling for the picker */
+.flatpickr-input {
+    background-color: #fff;
+    cursor: pointer;
+}
+.flatpickr-calendar {
+    font-family: inherit;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+</style>

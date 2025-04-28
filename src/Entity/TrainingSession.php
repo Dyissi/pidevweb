@@ -24,7 +24,7 @@ class TrainingSession
     )]
     private ?string $sessionFocus = null;
 
-    #[ORM\Column(type: "time")]
+    #[ORM\Column(type: "datetime")]
     #[Assert\NotBlank(message: "Start time cannot be blank")]
     private ?\DateTimeInterface $sessionStartTime = null;
 
