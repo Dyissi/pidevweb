@@ -65,5 +65,4 @@ class GeocodingService
             throw new \RuntimeException('Geocoding failed: ' . $e->getMessage());
         }
     }
-
 } 
