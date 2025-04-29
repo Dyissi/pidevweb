@@ -10,10 +10,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\GeocodingService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/location')]
 final class LocationController extends AbstractController
 {
+    private $locationRepository;
+
+    public function __construct(LocationRepository $locationRepository)
+    {
+        $this->locationRepository = $locationRepository;
+    }
+
     #[Route(name: 'app_location_index', methods: ['GET'])]
     public function index(LocationRepository $locationRepository): Response
     {
@@ -43,10 +52,15 @@ final class LocationController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_location_show', methods: ['GET'])]
-    public function show(Location $location): Response
-    {
+    public function show(
+        Location $location, 
+        GeocodingService $geocodingService
+    ): Response {
+        $coordinates = $geocodingService->getCoordinates($location);
+        
         return $this->render('location/show.html.twig', [
             'location' => $location,
+            'coordinates' => $coordinates
         ]);
     }
 
@@ -77,5 +91,21 @@ final class LocationController extends AbstractController
         }
 
         return $this->redirectToRoute('app_location_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/coordinates', name: 'app_location_coordinates')]
+    public function getCoordinates(
+        Location $location, 
+        GeocodingService $geocodingService
+    ): JsonResponse {
+        try {
+            $coordinates = $geocodingService->getCoordinates($location);
+            if (!$coordinates) {
+                return $this->json(['error' => 'Could not geocode address'], 404);
+            }
+            return $this->json($coordinates);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

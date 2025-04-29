@@ -26,7 +26,7 @@ class TrainingSession
 
     #[ORM\Column(type: "datetime")]
     #[Assert\NotBlank(message: "Start time cannot be blank")]
-    private ?\DateTimeInterface $sessionStartTime = null;
+    private ?\DateTime $sessionStartTime = null;
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(message: "Duration cannot be blank")]
@@ -70,12 +70,12 @@ class TrainingSession
         return $this;
     }
 
-    public function getSessionStartTime(): ?\DateTimeInterface
+    public function getSessionStartTime(): ?\DateTime
     {
         return $this->sessionStartTime;
     }
 
-    public function setSessionStartTime(?\DateTimeInterface $time): self
+    public function setSessionStartTime(?\DateTime $time): self
     {
         $this->sessionStartTime = $time;
         return $this;
