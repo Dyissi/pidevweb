@@ -9,12 +9,14 @@
         <meta name="author" content="{% block author %}{% endblock %}" />
         <title>{% block title %}SPIIN Dashboard - Admin {% endblock %}</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
         
         {% block stylesheet %}
         <link href="{{ asset('backOffice/css/styles.css') }}" rel="stylesheet" />
         <link href="{{ asset('backOffice/css/custom_styles.css') }}" rel="stylesheet" /> 
         {% endblock %}
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
         {% endblock %}
     </head>
     <body class="sb-nav-fixed">

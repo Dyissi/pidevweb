@@ -1,5 +1,7 @@
 # config/services.yaml
 parameters:
+    # Add any parameters you want to use in your services here
+    app.ninja_api_key: '%env(API_NINJAS_KEY)%'
 
 services:
     _defaults:
@@ -26,10 +28,28 @@ services:
         shared: false
 
     # Google calendar service 
-
     App\Service\GoogleCalendarService:
         arguments:
             $clientId: '%env(GOOGLE_CLIENT_ID)%'
             $clientSecret: '%env(GOOGLE_CLIENT_SECRET)%'
             $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
             $logger: '@logger'
+
+    # QuickChart service configuration
+    App\Service\QuickChartService:
+        arguments:
+            $httpClient: '@http_client'
+
+    App\Service\NinjaApiService:
+        arguments:
+            $httpClient: '@http_client'
+            $params: '@parameter_bag'
+            $logger: '@logger'
+
+    App\Service\GeocodingService:
+        arguments:
+            $nominatimGeocoder: '@bazinga_geocoder.provider.nominatim'
+
+    App\Service\GeminiService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%'

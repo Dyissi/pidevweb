@@ -9,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class TrainingSessionType extends AbstractType
@@ -29,12 +29,16 @@ class TrainingSessionType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
             ])
-            ->add('sessionStartTime', TimeType::class, [
+            ->add('sessionStartTime', DateTimeType::class, [
                 'widget' => 'single_text',
+                'html5' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Select date and time'
+                ],
+                'required' => true,
                 'input' => 'datetime',
-                'html5' => false,
-                'invalid_message' => 'Please enter a valid time (HH:MM)',
-                'attr' => ['placeholder' => 'HH:MM'],
+                'invalid_message' => 'Please enter a valid date and time'
             ])
             ->add('sessionDuration', ChoiceType::class, [
                 'choices' => [

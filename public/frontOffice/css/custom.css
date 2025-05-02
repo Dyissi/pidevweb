@@ -49,5 +49,21 @@
     background-color: var(--primary-dark);
     border-color: var(--primary-dark);
   }
+  .goog-te-gadget {
+    font-family: inherit !important;
+}
+.goog-te-gadget-simple {
+    background-color: transparent !important;
+    border: none !important;
+}
+.goog-te-menu-value {
+    color: inherit !important;
+}
+.goog-te-menu-value span:first-child {
+    display: none;
+}
+.goog-te-menu-value span:last-child::before {
+    content: "🌐 ";
+}
   
   /* Add other component-specific overrides as needed */

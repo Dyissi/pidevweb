@@ -10,17 +10,49 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Psr\Log\LoggerInterface; // Add this use statement
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Service\NinjaApiService;
+use Knp\Component\Pager\PaginatorInterface;
+
 
 
 #[Route('/training/session')]
 final class TrainingSessionController extends AbstractController
 {
-    #[Route(name: 'app_training_session_index', methods: ['GET'])]
-    public function index(TrainingSessionRepository $trainingSessionRepository): Response
+    private $ninjaApiService;
+
+    public function __construct(NinjaApiService $ninjaApiService)
     {
+        $this->ninjaApiService = $ninjaApiService;
+    }
+
+    #[Route(name: 'app_training_session_index', methods: ['GET'])]
+    public function index(Request $request, TrainingSessionRepository $trainingSessionRepository, PaginatorInterface $paginator): Response
+    {
+        $focus = $request->query->get('focus', 'all');
+        $filter = $request->query->get('filter', 'all');
+        $limit = $request->query->getInt('limit', 10);
+
+        // Get base query
+        $query = $trainingSessionRepository->createQueryBuilder('s');
+        if ($focus !== 'all') {
+            $query->andWhere('s.sessionFocus = :focus')->setParameter('focus', $focus);
+        }
+        // No duration filter in query for now (could be added if needed)
+        $query->orderBy('s.sessionStartTime', 'DESC');
+
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
         return $this->render('training_session/index.html.twig', [
-            'training_sessions' => $trainingSessionRepository->findAll(),
+            'training_sessions' => $pagination,
+            'current_focus' => $focus,
+            'current_filter' => $filter,
+            'focus_choices' => ["Agility", "Strength", "Dribbling", "Endurance", "Sprint", "Speed"]
         ]);
     }
     #[Route('/new', name: 'app_training_session_new')]
@@ -57,6 +89,7 @@ final class TrainingSessionController extends AbstractController
             'training_session' => $trainingSession,
         ]);
     }
+    
 
     #[Route('/{sessionId}/edit', name: 'app_training_session_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, TrainingSession $trainingSession, EntityManagerInterface $entityManager): Response
@@ -85,5 +118,73 @@ final class TrainingSessionController extends AbstractController
         }
 
         return $this->redirectToRoute('app_training_session_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/exercises/{focus}', name: 'app_training_session_exercises', methods: ['GET'], priority: 1000)]
+    public function getExercises(string $focus, LoggerInterface $logger): JsonResponse
+    {
+        try {
+            $logger->info('Exercise request received', ['focus' => $focus]);
+            
+            // Validate focus parameter
+            if (empty($focus)) {
+                throw new \InvalidArgumentException('Focus parameter cannot be empty');
+            }
+
+            $exercises = $this->ninjaApiService->getExercisesByMuscle($focus);
+            
+            if (empty($exercises)) {
+                $logger->info('No exercises found', ['focus' => $focus]);
+                return new JsonResponse([
+                    'message' => 'No exercises found for the selected category.',
+                    'data' => []
+                ]);
+            }
+            
+            return new JsonResponse([
+                'message' => 'Exercises found successfully',
+                'data' => $exercises
+            ]);
+            
+        } catch (\Exception $e) {
+            $logger->error('Exercise API error', [
+                'focus' => $focus,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMessage = 'An error occurred while fetching exercises. ';
+            if (str_contains($e->getMessage(), '400')) {
+                $errorMessage .= 'The API request was invalid. This might be due to maintenance or the free tier being temporarily unavailable.';
+            } elseif (str_contains($e->getMessage(), '402')) {
+                $errorMessage .= 'The free tier is currently unavailable. Please try again later or consider upgrading to premium.';
+            } else {
+                $errorMessage .= 'Please try again later.';
+            }
+            
+            return new JsonResponse([
+                'error' => true,
+                'message' => $errorMessage
+            ], 500);
+        }
+    }
+
+    #[Route('/analysis', name: 'app_training_session_analysis', methods: ['GET'])]
+    public function analysis(Request $request, TrainingSessionRepository $trainingSessionRepository, PaginatorInterface $paginator): Response
+    {
+        $limit = $request->query->getInt('limit', 10);
+        
+        $query = $trainingSessionRepository->createQueryBuilder('s')
+            ->orderBy('s.sessionStartTime', 'DESC');
+
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
+        return $this->render('training_session/analysis.html.twig', [
+            'training_sessions' => $pagination
+        ]);
     }
 }

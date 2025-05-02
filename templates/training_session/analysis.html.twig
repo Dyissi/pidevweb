@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Training Session Analysis{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+        .chart-title {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .insight-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+        }
+        .insight-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        .insight-content {
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        .analysis-form {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .analysis-response {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Training Session Analysis</h1>
+        
+        <!-- Sports Carousel -->
+        <div class="container-fluid p-0">
+            <div id="coachCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% set images = [
+                        'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        'https://images.unsplash.com/photo-1566932769119-7a1fb6d7ce23?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        'https://images.unsplash.com/photo-1502904550040-7534597429ae?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        'https://images.unsplash.com/photo-1485400031595-976c74cf4e25?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                    ] %}
+                    {% for img in images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ img }}" class="d-block w-100" style="height: 320px; object-fit: cover;" alt="Sports coaching image">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Sessions Table -->
+        <div class="container mt-4">
+            <div class="navigation mt-4">
+                {{ knp_pagination_render(training_sessions) }}
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Charts Section -->
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="chart-container">
+                        <h2 class="chart-title">Focus Distribution</h2>
+                        <div id="focus_distribution" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="chart-container">
+                        <h2 class="chart-title">Average Duration by Focus Type</h2>
+                        <div id="duration_chart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="chart-container">
+                        <h2 class="chart-title">Training Sessions Over Time</h2>
+                        <div id="time_chart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemini Q&A Section -->
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-7">
+                    <div class="card shadow-lg border-0 mb-4">
+                        <div class="card-body p-5">
+                            <h2 class="text-center mb-4" style="color: #d35400; font-family: 'Poppins', sans-serif;">Ask Gemini About Coaching</h2>
+                            <form id="analysisForm">
+                                <div class="mb-3">
+                                    <label for="question" class="form-label" style="color: #16a085;">Ask any question about coaching, training, or sports science:</label>
+                                    <textarea class="form-control" id="question" rows="3" required></textarea>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-warning px-4">Ask Gemini</button>
+                                </div>
+                            </form>
+                            <div id="analysisResponse" class="alert alert-info mt-4 d-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        {{ gc_draw([focusDistribution, durationChart, timeChart], ['focus_distribution', 'duration_chart', 'time_chart']) }}
+
+        // Handle analysis form submission
+        document.getElementById('analysisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const question = document.getElementById('question').value;
+            const responseDiv = document.getElementById('analysisResponse');
+            responseDiv.classList.remove('d-none', 'alert-danger');
+            responseDiv.classList.add('alert-info');
+            responseDiv.innerHTML = '<div class="text-center">Thinking...</div>';
+
+            fetch('{{ path("app_training_analysis_ask") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'question': question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    responseDiv.innerHTML = data.response;
+                } else {
+                    responseDiv.classList.remove('alert-info');
+                    responseDiv.classList.add('alert-danger');
+                    responseDiv.innerHTML = `<div class="text-center">Error: ${data.error}</div>`;
+                }
+            })
+            .catch(error => {
+                responseDiv.classList.remove('alert-info');
+                responseDiv.classList.add('alert-danger');
+                responseDiv.innerHTML = `<div class="text-center">Error: ${error.message}</div>`;
+            });
+        });
+    </script>
+{% endblock %} 
