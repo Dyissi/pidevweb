@@ -1,8 +1,78 @@
+<<<<<<< HEAD
+=======
 
+>>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c
 {% extends 'base.html.twig' %}
 
 {% block title %}Import Performance Data{% endblock %}
 
+<<<<<<< HEAD
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .import-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-text {
+            margin-top: 0.5rem;
+            color: #6c757d;
+        }
+        .btn-group {
+            margin-top: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="import-container">
+        <h1 class="text-center mb-4">Import Performance Data</h1>
+        
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+            <div class="form-group">
+                {{ form_label(form.csv_file, 'CSV File', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.csv_file, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.csv_file) }}
+                <div class="form-text">
+                    Upload a CSV file with the following columns (exact header names):
+                    <ul class="mt-2">
+                        <li><code>performanceSpeed</code> (float)</li>
+                        <li><code>performanceAgility</code> (float)</li>
+                        <li><code>performanceNbrGoals</code> (integer)</li>
+                        <li><code>performanceAssists</code> (integer)</li>
+                        <li><code>performanceDateRecorded</code> (date in YYYY-MM-DD format)</li>
+                        <li><code>performanceNbrFouls</code> (integer)</li>
+                    </ul>
+                    <div class="mt-3">
+                        <strong>Example CSV format:</strong>
+                        <pre class="bg-light p-2 rounded">
+performanceSpeed,performanceAgility,performanceNbrGoals,performanceAssists,performanceDateRecorded,performanceNbrFouls
+12.5,85,2,1,2024-03-15,1
+13.2,88,3,2,2024-03-16,0
+11.8,82,1,0,2024-03-17,2</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-upload"></i> Import
+                </button>
+                <a href="{{ path('app_data_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %} 
+=======
 {% block main %}
     <div class="container py-4">
         <h1>Import Performance Data</h1>
@@ -21,3 +91,4 @@
         {{ form_end(form) }}
     </div>
 {% endblock %}
+>>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c

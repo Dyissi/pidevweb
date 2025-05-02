@@ -21,7 +21,23 @@
   <link href="{{ asset('frontOffice/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
   <link href="{{ asset('frontOffice/css/main.css') }}" rel="stylesheet">
   <link href="{{ asset('frontOffice/css/custom.css') }}" rel="stylesheet">
-      
+  <!-- Google Translate-->
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                { 
+                    pageLanguage: 'en', 
+                    autoDisplay: false,
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                },
+                'google_translate_element'
+            );
+        }
+    </script>
+  <!--Bootstrap ithink -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- Main CSS File -->
 {% block stylesheet %}
   <link href="{{ asset('frontOffice/css/custom.css') }}" rel="stylesheet"> 
@@ -87,7 +103,9 @@
             <ul>
                 <li><a href="{{ path('app_training_session_index') }}">View All</a></li>
                 <li><a href="{{ path('app_training_session_new') }}">Add New</a></li>
+                <li><a href="{{ path('app_training_analysis') }}">Analysis</a></li>
             </ul>
+          </li>
 
         </li>
         {% endif %}
@@ -141,6 +159,8 @@
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
+      <div id="google_translate_element" class="me-3"></div>
+      
       {% if app.user %}
             <span class="me-3">Welcome, {{ app.user.userFname }} ({{ app.user.userRole }})</span>
             <a class="btn-getstarted" href="{{ path('app_logout') }}">Logout</a>

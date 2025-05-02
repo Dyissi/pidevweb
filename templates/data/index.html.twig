@@ -2,6 +2,111 @@
 
 {% block title %}Performance Data{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+    /* Weather Card CSS from Uiverse.io by sahilxkhadka */
+    .weather-card-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    .card {
+      width: 300px;
+      height: 120px;
+      position: relative;
+      padding: 12px 16px 10px 16px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border-radius: 1rem;
+      font-size: 0.98rem;
+    }
+    .background {
+      fill: linear-gradient(90deg, #5936B4 0%, #362A84 100%);
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+    .cloud {
+      position: absolute;
+      right: 0;
+      top: -4px;
+    }
+    .cloud svg {
+      height: 48px;
+      width: 70px;
+    }
+    .card .main-text {
+      font-size: 28px;
+      z-index: 2;
+      margin-bottom: 0.2rem;
+    }
+    .card .info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .card .info .text-gray {
+      color: rgba(235, 235, 245, 0.60);
+      font-size: 0.92rem;
+    }
+    .card .info .info-right {
+      align-self: flex-end;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .weather-extra {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.93rem;
+      margin-top: 0.2rem;
+      color: #e0e0e0;
+    }
+    /* Slim Banner Carousel */
+    .carousel {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+    .carousel-inner {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .carousel-item img {
+        object-fit: cover;
+        object-position: center center;
+        width: 320px !important;
+        height: 80px !important;
+        max-width: 100%;
+        max-height: 80px;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        margin: 0 auto;
+        display: block;
+    }
+    .carousel-inner {
+        max-width: 340px;
+        margin: 0 auto;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .weather-error {
+        color: #fff;
+        background: #e74c3c;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        text-align: center;
+    }
+    </style>
+{% endblock %}
+
 {% block main %}
     <div class="page-title text-center py-5">
       <div class="container">
@@ -25,6 +130,26 @@
         {% endfor %}
     {% endfor %}
 
+<<<<<<< HEAD
+    <div class="container">
+       
+        <div class="container-fluid p-0">
+            <div id="sportsCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% set images = [
+                        'https://img.freepik.com/free-photo/stock-portfolio-computer-monitor-containing-collection-financial-assets_482257-93465.jpg?t=st=1746220267~exp=1746223867~hmac=b7d36c793e09a189eaf4f2f4efaff72f3d40534e8f6c36b7eaf761fe8e093d0e&w=1380',
+                        'https://img.freepik.com/free-photo/physical-activity-stats-around-person_23-2150163381.jpg?t=st=1746216099~exp=1746219699~hmac=699a50d4868f059b5dfb40978069413f294a3d7278aae01bc196c46d8fae3d47&w=996',
+                        'https://img.freepik.com/free-photo/data-stats-around-person-doing-physical-activity_23-2150165180.jpg?t=st=1746216152~exp=1746219752~hmac=151185d3c9fe0494fbe1b559157ce487593be54b8c207efdd61b7573a3477513&w=996',
+                        'https://img.freepik.com/premium-photo/composite-image-football-player-kicking-ball_1134-1778.jpg?w=996',
+                        'https://img.freepik.com/free-photo/woman-doing-sport-with-stats-side-view_23-2150040505.jpg?t=st=1746220349~exp=1746223949~hmac=d6e3b8d1a91e18277360aa4f49c660f1ca8276c951d8d45e6f49197680b72f4d&w=900'
+                    ] %}
+                    {% for img in images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ img }}" class="d-block w-100" style="height: 320px; object-fit: cover;" alt="Sports image">
+                        </div>
+                    {% endfor %}
+                </div>
+=======
     <div class="container performance-table">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Performance Records</h1>
@@ -35,30 +160,102 @@
                 <a href="{{ path('app_data_new') }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg"></i> Add New
                 </a>
+>>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c
             </div>
         </div>
 
-        <form method="get" class="mb-4 d-flex gap-2 align-items-center">
-            <label for="filter" class="form-label mb-0">Filter by:</label>
-            <select name="filter" id="filter" class="form-select w-auto">
-                <option value="">-- None --</option>
-                <option value="least_fouls" {{ selectedFilter == 'least_fouls' ? 'selected' : '' }}>Least Fouls</option>
-                <option value="highest_speed" {{ selectedFilter == 'highest_speed' ? 'selected' : '' }}>Highest Speed</option>
-            </select>
-            <button type="submit" class="btn btn-outline-secondary">Apply</button>
-        </form>
+        <!-- Weather Modal Trigger Button -->
+        <div class="d-flex justify-content-center mb-3">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#weatherModal">
+                <i class="bi bi-cloud-sun"></i> Show Weather
+            </button>
+        </div>
 
-        <!-- Search Input Positioned Below the Button -->
-        <div class="mb-4" style="max-width: 300px;">
-            <label for="searchInput" class="form-label visually-hidden">Search</label>
-            <div class="input-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterTable()">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <!-- Weather Modal -->
+        <div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+              <div class="modal-body d-flex justify-content-center align-items-center p-0">
+                <!-- Uiverse.io Weather Card (40% bigger, new background, white text) -->
+                <div id="weatherCard" style="width:330px; min-width:330px; min-height:202px; background: #709755; border-radius: 1.5em; box-shadow: 0px 4px 16px 0px #222; color: #fff; font-family: 'Nunito', sans-serif; padding: 1.44em 1.44em 0.72em 1.44em; display: flex; flex-direction: column; align-items: center; gap: 0.72em;">
+                  <div style="display: flex; align-items: center; gap: 1em; width: 100%; justify-content: center;">
+                    <svg viewBox="0 0 80 80" fill="none" height="70" width="70" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M77.39 46.522c0 1.478-.086 2.974-.26 4.435 0 .035-.017.035-.017.07L61.72 46.921c.018-.14.018-.261.018-.4 0-11.983-9.757-21.74-21.74-21.74-11.982 0-21.738 9.757-21.738 21.74v.33l-15.392 4.14v-.035a37.706 37.706 0 0 1-.26-4.435c0-20.609 16.765-37.392 37.39-37.392 20.627 0 37.392 16.783 37.392 37.392Z" fill="#F95428"></path>
+                    </svg>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                      <span id="weatherCity" style="font-size: 1.15em; font-weight: 400; color: #fff;">Loading...</span>
+                      <span id="weatherTemp" style="font-size: 2.3em; font-weight: 700; color: #fff;">--°C</span>
+                      <span id="weatherDesc" style="font-size: 1.3em; font-weight: 400; color: #fff;">--</span>
+                    </div>
+                  </div>
+                  <div style="width: 100%; height: 1.4px; background: hsla(0,0%,100%,0.2); margin: 0.43em 0;"></div>
+                  <div style="display: flex; flex-direction: column; width: 100%; gap: 0.29em;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.3em; color: #fff;">
+                      <span><i class="bi bi-wind"></i> <span id="weatherWind">-- km/h</span></span>
+                      <span><i class="bi bi-droplet"></i> <span id="weatherHumidity">--%</span></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.3em; color: #fff;">
+                      <span><i class="bi bi-cloud-drizzle"></i> <span id="weatherRain">-- mm</span></span>
+                      <span style="font-size:1.22em; color: #fff;">Feels like <span id="weatherFeels">--°C</span></span>
+                    </div>
+                  </div>
+                </div>
+                <!-- End Uiverse.io Weather Card -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Weather Modal -->
+    </div>
+
+    <div class="container performance-table">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Performance Data</h2>
+            <div>
+                <a href="{{ path('app_data_import') }}" class="btn btn-info me-2">
+                    <i class="bi bi-upload"></i> Import CSV
+                </a>
+                <a href="{{ path('app_data_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Add New
+                </a>
+            </div>
+        </div>
+
+        <div class="row mb-4 align-items-end">
+            <div class="col-md-8 d-flex gap-3 align-items-center">
+                <form method="get" class="d-flex gap-2 align-items-center mb-0">
+                    <label for="filter" class="form-label mb-0">Filter by:</label>
+                    <select name="filter" id="filter" class="form-select w-auto">
+                        <option value="">-- None --</option>
+                        <option value="least_fouls" {{ selectedFilter == 'least_fouls' ? 'selected' : '' }}>Least Fouls</option>
+                        <option value="highest_speed" {{ selectedFilter == 'highest_speed' ? 'selected' : '' }}>Highest Speed</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-secondary">Apply</button>
+                </form>
+                <div style="max-width: 300px;">
+                    <label for="searchInput" class="form-label visually-hidden">Search</label>
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterTable()">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex justify-content-end">
+                <form method="get" class="mb-0 d-flex align-items-center gap-2">
+                    <label for="limit" class="form-label mb-0">Show:</label>
+                    <select name="limit" id="limit" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="1" {{ app.request.get('limit') == 1 ? 'selected' : '' }}>1</option>
+                        <option value="5" {{ app.request.get('limit') == 5 ? 'selected' : '' }}>5</option>
+                        <option value="10" {{ app.request.get('limit') == 10 or not app.request.get('limit') ? 'selected' : '' }}>10</option>
+                        <option value="20" {{ app.request.get('limit') == 20 ? 'selected' : '' }}>20</option>
+                    </select>
+                    <span>per page</span>
+                </form>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-striped">
                 <thead class="thead-dark">
                     <tr>
                         <th>Speed</th>
@@ -120,6 +317,69 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <div class="navigation">
+            {{ knp_pagination_render(data) }}
+        </div>
+    </div>
+
+    <!-- Charts Modal -->
+    <div class="modal fade" id="chartsModal" tabindex="-1" aria-labelledby="chartsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartsModalLabel">Performance Charts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Speed Over Time</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ speedChartUrl }}" alt="Speed Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Agility Over Time</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ agilityChartUrl }}" alt="Agility Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Goals Per Session</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ goalsChartUrl }}" alt="Goals Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Fouls Per Session</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ foulsChartUrl }}" alt="Fouls Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -210,5 +470,40 @@
             }
         }
     }
+    </script>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateWeatherCard(data) {
+            document.getElementById('weatherCity').textContent = data.city || 'Tunis';
+            document.getElementById('weatherTemp').textContent = (data.temperature !== undefined ? data.temperature : '--') + '°C';
+            document.getElementById('weatherDesc').textContent = data.description || '';
+            document.getElementById('weatherWind').textContent = (data.wind_speed !== undefined ? data.wind_speed : '--') + ' km/h';
+            document.getElementById('weatherRain').textContent = (data.rain !== undefined ? data.rain : '--') + ' mm';
+            document.getElementById('weatherHumidity').textContent = (data.humidity !== undefined ? data.humidity : '--') + '%';
+            document.getElementById('weatherFeels').textContent = 'Feels like ' + (data.feels_like !== undefined ? data.feels_like : '--') + '°C';
+        }
+        function fetchWeather(lat, lon) {
+            fetch(`/data/meteo?lat=${lat}&lon=${lon}`)
+                .then(res => res.json())
+                .then(json => {
+                    if (json.success && json.weather) {
+                        updateWeatherCard(json.weather);
+                    }
+                });
+        }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                fetchWeather(position.coords.latitude, position.coords.longitude);
+            }, function() {
+                fetchWeather(36.819, 10.1658); // Tunis fallback
+            });
+        } else {
+            fetchWeather(36.819, 10.1658); // Tunis fallback
+        }
+    });
     </script>
 {% endblock %}

@@ -5,16 +5,18 @@ namespace App\Controller;
 use App\Entity\Data;
 use App\Form\DataType;
 use App\Repository\DataRepository;
+use App\Service\QuickChartService;
+use App\Service\OpenMeteoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\CsvImportService;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
-use App\Service\QuickChartService;
-
 
 #[Route('/data')]
 
@@ -22,24 +24,34 @@ final class DataController extends AbstractController
 {
     
     #[Route(name: 'app_data_index', methods: ['GET'])]
-    public function index(Request $request, DataRepository $dataRepository, QuickChartService $quickChart): Response
+    public function index(Request $request, DataRepository $dataRepository, QuickChartService $quickChart, PaginatorInterface $paginator, OpenMeteoService $openMeteo): Response
     {
-        $filter = $request->query->get('filter');  // Get ?filter=value from URL
+        $filter = $request->query->get('filter');
 
         if ($filter) {
-            $data = $dataRepository->findFiltered($filter); // Use custom method in repo
+            $query = $dataRepository->findFiltered($filter); // Use custom method in repo
         } else {
-            $data = $dataRepository->findAll(); // Default behavior
+            $query = $dataRepository->createQueryBuilder('d');
         }
-    
-        // Prepare data for charts
+
+        $limit = $request->query->getInt('limit', 10);
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
+        // Get weather data for Tunis (default location)
+        $weather = $openMeteo->getWeatherData(36.819, 10.1658);
+
+        // Prepare data for charts (use paginated data)
         $labels = [];
         $speedData = [];
         $agilityData = [];
         $goalsData = [];
         $foulsData = [];
 
-        foreach ($data as $item) {
+        foreach ($pagination as $item) {
             $labels[] = $item->getPerformanceDateRecorded()->format('M d, Y');
             $speedData[] = $item->getPerformanceSpeed();
             $agilityData[] = $item->getPerformanceAgility();
@@ -77,54 +89,27 @@ final class DataController extends AbstractController
         );
 
         return $this->render('data/index.html.twig', [
-            'data' => $data,
+            'data' => $pagination,
             'selectedFilter' => $filter,
             'speedChartUrl' => $speedChartUrl,
             'agilityChartUrl' => $agilityChartUrl,
             'goalsChartUrl' => $goalsChartUrl,
             'foulsChartUrl' => $foulsChartUrl,
+            'weather' => $weather,
         ]);
     }
-    #[Route('/chart', name: 'app_data_chart', methods: ['GET'])]
-    public function chart(): Response
+    #[Route('/meteo', name: 'app_data_meteo', methods: ['GET'])]
+    public function meteo(Request $request, \App\Service\OpenMeteoService $openMeteo): JsonResponse
     {
-        return $this->render('data/chart.html.twig');
-    }
-    // Add this new method to your DataController class
-    #[Route('/import', name: 'app_data_import', methods: ['GET', 'POST'])]
-    public function import(Request $request, CsvImportService $csvImportService): Response
-    {
-    $form = $this->createFormBuilder()
-        ->add('csv_file', FileType::class, [
-            'label' => 'CSV File',
-            'constraints' => [
-                new File([
-                    'maxSize' => '1024k',
-                    'mimeTypes' => ['text/csv', 'text/plain'],
-                    'mimeTypesMessage' => 'Please upload a valid CSV file',
-                ])
-            ],
-        ])
-        ->getForm();
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $file = $form->get('csv_file')->getData();
-        
-        try {
-            $count = $csvImportService->import($file->getPathname(), $this->getUser());
-            $this->addFlash('success', "Successfully imported $count records");
-            return $this->redirectToRoute('app_data_index');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Error importing CSV: '.$e->getMessage());
+        $lat = $request->query->get('lat', 36.819); 
+        $lon = $request->query->get('lon', 10.1658);
+        $weather = $openMeteo->getWeatherData((float)$lat, (float)$lon);
+        if ($weather) {
+            return new JsonResponse(['success' => true, 'weather' => $weather]);
         }
+        return new JsonResponse(['success' => false, 'weather' => null], 400);
     }
 
-    return $this->render('data/import.html.twig', [
-        'form' => $form->createView(),
-        ]);
-    }
 
     #[Route('/new', name: 'app_data_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
@@ -148,6 +133,42 @@ final class DataController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    
+    #[Route('/import', name: 'app_data_import', methods: ['GET', 'POST'])]
+    public function import(Request $request, CsvImportService $csvImportService): Response
+    {
+        $form = $this->createFormBuilder()
+            ->add('csv_file', FileType::class, [
+                'label' => 'CSV File',
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => ['text/csv', 'text/plain'],
+                        'mimeTypesMessage' => 'Please upload a valid CSV file',
+                    ])
+                ],
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('csv_file')->getData();
+            
+            try {
+                $count = $csvImportService->import($file->getPathname(), $this->getUser());
+                $this->addFlash('success', "Successfully imported $count records");
+                return $this->redirectToRoute('app_data_index');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Error importing CSV: '.$e->getMessage());
+            }
+        }
+
+        return $this->render('data/import.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
 
     #[Route('/{performanceId}', name: 'app_data_show', methods: ['GET'])]
     public function show(int $performanceId, DataRepository $dataRepository): Response
@@ -192,4 +213,5 @@ final class DataController extends AbstractController
 
         return $this->redirectToRoute('app_data_index', [], Response::HTTP_SEE_OTHER);
     }
+
 }

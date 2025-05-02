@@ -1,7 +1,7 @@
 
 parameters:
     # Add any parameters you want to use in your services here
-    api_ninjas_key: '%env(API_NINJAS_KEY)%'
+    app.ninja_api_key: '%env(API_NINJAS_KEY)%'
 
 services:
     _defaults:
@@ -45,8 +45,16 @@ services:
         arguments:
             $httpClient: '@http_client'
 
-    # WgerApiService configuration
-    App\Service\WgerApiService:
+    App\Service\NinjaApiService:
         arguments:
             $httpClient: '@http_client'
-            $apiKey: '%api_ninjas_key%'
+            $params: '@parameter_bag'
+            $logger: '@logger'
+
+    App\Service\GeocodingService:
+        arguments:
+            $nominatimGeocoder: '@bazinga_geocoder.provider.nominatim'
+
+    App\Service\GeminiService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%'

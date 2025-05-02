@@ -12,49 +12,44 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Service\WgerApiService;
+use App\Service\NinjaApiService;
+use Knp\Component\Pager\PaginatorInterface;
 
 
 
 #[Route('/training/session')]
 final class TrainingSessionController extends AbstractController
 {
-    private $wgerApiService;
+    private $ninjaApiService;
 
-    public function __construct(WgerApiService $wgerApiService)
+    public function __construct(NinjaApiService $ninjaApiService)
     {
-        $this->wgerApiService = $wgerApiService;
+        $this->ninjaApiService = $ninjaApiService;
     }
 
     #[Route(name: 'app_training_session_index', methods: ['GET'])]
-    public function index(Request $request, TrainingSessionRepository $trainingSessionRepository): Response
+    public function index(Request $request, TrainingSessionRepository $trainingSessionRepository, PaginatorInterface $paginator): Response
     {
         $focus = $request->query->get('focus', 'all');
         $filter = $request->query->get('filter', 'all');
+        $limit = $request->query->getInt('limit', 10);
 
         // Get base query
-        $sessions = $trainingSessionRepository->findAll();
-
-        // Apply focus filter
+        $query = $trainingSessionRepository->createQueryBuilder('s');
         if ($focus !== 'all') {
-            $sessions = array_filter($sessions, function($session) use ($focus) {
-                return $session->getSessionFocus() === $focus;
-            });
+            $query->andWhere('s.sessionFocus = :focus')->setParameter('focus', $focus);
         }
+        // No duration filter in query for now (could be added if needed)
+        $query->orderBy('s.sessionStartTime', 'DESC');
 
-        // Apply duration filter
-        if ($filter === 'longest') {
-            usort($sessions, function($a, $b) {
-                return $b->getSessionDuration() - $a->getSessionDuration();
-            });
-        } elseif ($filter === 'shortest') {
-            usort($sessions, function($a, $b) {
-                return $a->getSessionDuration() - $b->getSessionDuration();
-            });
-        }
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $limit
+        );
 
         return $this->render('training_session/index.html.twig', [
-            'training_sessions' => $sessions,
+            'training_sessions' => $pagination,
             'current_focus' => $focus,
             'current_filter' => $filter,
             'focus_choices' => ["Agility", "Strength", "Dribbling", "Endurance", "Sprint", "Speed"]
@@ -94,91 +89,6 @@ final class TrainingSessionController extends AbstractController
             'training_session' => $trainingSession,
         ]);
     }
-    #[Route('/calendar', name: 'app_training_session_calendar', methods: ['GET'])]
-    public function calendar(): Response
-    {
-        return $this->render('training_session/calendar.html.twig');    
-    }
-    
-    #[Route('/calendar/data', name: 'app_training_session_calendar_data', methods: ['GET'])]
-    public function calendarData(TrainingSessionRepository $repository): JsonResponse
-    {
-        $sessions = $repository->findAll();
-        $events = [];
-    
-        foreach ($sessions as $session) {
-            $start = $session->getSessionStartTime();
-            if (!$start instanceof \DateTime) {
-                continue;
-            }
-    
-            // Create end time safely
-            $end = clone $start;
-            $end->modify('+'.$session->getSessionDuration().' minutes');
-    
-            $events[] = [
-                'id' => $session->getSessionId(),
-                'title' => $session->getSessionFocus(),
-                'start' => $start->format('Y-m-d\TH:i:s'),
-                'end' => $end->format('Y-m-d\TH:i:s'),
-                'url' => $this->generateUrl('app_training_session_show', ['sessionId' => $session->getSessionId()]),
-                'backgroundColor' => $this->getColorForFocus($session->getSessionFocus()),
-                'borderColor' => $this->getColorForFocus($session->getSessionFocus()),
-                'extendedProps' => [
-                    'description' => sprintf(
-                        "Team: %s\nLocation: %s\nNotes: %s",
-                        $session->getTeam() ? $session->getTeam()->getTeamName() : 'N/A',
-                        $session->getLocation()->getLocationName(),
-                        $session->getSessionNotes() ?: 'No notes'
-                    )
-                ]
-            ];
-        }
-    
-        return new JsonResponse($events);
-    }
-
-    #[Route('/calendar-events', name: 'app_training_session_calendar_events', methods: ['GET'])]
-    public function calendarEvents(TrainingSessionRepository $trainingSessionRepository): JsonResponse
-    {
-        $trainingSessions = $trainingSessionRepository->findAll();
-        $events = [];
-
-        foreach ($trainingSessions as $session) {
-            $start = $session->getSessionStartTime();
-            $end = clone $start;
-            $end->modify('+' . $session->getSessionDuration() . ' minutes');
-
-            $events[] = [
-                'id' => $session->getSessionId(),
-                'title' => $session->getSessionFocus(),
-                'start' => $start->format('Y-m-d\TH:i:s'),
-                'end' => $end->format('Y-m-d\TH:i:s'),
-                'extendedProps' => [
-                    'focus' => $session->getSessionFocus(),
-                    'location' => $session->getLocation() ? $session->getLocation()->getLocationName() : 'No Location',
-                    'team' => $session->getTeam() ? $session->getTeam()->getTeamName() : 'No Team',
-                    'notes' => $session->getSessionNotes() ?: 'No notes'
-                ],
-                'className' => 'training-focus-' . strtolower($session->getSessionFocus())
-            ];
-        }
-
-        return new JsonResponse($events);
-    }
-
-    private function getColorForFocus(string $focus): string
-    {
-        $colors = [
-            'Fitness' => '#ff7675',
-            'Technique' => '#74b9ff',
-            'Tactics' => '#55efc4',
-            'Match' => '#a29bfe'
-        ];
-        return $colors[$focus] ?? '#34495e';
-    }
-
-
     
 
     #[Route('/{sessionId}/edit', name: 'app_training_session_edit', methods: ['GET', 'POST'])]
@@ -210,15 +120,71 @@ final class TrainingSessionController extends AbstractController
         return $this->redirectToRoute('app_training_session_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/exercises/{focus}', name: 'app_training_session_exercises', methods: ['GET'])]
-    public function getExercises(string $focus): JsonResponse
+    #[Route('/exercises/{focus}', name: 'app_training_session_exercises', methods: ['GET'], priority: 1000)]
+    public function getExercises(string $focus, LoggerInterface $logger): JsonResponse
     {
         try {
-            // Direct pass-through of the category to the API service
-            $exercises = $this->wgerApiService->getExercisesByCategory($focus);
-            return new JsonResponse($exercises);
+            $logger->info('Exercise request received', ['focus' => $focus]);
+            
+            // Validate focus parameter
+            if (empty($focus)) {
+                throw new \InvalidArgumentException('Focus parameter cannot be empty');
+            }
+
+            $exercises = $this->ninjaApiService->getExercisesByMuscle($focus);
+            
+            if (empty($exercises)) {
+                $logger->info('No exercises found', ['focus' => $focus]);
+                return new JsonResponse([
+                    'message' => 'No exercises found for the selected category.',
+                    'data' => []
+                ]);
+            }
+            
+            return new JsonResponse([
+                'message' => 'Exercises found successfully',
+                'data' => $exercises
+            ]);
+            
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Failed to fetch exercises. Please try again.'], 500);
+            $logger->error('Exercise API error', [
+                'focus' => $focus,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMessage = 'An error occurred while fetching exercises. ';
+            if (str_contains($e->getMessage(), '400')) {
+                $errorMessage .= 'The API request was invalid. This might be due to maintenance or the free tier being temporarily unavailable.';
+            } elseif (str_contains($e->getMessage(), '402')) {
+                $errorMessage .= 'The free tier is currently unavailable. Please try again later or consider upgrading to premium.';
+            } else {
+                $errorMessage .= 'Please try again later.';
+            }
+            
+            return new JsonResponse([
+                'error' => true,
+                'message' => $errorMessage
+            ], 500);
         }
+    }
+
+    #[Route('/analysis', name: 'app_training_session_analysis', methods: ['GET'])]
+    public function analysis(Request $request, TrainingSessionRepository $trainingSessionRepository, PaginatorInterface $paginator): Response
+    {
+        $limit = $request->query->getInt('limit', 10);
+        
+        $query = $trainingSessionRepository->createQueryBuilder('s')
+            ->orderBy('s.sessionStartTime', 'DESC');
+
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
+        return $this->render('training_session/analysis.html.twig', [
+            'training_sessions' => $pagination
+        ]);
     }
 }

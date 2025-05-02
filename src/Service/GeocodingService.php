@@ -65,4 +65,75 @@ class GeocodingService
             throw new \RuntimeException('Geocoding failed: ' . $e->getMessage());
         }
     }
+
+    private function isWithinTunisia(float $lat, float $lng): bool
+    {
+        // Tunisia's approximate bounding box
+        $minLat = 30.230236;
+        $maxLat = 37.728926;
+        $minLng = 7.524833;
+        $maxLng = 11.598278;
+
+        return $lat >= $minLat && $lat <= $maxLat && $lng >= $minLng && $lng <= $maxLng;
+    }
+
+    private function normalizeAddress(string $address): string
+    {
+        // Common Tunisian address abbreviations and corrections
+        $replacements = [
+            // Streets and Roads
+            'Av.' => 'Avenue',
+            'Ave.' => 'Avenue',
+            'Rue' => 'Avenue',
+            'Route' => 'Road',
+            'Rt' => 'Road',
+            'Boulevard' => 'Avenue',
+            'Blvd' => 'Avenue',
+            
+            // Common place names
+            'Lac' => 'Lake',
+            'Berges' => 'Banks',
+            'Centre' => 'Center',
+            'Pôle' => 'Pole',
+            'Technologique' => 'Technology',
+            
+            // Common Tunisian street names
+            'Mohamed V' => 'Mohammed V',
+            'Habib Bourguiba' => 'Bourguiba',
+            'Leopold Sedar Senghor' => 'Senghor',
+            'Fethi Zouhir' => 'Fethi Zouhir Road',
+            'Mharza' => 'El Mharza',
+            
+            // Areas
+            'Cebalat' => 'Cebalet',
+            'El Menzah' => 'Menzah',
+            'Les Berges du Lac' => 'Lake Bank'
+        ];
+
+        // Remove special characters except basic punctuation
+        $address = preg_replace('/[^\p{L}\p{N}\s,.-]/u', ' ', $address);
+        
+        // Normalize spaces
+        $address = preg_replace('/\s+/', ' ', $address);
+        
+        // Apply replacements
+        $address = str_replace(array_keys($replacements), array_values($replacements), $address);
+        
+        return trim($address);
+    }
+
+    private function normalizeCity(string $city): string
+    {
+        // Common Tunisian city name normalizations
+        $cityReplacements = [
+            'tunis' => 'Tunis',
+            'ariana' => 'Ariana',
+            'Rades' => 'Rades',
+            'sousse' => 'Sousse',
+            'monastir' => 'Monastir'
+        ];
+
+        $city = strtolower(trim($city));
+        return $cityReplacements[$city] ?? ucfirst($city);
+    }
 } 
