@@ -15,10 +15,8 @@ return [
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
-<<<<<<< HEAD
     Nucleos\DompdfBundle\NucleosDompdfBundle::class => ['all' => true],
-=======
     Bazinga\GeocoderBundle\BazingaGeocoderBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
->>>>>>> e7c17639e2d7249c7c164c027174f32c77fb3d02
+    Knp\Bundle\TimeBundle\KnpTimeBundle::class => ['all' => true],
 ];

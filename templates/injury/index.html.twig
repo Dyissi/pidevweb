@@ -1,8 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block hero %}
-
-
 {% block body %}
 <section id="injury-index" class="py-5">
   <div class="container" data-aos="fade-up">
@@ -14,10 +12,16 @@
 
     <!-- Flash Messages -->
     {% for message in app.flashes('success') %}
-      <div class="alert alert-success">{{ message }}</div>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-      <div class="alert alert-danger">{{ message }}</div>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     {% endfor %}
 
     <!-- Search and Sort -->
@@ -45,16 +49,21 @@
           </tr>
         </thead>
         <tbody>
-        {% for injury in injuries %}
+        {% for injury in pagination %}
           <tr>
             <td>{{ injury.injuryId }}</td>
-            <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}</td>
+            <td>
+              {{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}
+              {% if injury.injuryDate %}
+                <br><small class="text-muted">({{ injury.injuryDate|time_diff }})</small>
+              {% endif %}
+            </td>
             <td>{{ injury.injurySeverity }}</td>
             <td>{{ injury.injuryDescription }}</td>
             <td>{{ injury.injuryType }}</td>
             <td>
               {% if injury.user %}
-                {{ injury.user.userfname }} {{ injury.user.userlname }}
+                {{ injury.user.userFname }} {{ injury.user.userLname }}
               {% else %}
                 No user associated
               {% endif %}
@@ -72,6 +81,15 @@
         {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="navigation mt-4">
+      {{ knp_pagination_render(pagination, null, {}, {
+        'align': 'center',
+        'rounded': true,
+        'size': 'sm'
+      }) }}
     </div>
 
     <!-- Export Data and Add New Buttons -->

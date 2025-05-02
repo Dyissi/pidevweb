@@ -40,9 +40,6 @@ services:
             $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
             $logger: '@logger'
 
-<<<<<<< HEAD
-  
-=======
     # QuickChart service configuration
     App\Service\QuickChartService:
         arguments:
@@ -53,4 +50,3 @@ services:
         arguments:
             $httpClient: '@http_client'
             $apiKey: '%api_ninjas_key%'
->>>>>>> e7c17639e2d7249c7c164c027174f32c77fb3d02

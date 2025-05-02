@@ -62,6 +62,9 @@
     "knplabs/knp-paginator-bundle": {
         "version": "v6.8.0"
     },
+    "knplabs/knp-time-bundle": {
+        "version": "v2.4.0"
+    },
     "nucleos/dompdf-bundle": {
         "version": "4.3",
         "recipe": {
@@ -70,6 +73,7 @@
             "version": "3.1",
             "ref": "ac77a0c751bdccab42ddc73d7290719b31ecb691"
         }
+    },
     "php-http/discovery": {
         "version": "1.20",
         "recipe": {

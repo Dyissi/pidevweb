@@ -10,27 +10,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Routing\Annotation\Route;
 use Nucleos\DompdfBundle\Factory\DompdfFactoryInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 
 #[Route('/injury')]
 final class InjuryController extends AbstractController
 {
     #[Route('/', name: 'app_injury_index', methods: ['GET'])]
-    public function index(Request $request, InjuryRepository $injuryRepository): Response
+    public function index(Request $request, InjuryRepository $injuryRepository, PaginatorInterface $paginator): Response
     {
         $search = $request->query->get('search');
         $sort = $request->query->get('sort', 'asc');
-
-        $severityOrder = [
-            'Mild' => 1,
-            'Moderate' => 2,
-            'Severe' => 3,
-            'Critical' => 4,
-        ];
 
         $queryBuilder = $injuryRepository->createQueryBuilder('i')
             ->leftJoin('i.user', 'u')
@@ -59,16 +52,21 @@ final class InjuryController extends AbstractController
         ->setParameter('severe', 'Severe')
         ->setParameter('critical', 'Critical');
 
-        $injuries = $queryBuilder->getQuery()->getResult();
+        // Paginate the query
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1), // Current page
+            10 // Items per page
+        );
 
         return $this->render('injury/index.html.twig', [
-            'injuries' => $injuries,
+            'pagination' => $pagination,
             'sort' => $sort,
         ]);
     }
 
     #[Route('/new', name: 'app_injury_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, LoggerInterface $logger): Response
     {
         $injury = new Injury();
 
@@ -80,6 +78,47 @@ final class InjuryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle image upload
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile instanceof UploadedFile) {
+                $tmpFilePath = $imageFile->getPathname();
+                $logger->debug('Image file received', [
+                    'filename' => $imageFile->getClientOriginalName(),
+                    'tmp_name' => $tmpFilePath,
+                    'is_valid' => $imageFile->isValid(),
+                    'error' => $imageFile->getErrorMessage(),
+                    'file_exists' => file_exists($tmpFilePath),
+                ]);
+
+                if ($imageFile->isValid() && file_exists($tmpFilePath)) {
+                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/frontOffice/img/';
+                    
+                    // Ensure upload directory exists
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                    try {
+                        copy($tmpFilePath, $uploadDir . $newFilename);
+                        $injury->setImage($newFilename);
+                        $logger->debug('Image copied successfully', ['new_filename' => $newFilename]);
+                    } catch (\Exception $e) {
+                        $logger->error('Failed to copy image', ['error' => $e->getMessage()]);
+                        $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                    }
+                } else {
+                    $logger->warning('Invalid or non-existent uploaded file', [
+                        'error' => $imageFile->getErrorMessage(),
+                        'tmp_name' => $tmpFilePath,
+                    ]);
+                    $this->addFlash('error', 'Invalid image file uploaded.');
+                }
+            }
+
             $entityManager->persist($injury);
             $entityManager->flush();
 
@@ -219,12 +258,10 @@ final class InjuryController extends AbstractController
         InjuryRepository $injuryRepository,
         DompdfFactoryInterface $dompdfFactory
     ): Response {
-        // Restrict to medical staff
         if (!$this->isGranted('ROLE_MED_STAFF')) {
             throw $this->createAccessDeniedException('Only medical staff can export injury data.');
         }
 
-        // Fetch all injuries with their recovery plans
         $injuries = $injuryRepository->createQueryBuilder('i')
             ->leftJoin('i.recoveryplans', 'r')
             ->addSelect('r')
@@ -233,18 +270,15 @@ final class InjuryController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // Render HTML using Twig template
         $html = $this->renderView('injury/export_pdf.html.twig', [
             'injuries' => $injuries,
         ]);
 
-        // Create Dompdf instance
         $dompdf = $dompdfFactory->create();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // Return PDF response
         return new Response(
             $dompdf->output(),
             200,
