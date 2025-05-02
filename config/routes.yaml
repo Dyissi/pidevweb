@@ -7,3 +7,8 @@ controllers:
 calendar:
     resource: '../src/Controller/GoogleCalendarController.php'
     type: annotation
+
+api_chart_data:
+    path: /api/chart-data
+    controller: App\Controller\Api\ChartApiController::chartData
+    methods: GET

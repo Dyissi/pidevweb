@@ -32,5 +32,23 @@ class DataRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
+public function findPerformanceData(): array
+{
+    return $this->createQueryBuilder('d')
+        ->select([
+            'AVG(d.performanceSpeed) as avg_speed',
+            'SUM(d.performanceNbrGoals) as total_goals'
+        ])
+        ->getQuery()
+        ->getSingleResult(); 
+}
+
+public function findAllOrdered(): array
+{
+    return $this->createQueryBuilder('d')
+        ->orderBy('d.performanceDateRecorded', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 
 }

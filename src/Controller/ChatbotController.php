@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Recoveryplan;
+use App\Entity\Injury;
 use App\Service\RecoveryPhaseService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 #[Route('/chatbot')]
 class ChatbotController extends AbstractController

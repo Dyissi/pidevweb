@@ -10,6 +10,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\CsvImportService;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
+use App\Service\QuickChartService;
+
 
 #[Route('/data')]
 
@@ -17,7 +22,7 @@ final class DataController extends AbstractController
 {
     
     #[Route(name: 'app_data_index', methods: ['GET'])]
-    public function index(Request $request,DataRepository $dataRepository): Response
+    public function index(Request $request, DataRepository $dataRepository, QuickChartService $quickChart): Response
     {
         $filter = $request->query->get('filter');  // Get ?filter=value from URL
 
@@ -27,9 +32,97 @@ final class DataController extends AbstractController
             $data = $dataRepository->findAll(); // Default behavior
         }
     
+        // Prepare data for charts
+        $labels = [];
+        $speedData = [];
+        $agilityData = [];
+        $goalsData = [];
+        $foulsData = [];
+
+        foreach ($data as $item) {
+            $labels[] = $item->getPerformanceDateRecorded()->format('M d, Y');
+            $speedData[] = $item->getPerformanceSpeed();
+            $agilityData[] = $item->getPerformanceAgility();
+            $goalsData[] = $item->getPerformanceNbrGoals();
+            $foulsData[] = $item->getPerformanceNbrFouls();
+        }
+
+        // Generate chart URLs
+        $speedChartUrl = $quickChart->generateLineChart(
+            $labels,
+            $speedData,
+            'Speed (km/h)',
+            ['width' => 800, 'height' => 400]
+        );
+
+        $agilityChartUrl = $quickChart->generateLineChart(
+            $labels,
+            $agilityData,
+            'Agility Score',
+            ['width' => 800, 'height' => 400]
+        );
+
+        $goalsChartUrl = $quickChart->generateBarChart(
+            $labels,
+            $goalsData,
+            'Goals',
+            ['width' => 800, 'height' => 400]
+        );
+
+        $foulsChartUrl = $quickChart->generateBarChart(
+            $labels,
+            $foulsData,
+            'Fouls',
+            ['width' => 800, 'height' => 400]
+        );
+
         return $this->render('data/index.html.twig', [
             'data' => $data,
             'selectedFilter' => $filter,
+            'speedChartUrl' => $speedChartUrl,
+            'agilityChartUrl' => $agilityChartUrl,
+            'goalsChartUrl' => $goalsChartUrl,
+            'foulsChartUrl' => $foulsChartUrl,
+        ]);
+    }
+    #[Route('/chart', name: 'app_data_chart', methods: ['GET'])]
+    public function chart(): Response
+    {
+        return $this->render('data/chart.html.twig');
+    }
+    // Add this new method to your DataController class
+    #[Route('/import', name: 'app_data_import', methods: ['GET', 'POST'])]
+    public function import(Request $request, CsvImportService $csvImportService): Response
+    {
+    $form = $this->createFormBuilder()
+        ->add('csv_file', FileType::class, [
+            'label' => 'CSV File',
+            'constraints' => [
+                new File([
+                    'maxSize' => '1024k',
+                    'mimeTypes' => ['text/csv', 'text/plain'],
+                    'mimeTypesMessage' => 'Please upload a valid CSV file',
+                ])
+            ],
+        ])
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $file = $form->get('csv_file')->getData();
+        
+        try {
+            $count = $csvImportService->import($file->getPathname(), $this->getUser());
+            $this->addFlash('success', "Successfully imported $count records");
+            return $this->redirectToRoute('app_data_index');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Error importing CSV: '.$e->getMessage());
+        }
+    }
+
+    return $this->render('data/import.html.twig', [
+        'form' => $form->createView(),
         ]);
     }
 
