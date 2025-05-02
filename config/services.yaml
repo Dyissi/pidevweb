@@ -1,4 +1,4 @@
-# config/services.yaml
+
 parameters:
     # Add any parameters you want to use in your services here
     app.ninja_api_key: '%env(API_NINJAS_KEY)%'
@@ -7,6 +7,11 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+
+    Nucleos\DompdfBundle\Factory\DompdfFactoryInterface:
+        class: Nucleos\DompdfBundle\Factory\DompdfFactory
+        arguments:
+            $options: { }
 
     # Makes classes in src/ available to be used as services
     App\:
@@ -34,6 +39,7 @@ services:
             $clientSecret: '%env(GOOGLE_CLIENT_SECRET)%'
             $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
             $logger: '@logger'
+
 
     # QuickChart service configuration
     App\Service\QuickChartService:

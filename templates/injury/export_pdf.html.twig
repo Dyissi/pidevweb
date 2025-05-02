@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Injuries Report</title>
+    <style>
+        body { font-family: helvetica, sans-serif; margin: 20px; }
+        h1 { text-align: center; color: #D68C45; font-size: 36px; margin-bottom: 20px; font-weight: bold; }
+        h2 { text-align: center; color: #709775; font-size: 24px; margin-bottom: 15px; }
+        table { width: 98%; border-collapse: collapse; margin: 15px auto; table-layout: fixed; background-color: #BCCCE0; border: 2px solid #463F3A; }
+        th, td { border: 1px solid #463F3A; padding: 10px 12px; text-align: left; color: #463F3A; font-size: 12px; line-height: 1.4; vertical-align: top; }
+        th { background-color: #709775; color: white; font-weight: bold; padding: 12px 12px; }
+        tr:nth-child(even) { background-color: #ffffff; }
+        tr:nth-child(odd) { background-color: #f0f4f7; }
+        .no-data { text-align: center; font-style: italic; color: #463F3A; font-size: 16px; }
+        col:nth-child(1) { width: 8%; }  /* Injury ID */
+        col:nth-child(2) { width: 14%; } /* User */
+        col:nth-child(3) { width: 11%; }  /* Type */
+        col:nth-child(4) { width: 11%; }  /* Date */
+        col:nth-child(5) { width: 11%; }  /* Severity */
+        col:nth-child(6) { width: 17%; } /* Description */
+        col:nth-child(7) { width: 17%; } /* Recovery Goal */
+        col:nth-child(8) { width: 11%; }  /* Start Date */
+        col:nth-child(9) { width: 11%; }  /* End Date */
+        col:nth-child(10) { width: 9%; } /* Status */
+    </style>
+</head>
+<body>
+    <h1>Spin</h1>
+    <h2>All Injuries Report</h2>
+
+    {% if injuries|length > 0 %}
+        <table>
+            <colgroup>
+                <col><col><col><col><col><col><col><col><col><col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Injury ID</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Severity</th>
+                    <th>Description</th>
+                    <th>Recovery Goal</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for injury in injuries %}
+                    {% set recoveryPlan = injury.recoveryplans|first %}
+                    <tr>
+                        <td>{{ injury.injuryId }}</td>
+                        <td>{{ injury.user ? injury.user.userfname ~ ' ' ~ injury.user.userlname : 'N/A' }}</td>
+                        <td>{{ injury.injuryType }}</td>
+                        <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ injury.injurySeverity }}</td>
+                        <td>{{ injury.injuryDescription }}</td>
+                        <td>{{ recoveryPlan ? recoveryPlan.recoveryGoal : 'None' }}</td>
+                        <td>{{ recoveryPlan ? recoveryPlan.recoveryStartDate|date('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ recoveryPlan ? recoveryPlan.recoveryEndDate|date('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ recoveryPlan ? (recoveryPlan.recoveryStatus == 'Pe' ? 'Pending' : (recoveryPlan.recoveryStatus == 'On' ? 'Ongoing' : recoveryPlan.recoveryStatus)) : 'N/A' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-data">No injuries recorded.</p>
+    {% endif %}
+</body>
+</html>

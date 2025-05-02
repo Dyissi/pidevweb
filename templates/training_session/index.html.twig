@@ -175,6 +175,179 @@
     </style>
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {# FullCalendar CSS removed #}
+    <style>
+        .filter-btn {
+            margin-right: 5px;
+        }
+        .filter-btn.active {
+            background-color: #007bff !important;
+            color: white !important;
+            border-color: #007bff !important;
+        }
+        .filter-section {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+        }
+        .filter-section h5 {
+            margin-bottom: 0.5rem;
+        }
+        /* Exercise browser styles */
+        .exercise-browser {
+            margin: 2rem 0;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .exercise-card {
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .exercise-title {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+        .exercise-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .exercise-meta {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+        .exercise-meta span {
+            margin-right: 1rem;
+            font-size: 0.85rem;
+        }
+        /* Focus badge styles */
+        .badge-focus {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .badge-agility { background-color: #3498db; }
+        .badge-strength { background-color: #e74c3c; }
+        .badge-dribbling { background-color: #2ecc71; }
+        .badge-endurance { background-color: #f39c12; }
+        .badge-sprint { background-color: #9b59b6; }
+        .badge-speed { background-color: #1abc9c; }
+        .category-btn {
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .category-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .category-btn.active {
+            background-color: var(--bs-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #exerciseResults {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        #exerciseResults::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #exerciseResults::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        #exerciseResults::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        #exerciseResults::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .instruction-step {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .instruction-step:hover {
+            background-color: #e9ecef;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        
+        .exercise-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-card {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .info-card i {
+            font-size: 1.5rem;
+            color: #0d6efd;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-card-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-card-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+    </style>
+{% endblock %}
+
 {% block main %}
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -401,6 +574,8 @@
     </div>
 {% endblock %}
 
+{% block javascript %}
+    {{ parent() }}
 {% block javascript %}
     {{ parent() }}
     <script>

@@ -1,0 +1,4 @@
+nucleos_dompdf:
+    defaults:
+        paper_size: 'A4'
+        orientation: 'portrait'

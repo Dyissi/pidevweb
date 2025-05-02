@@ -130,6 +130,7 @@
         {% endfor %}
     {% endfor %}
 
+<<<<<<< HEAD
     <div class="container">
        
         <div class="container-fluid p-0">
@@ -148,6 +149,18 @@
                         </div>
                     {% endfor %}
                 </div>
+=======
+    <div class="container performance-table">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Performance Records</h1>
+            <div>
+                <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#chartsModal">
+                    <i class="bi bi-graph-up"></i> View Charts
+                </button>
+                <a href="{{ path('app_data_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Add New
+                </a>
+>>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c
             </div>
         </div>
 
@@ -308,6 +321,65 @@
 
         <div class="navigation">
             {{ knp_pagination_render(data) }}
+        </div>
+    </div>
+
+    <!-- Charts Modal -->
+    <div class="modal fade" id="chartsModal" tabindex="-1" aria-labelledby="chartsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartsModalLabel">Performance Charts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Speed Over Time</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ speedChartUrl }}" alt="Speed Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Agility Over Time</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ agilityChartUrl }}" alt="Agility Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Goals Per Session</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ goalsChartUrl }}" alt="Goals Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Fouls Per Session</h5>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ foulsChartUrl }}" alt="Fouls Chart" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 

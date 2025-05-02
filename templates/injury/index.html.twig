@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block hero %}
-  
+
 
 {% block body %}
 <section id="injury-index" class="py-5">
@@ -48,7 +48,7 @@
         {% for injury in injuries %}
           <tr>
             <td>{{ injury.injuryId }}</td>
-<td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}</td>
+            <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}</td>
             <td>{{ injury.injurySeverity }}</td>
             <td>{{ injury.injuryDescription }}</td>
             <td>{{ injury.injuryType }}</td>
@@ -62,7 +62,7 @@
             <td>
               <a href="{{ path('app_injury_show', {'id': injury.injuryId}) }}" class="btn btn-sm btn-info">Show</a>
               <a href="{{ path('app_injury_edit', {'id': injury.injuryId}) }}" class="btn btn-sm btn-warning">Edit</a>
-              <a href="{{ path('app_injury_delete', {'id': injury.injuryId}) }}" class="btn btn-sm btn-danger">Delete</a>
+              {{ include('injury/delete_form.html.twig', { injury: injury }) }}
             </td>
           </tr>
         {% else %}
@@ -74,11 +74,12 @@
       </table>
     </div>
 
-    <!-- Add New Button -->
+    <!-- Export Data and Add New Buttons -->
     <div class="text-center mt-4">
-      <a href="{{ path('app_injury_new') }}" class="btn btn-primary">
-        Create New Injury
-      </a>
+      {% if is_granted('ROLE_MED_STAFF') %}
+        <a href="{{ path('app_injury_export_pdf') }}" class="btn btn-primary me-2">Export Data</a>
+      {% endif %}
+      <a href="{{ path('app_injury_new') }}" class="btn btn-primary">Create New Injury</a>
     </div>
 
   </div>
