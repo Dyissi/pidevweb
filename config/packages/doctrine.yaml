@@ -1,16 +1,15 @@
 doctrine:
     dbal:
+        driver: 'pdo_mysql'  # 👈 explicitly use MySQL driver
+        server_version: '8.0'  # 👈 adjust if you're using MariaDB (e.g. '10.11')
         url: '%env(resolve:DATABASE_URL)%'
         types:
             enum: Doctrine\DBAL\Types\StringType
         mapping_types:
             enum: string
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
-
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -29,11 +28,15 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
+            driver: 'pdo_mysql'  # repeat here for test
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
     doctrine:
+        dbal:
+            driver: 'pdo_mysql'  # repeat here for prod
+            server_version: '8.0'
+
         orm:
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'

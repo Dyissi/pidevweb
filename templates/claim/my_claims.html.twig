@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Claims{% endblock %}
+
+{% block main %}
+<style>
+thead th {
+    background-color: black !important;
+    color: white !important;
+}
+.table-container {
+    overflow: hidden;
+    border-radius: 0px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.table {
+    margin-bottom: 0;
+}
+.claim-action-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+.claim-action-wrapper.showing {
+    max-height: 500px;
+}
+.claim-action-card {
+    background: #fff;
+    margin-top: 10px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    font-size: 0.95rem;
+    color: #333;
+}
+.claim-action-card div {
+    line-height: 1.2;
+}
+.flash-update {
+    animation: flashHighlight 1.5s ease-in-out;
+}
+@keyframes flashHighlight {
+    0% { background-color: #ffeeba; }
+    100% { background-color: transparent; }
+}
+.badge.rounded-pill.equal-width {
+    min-width: 160px;
+    text-align: center;
+    display: inline-block;
+    padding: 0.35em 0.75em;
+}
+</style>
+
+<div class="container mt-4">
+    <h1 class="mb-4" style="color: #d17c14;">My Submitted Claims</h1>
+
+    <div class="table-container">
+        <table class="table table-bordered mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Against</th>
+                    <th>Action Taken</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td>{{ claim.claimDescription }}</td>
+                    <td>
+                        {% if claim.claimStatus == 'Approved' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>Approved
+                            </span>
+                        {% elseif claim.claimStatus == 'Rejected' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times-circle me-1"></i>Rejected
+                            </span>
+                        {% elseif claim.claimStatus == 'In Review' %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-hourglass-half me-1"></i>In Review
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ claim.claimStatus }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="width: 20px;" class="d-inline-flex justify-content-center">
+                                {% if claim.claimCategory == 'Health Issue' %}
+                                    <i class="fas fa-notes-medical text-danger"></i>
+                                {% elseif claim.claimCategory == 'Misconduct' %}
+                                    <i class="fas fa-user-slash text-warning"></i>
+                                {% elseif claim.claimCategory == 'Policy Violation' %}
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                {% endif %}
+                            </span>
+                            <span class="ms-2">{{ claim.claimCategory }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if claim.idUserToClaim %}
+                            {{ claim.idUserToClaim.userFname }} {{ claim.idUserToClaim.userLname }}
+                        {% else %}
+                            <em>Unknown</em>
+                        {% endif %}
+                    </td>
+                    <td class="align-middle" data-controller="claim-action-toggle">
+    {% if claim.claimStatus == 'Approved' and claim.claimactions is not empty %}
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-eye text-info" style="min-width: 18px;"></i>
+            <span role="button"
+                  class="badge rounded-pill equal-width border border-primary text-primary bg-light"
+                  data-action="click->claim-action-toggle#toggle">
+                View Action
+            </span>
+        </div>
+        <div class="claim-action-wrapper" data-claim-action-toggle-target="content">
+            <div class="claim-action-card text-start">
+                <div class="mb-2"><strong>Type:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionType }}</span></div>
+                <div class="mb-2"><strong>From:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionStartDate|date('Y-m-d') }}</span></div>
+                <div class="mb-2"><strong>To:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionEndDate|date('Y-m-d') }}</span></div>
+                <div><strong>Notes:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionNotes }}</span></div>
+            </div>
+        </div>
+
+    {% elseif claim.claimStatus == 'Approved' %}
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-hourglass-half text-muted" style="min-width: 18px;"></i>
+            <span class="badge rounded-pill equal-width border border-secondary text-muted bg-light">
+                No action submitted.
+            </span>
+        </div>
+
+    {% else %}
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-hourglass-half text-warning" style="min-width: 18px;"></i>
+            <span class="badge rounded-pill equal-width border border-warning text-warning bg-light">
+                Pending
+            </span>
+        </div>
+    {% endif %}
+</td>
+
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">You have not submitted any claims.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(claims) }}
+    </div>
+</div>
+{% endblock %}

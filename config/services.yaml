@@ -1,6 +1,7 @@
-
 parameters:
-    # Add any parameters you want to use in your services here
+    elevenlabs.api_key: '%env(ELEVENLABS_API_KEY)%'
+    huggingface.api_key: '%env(HUGGINGFACE_API_KEY)%'
+    assemblyai.api_key: '%env(ASSEMBLYAI_API_KEY)%' # ✅ NEW
     app.ninja_api_key: '%env(API_NINJAS_KEY)%'
 
 services:
@@ -40,6 +41,27 @@ services:
             $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
             $logger: '@logger'
 
+    # Mercure Hub service for publishing Turbo Streams
+    Symfony\Component\Mercure\HubInterface: '@mercure.hub.default'
+
+    # ElevenLabs TTS Service
+    App\Service\ElevenLabsTTSService:
+        arguments:
+            $elevenLabsApiKey: '%elevenlabs.api_key%'
+
+    # Hugging Face Sentiment Service
+    App\Service\SentimentService:
+        arguments:
+            $huggingfaceApiKey: '%huggingface.api_key%'
+
+    # Bad Words Detection Service
+    App\Service\BadWordsService: ~
+
+    # ✅ AssemblyAI Service
+    App\Service\AssemblyAIService:
+        arguments:
+            $assemblyAiApiKey: '%assemblyai.api_key%'
+            $logger: '@logger'
     # QuickChart service configuration
     App\Service\QuickChartService:
         arguments:
