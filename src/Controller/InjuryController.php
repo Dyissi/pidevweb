@@ -13,7 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-
+use Nucleos\DompdfBundle\Factory\DompdfFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 #[Route('/injury')]
 final class InjuryController extends AbstractController
@@ -31,7 +32,6 @@ final class InjuryController extends AbstractController
             'Critical' => 4,
         ];
 
-        // Create the query builder with proper join
         $queryBuilder = $injuryRepository->createQueryBuilder('i')
             ->leftJoin('i.user', 'u')
             ->addSelect('u');
@@ -68,38 +68,34 @@ final class InjuryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_injury_new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $injury = new Injury();
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $injury = new Injury();
 
-    if ($injury->getInjuryDate() === null) {
-        $injury->setInjuryDate(new \DateTime());
+        if ($injury->getInjuryDate() === null) {
+            $injury->setInjuryDate(new \DateTime());
+        }
+
+        $form = $this->createForm(InjuryFormType::class, $injury);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($injury);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Injury created successfully!');
+            return $this->redirectToRoute('app_injury_index');
+        }
+
+        return $this->render('injury/new.html.twig', [
+            'injury' => $injury,
+            'form' => $form->createView(),
+        ]);
     }
-
-    $form = $this->createForm(InjuryFormType::class, $injury);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // VichUploader automatically handles file uploads
-        // No need for manual file movement
-        
-        $entityManager->persist($injury);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Injury created successfully!');
-        return $this->redirectToRoute('app_injury_index');
-    }
-
-    return $this->render('injury/new.html.twig', [
-        'injury' => $injury,
-        'form' => $form->createView(),
-    ]);
-}
-
 
     #[Route('/{id}', name: 'app_injury_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, InjuryRepository $injuryRepository): Response
-{
+    {
         $injury = $injuryRepository->find($id);
     
         if (!$injury) {
@@ -110,8 +106,9 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
             'injury' => $injury,
         ]);
     }
+
     #[Route('/{id}/edit', name: 'app_injury_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Injury $injury, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Injury $injury, EntityManagerInterface $entityManager, LoggerInterface $logger): Response
     {
         $form = $this->createForm(InjuryFormType::class, $injury);
         $form->handleRequest($request);
@@ -120,39 +117,54 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
             // Handle image deletion
             if ($form->get('deleteImage')->getData() && $injury->getImage()) {
                 try {
-                    // Remove the file from filesystem
-                    $filePath = $this->getParameter('kernel.project_dir').'/public/frontOffice/img/'.$injury->getImage();
+                    $filePath = $this->getParameter('kernel.project_dir') . '/public/frontOffice/img/' . $injury->getImage();
                     if (file_exists($filePath)) {
                         unlink($filePath);
                     }
-                    
-                    // Clear the image fields
                     $injury->setImage(null);
-                  
                 } catch (\Exception $e) {
-                    $this->addFlash('error', 'Failed to delete the image: '.$e->getMessage());
+                    $this->addFlash('error', 'Failed to delete the image: ' . $e->getMessage());
                 }
             }
     
-            // Handle file upload
-            /** @var UploadedFile $imageFile */
+            // Handle image upload
+            /** @var UploadedFile|null $imageFile */
             $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $newFilename = $originalFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+            if ($imageFile instanceof UploadedFile) {
+                $tmpFilePath = $imageFile->getPathname();
+                $logger->debug('Image file received', [
+                    'filename' => $imageFile->getClientOriginalName(),
+                    'tmp_name' => $tmpFilePath,
+                    'is_valid' => $imageFile->isValid(),
+                    'error' => $imageFile->getErrorMessage(),
+                    'file_exists' => file_exists($tmpFilePath),
+                ]);
+
+                if ($imageFile->isValid() && file_exists($tmpFilePath)) {
+                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/frontOffice/img/';
+                    
+                    // Ensure upload directory exists
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
     
-                try {
-                    // Move the file to the upload directory
-                    $imageFile->move(
-                        $this->getParameter('kernel.project_dir').'/public/frontOffice/img/',
-                        $newFilename
-                    );
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
     
-                    // Update the injury entity
-                    $injury->setImage($newFilename);
-                   
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'There was an error uploading your image');
+                    try {
+                        copy($tmpFilePath, $uploadDir . $newFilename);
+                        $injury->setImage($newFilename);
+                        $logger->debug('Image copied successfully', ['new_filename' => $newFilename]);
+                    } catch (\Exception $e) {
+                        $logger->error('Failed to copy image', ['error' => $e->getMessage()]);
+                        $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                    }
+                } else {
+                    $logger->warning('Invalid or non-existent uploaded file', [
+                        'error' => $imageFile->getErrorMessage(),
+                        'tmp_name' => $tmpFilePath,
+                    ]);
+                    $this->addFlash('error', 'Invalid image file uploaded.');
                 }
             }
     
@@ -168,40 +180,78 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
         ]);
     }
 
-#[Route('/{id}/delete', name: 'app_injury_delete', methods: ['POST'])]
-public function delete(Request $request, int $id, InjuryRepository $injuryRepository, EntityManagerInterface $entityManager): Response
-{
-    // Fetch the Injury entity by ID manually
-    $injury = $injuryRepository->find($id);
+    #[Route('/{id}/delete', name: 'app_injury_delete', methods: ['POST'])]
+    public function delete(Request $request, int $id, InjuryRepository $injuryRepository, EntityManagerInterface $entityManager): Response
+    {
+        $injury = $injuryRepository->find($id);
 
-    if (!$injury) {
-        throw $this->createNotFoundException('Injury not found');
+        if (!$injury) {
+            throw $this->createNotFoundException('Injury not found');
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $injury->getInjuryId(), $request->request->get('_token'))) {
+            $entityManager->remove($injury);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Injury deleted successfully!');
+        }
+
+        return $this->redirectToRoute('app_injury_index');
     }
 
-    // Validate CSRF token
-    if ($this->isCsrfTokenValid('delete' . $injury->getInjuryId(), $request->request->get('_token'))) {
-        $entityManager->remove($injury);
-        $entityManager->flush();
+    #[Route('/Myhealth', name: 'app_injury_Myhealth')]
+    public function myRecoveryPlans(
+        RecoveryplanRepository $recoveryplanRepository,
+        InjuryRepository $injuryRepository): Response {
+        $user = $this->getUser();
 
-        $this->addFlash('success', 'Injury deleted successfully!');
+        $injuries = $injuryRepository->findBy(['user' => $user]);
+        $recoveryplans = $recoveryplanRepository->findBy(['user' => $user]);
+
+        return $this->render('injury/Myhealth.html.twig', [
+            'injuries' => $injuries,
+            'recoveryplans' => $recoveryplans,
+        ]);
     }
 
-    return $this->redirectToRoute('app_injury_index');
-}
+    #[Route('/export/pdf', name: 'app_injury_export_pdf', methods: ['GET'])]
+    public function exportInjuriesPdf(
+        InjuryRepository $injuryRepository,
+        DompdfFactoryInterface $dompdfFactory
+    ): Response {
+        // Restrict to medical staff
+        if (!$this->isGranted('ROLE_MED_STAFF')) {
+            throw $this->createAccessDeniedException('Only medical staff can export injury data.');
+        }
 
-#[Route('/Myhealth', name: 'app_injury_Myhealth')]
-public function myRecoveryPlans(
-    RecoveryplanRepository $recoveryplanRepository,
-    InjuryRepository $injuryRepository): Response {
-    $user = $this->getUser();
+        // Fetch all injuries with their recovery plans
+        $injuries = $injuryRepository->createQueryBuilder('i')
+            ->leftJoin('i.recoveryplans', 'r')
+            ->addSelect('r')
+            ->leftJoin('i.user', 'u')
+            ->addSelect('u')
+            ->getQuery()
+            ->getResult();
 
-    // Fetch injuries and recovery plans for this user
-    $injuries = $injuryRepository->findBy(['user' => $user]);
-    $recoveryplans = $recoveryplanRepository->findBy(['user' => $user]);
+        // Render HTML using Twig template
+        $html = $this->renderView('injury/export_pdf.html.twig', [
+            'injuries' => $injuries,
+        ]);
 
-    return $this->render('injury/Myhealth.html.twig', [
-        'injuries' => $injuries,
-        'recoveryplans' => $recoveryplans,
-    ]);
-}
+        // Create Dompdf instance
+        $dompdf = $dompdfFactory->create();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Return PDF response
+        return new Response(
+            $dompdf->output(),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment;filename="all_injuries_report.pdf"',
+            ]
+        );
+    }
 }

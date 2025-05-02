@@ -2,55 +2,49 @@
 
 namespace App\Controller;
 
-use App\Entity\Recoveryplan;
 use App\Service\RecoveryPhaseService;
-use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/chatbot')]
 class ChatbotController extends AbstractController
 {
+    private $logger;
+    private $recoveryPhaseService;
+
+    public function __construct(LoggerInterface $logger, RecoveryPhaseService $recoveryPhaseService)
+    {
+        $this->logger = $logger;
+        $this->recoveryPhaseService = $recoveryPhaseService;
+    }
+
     #[Route('/show', name: 'chatbot_show')]
-    public function show(EntityManagerInterface $em, RecoveryPhaseService $phaseService): Response
+    public function show(Request $request): Response
     {
         $user = $this->getUser();
         if (!$user) {
+            $this->logger->warning('No user logged in for chatbot access');
             return $this->redirectToRoute('app_login');
         }
 
-        $recoveryPlan = $em->getRepository(Recoveryplan::class)->findOneBy(['user' => $user]);
-        if (!$recoveryPlan) {
-            return $this->render('recoveryplan/chatbot.html.twig', [
-                'error' => 'No recovery plan found.',
-            ]);
-        }
+        $this->logger->info('Fetching data for user: ' . get_class($user));
 
-        $injury = $recoveryPlan->getInjury();
-        $phase = $phaseService->getRecoveryPhase($recoveryPlan);
-        $nutritionPlan = $this->getNutritionPlan($injury ? $injury->getInjuryType() : 'Unknown', $phase);
+        // Handle AJAX request for message processing
+        if ($request->isXmlHttpRequest()) {
+            $message = $request->request->get('message', '');
+            if (empty($message)) {
+                return $this->json(['error' => 'Empty message'], 400);
+            }
+
+            $response = $this->recoveryPhaseService->getChatBotResponse($message, $user);
+            return $this->json(['response' => $response]);
+        }
 
         return $this->render('recoveryplan/chatbot.html.twig', [
-            'injury' => $injury ? $injury->getInjuryType() : 'Unknown',
-            'phase' => $phase,
-            'nutrition' => $nutritionPlan,
-            'recoveryData' => [
-                'injuryType' => $injury ? $injury->getInjuryType() : 'Unknown',
-                'recoveryPhase' => $phase,
-                'nutritionPlan' => $nutritionPlan,
-            ],
+            'back_route' => 'app_home',
         ]);
-    }
-
-    private function getNutritionPlan(string $injuryType, string $phase): string
-    {
-        $basePlan = "Eat a balanced diet with protein (chicken, fish, legumes), healthy fats (avocado, nuts), and complex carbs (whole grains). Stay hydrated.";
-        if (stripos($injuryType, 'fracture') !== false) {
-            return $basePlan . " Include calcium-rich foods (dairy, leafy greens) and vitamin D for bone healing.";
-        } elseif (stripos($injuryType, 'sprain') !== false) {
-            return $basePlan . " Add anti-inflammatory foods (berries, turmeric) to reduce swelling.";
-        }
-        return $basePlan;
     }
 }

@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+{% block hero %}
+{% block body %}
+    <h1 style="text-align: center; color: #D68C45; font-size: 36px; margin-bottom: 20px; font-weight: bold;">Recovery Run</h1>
+    <h2 style="text-align: center; color: #709775; font-size: 24px; margin-bottom: 15px;">Bounce to Recover!</h2>
+    <canvas id="gameCanvas" width="800" height="400" style="border: 2px solid #FFFFFF; display: block; margin: 0 auto;"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <p style="color: #463F3A; font-size: 16px;">Press Space to bounce!</p>
+        <button id="restartButton" style="display: none; padding: 10px 20px; background-color: #709775; color: white; border: 1px solid #463F3A; cursor: pointer; font-family: helvetica, sans-serif; font-size: 14px;">Restart Game</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const restartButton = document.getElementById('restartButton');
+        let fluffball = { x: 50, y: 340, radius: 20, dy: 0, gravity: 0.6, jumpPower: -15 };
+        let obstacles = [];
+        let frame = 0;
+        let score = 0;
+        let isJumping = false;
+        let gameOver = false;
+        let fluffFrame = 0; // For fluffball bounce animation
+        let bgOffset = 0; // For scrolling background
+
+        // Sound effects using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(frequency, type, duration, volume) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function jumpSound() {
+            playSound(400, 'triangle', 0.1, 0.3); // Cute boop
+        }
+
+        function gameOverSound() {
+            playSound(200, 'sawtooth', 0.3, 0.2); // Sad tone
+        }
+
+        function spawnObstacle() {
+            obstacles.push({ x: 800, y: 340, width: 20, height: 40, speed: 4 });
+        }
+
+        function detectCollision(fluffball, obstacle) {
+            // Rectangle-circle collision: closest point on rectangle to circle center
+            const closestX = Math.max(obstacle.x, Math.min(fluffball.x, obstacle.x + obstacle.width));
+            const closestY = Math.max(obstacle.y, Math.min(fluffball.y, obstacle.y + obstacle.height));
+            const dx = fluffball.x - closestX;
+            const dy = fluffball.y - closestY;
+            return (dx * dx + dy * dy) < (fluffball.radius * fluffball.radius);
+        }
+
+        function resetGame() {
+            fluffball = { x: 50, y: 340, radius: 20, dy: 0, gravity: 0.6, jumpPower: -15 };
+            obstacles = [];
+            frame = 0;
+            score = 0;
+            isJumping = false;
+            gameOver = false;
+            fluffFrame = 0;
+            bgOffset = 0;
+            restartButton.style.display = 'none';
+            gameLoop();
+        }
+
+        function drawBackground() {
+            // Pulsing sky gradient
+            const pulse = 0.5 + 0.5 * Math.sin(frame * 0.01);
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, 400);
+            skyGradient.addColorStop(0, '#BCCCE0');
+            skyGradient.addColorStop(1, `rgb(${255 * pulse}, ${179 + 76 * pulse}, ${186 + 32 * pulse})`);
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Scrolling clouds
+            ctx.fillStyle = '#f0f4f7';
+            ctx.globalAlpha = 0.8;
+            for (let x = -(bgOffset * 0.3) % 300; x < canvas.width; x += 300) {
+                ctx.beginPath();
+                ctx.arc(x + 50, 100, 30, 0, Math.PI * 2);
+                ctx.arc(x + 80, 100, 40, 0, Math.PI * 2);
+                ctx.arc(x + 110, 100, 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 70, 150, 25, 0, Math.PI * 2);
+                ctx.arc(x + 90, 150, 35, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Foreground waves
+            ctx.fillStyle = '#709775';
+            ctx.beginPath();
+            for (let x = -(bgOffset * 0.8) % 250; x < canvas.width; x += 250) {
+                ctx.moveTo(x, 400);
+                ctx.quadraticCurveTo(x + 60, 340, x + 125, 400);
+                ctx.quadraticCurveTo(x + 190, 340, x + 250, 400);
+            }
+            ctx.lineTo(canvas.width, 400);
+            ctx.lineTo(0, 400);
+            ctx.fill();
+
+            ctx.fillStyle = '#D68C45';
+            ctx.beginPath();
+            for (let x = -(bgOffset * 1.2) % 200; x < canvas.width; x += 200) {
+                ctx.moveTo(x, 400);
+                ctx.quadraticCurveTo(x + 50, 360, x + 100, 400);
+                ctx.quadraticCurveTo(x + 150, 360, x + 200, 400);
+            }
+            ctx.lineTo(canvas.width, 400);
+            ctx.lineTo(0, 400);
+            ctx.fill();
+
+            // Ground
+            ctx.fillStyle = '#f0f4f7';
+            ctx.fillRect(0, 380, canvas.width, 20);
+        }
+
+        function drawFluffball() {
+            const scale = isJumping ? 1 : (1 + 0.05 * Math.sin(fluffFrame * 0.2)); // Bounce effect
+            ctx.save();
+            ctx.translate(fluffball.x, fluffball.y);
+            ctx.scale(scale, scale);
+
+            // Fuzzy layers for fluffiness
+            ctx.globalAlpha = 0.5;
+            const gradient = ctx.createRadialGradient(0, 0, 5, 0, 0, fluffball.radius + 5);
+            gradient.addColorStop(0, '#D68C45');
+            gradient.addColorStop(1, '#f0f4f7');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(2, 2, fluffball.radius + 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.arc(-1, -1, fluffball.radius + 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            ctx.arc(0, 0, fluffball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+            fluffFrame++;
+        }
+
+        function gameLoop() {
+            if (gameOver) {
+                ctx.fillStyle = '#463F3A';
+                ctx.font = '30px Helvetica';
+                ctx.fillText('Game Over! Score: ' + score, 250, 180);
+                ctx.fillText('Press Space or Click Restart', 230, 220);
+                restartButton.style.display = 'block';
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw scrolling background
+            drawBackground();
+            bgOffset += 0.5;
+
+            // Fluffball
+            fluffball.dy += fluffball.gravity;
+            fluffball.y += fluffball.dy;
+            if (fluffball.y > 340) {
+                fluffball.y = 340;
+                fluffball.dy = 0;
+                isJumping = false;
+            }
+            drawFluffball();
+
+            // Obstacles
+            if (frame % 80 === 0) spawnObstacle();
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= obstacle.speed;
+                ctx.fillStyle = '#463F3A';
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                if (detectCollision(fluffball, obstacle)) {
+                    gameOver = true;
+                    gameOverSound();
+                }
+                if (obstacle.x < -obstacle.width) obstacles.splice(index, 1);
+            });
+
+            // Score
+            score++;
+            ctx.fillStyle = '#463F3A';
+            ctx.font = '20px Helvetica';
+            ctx.fillText('Score: ' + score, 10, 30);
+
+            frame++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // Prevent page scrolling
+                if (gameOver) {
+                    resetGame();
+                } else if (!isJumping) {
+                    fluffball.dy = fluffball.jumpPower;
+                    isJumping = true;
+                    jumpSound();
+                }
+            }
+        });
+
+        restartButton.addEventListener('click', resetGame);
+
+        gameLoop();
+    </script>
+{% endblock %}
+{% endblock %}
