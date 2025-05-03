@@ -20,7 +20,9 @@
         "knplabs/knp-time-bundle": "^2.4",
         "league/csv": "^9.23",
         "nucleos/dompdf-bundle": "4.3",
-        "league/csv": "^9.23",
+        
+        "monolog/monolog": "3.0",
+       
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
         "symfony/asset": "6.4.*",
