@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  My Profile | SPIIN Sports
+{% endblock %}
+{% block description %}
+  View and edit your profile details in the SPIIN Sports system
+{% endblock %}
+{% block keywords %}
+  profile, edit profile, {{ user.userFname }} {{ user.userLname }}, sports, SPIIN
+{% endblock %}
+
+{% block body_class %}
+  profile-page
+{% endblock %}
+
+{% block main %}
+  <div class="container py-5" data-aos="fade-up">
+    <h1 class="mb-4">My Profile: {{ user.userFname }} {{ user.userLname }}</h1>
+
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger" role="alert">{{ message }}</div>
+    {% endfor %}
+
+    {# Read-only view #}
+    <div id="profile-view" class="card shadow-sm">
+      <div class="card-body">
+        {% if user.profileImageUrl %}
+          <img src="{{ user.profileImageUrl }}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+        {% else %}
+          <p>No profile image set.</p>
+        {% endif %}
+        <p><strong>Email:</strong> {{ user.userEmail }}</p>
+        <p><strong>Phone:</strong> {{ user.userNbr ?: 'N/A' }}</p>
+        {% if role == 'athlete' %}
+          <p><strong>Date of Birth:</strong> {{ user.athleteDoB ? user.athleteDoB|date('Y-m-d') : 'N/A' }}</p>
+          <p><strong>Gender:</strong> {{ user.athleteGender ?: 'N/A' }}</p>
+          <p><strong>Height (cm):</strong> {{ user.athleteHeight ?: 'N/A' }}</p>
+          <p><strong>Weight (kg):</strong> {{ user.athleteWeight ?: 'N/A' }}</p>
+          <p><strong>Injury Status:</strong> 
+            {% if user.isInjured %}
+              <span class="badge bg-danger">Injured</span>
+            {% else %}
+              <span class="badge bg-success">Healthy</span>
+            {% endif %}
+          </p>
+        {% elseif role == 'coach' %}
+          <p><strong>Number of Teams:</strong> {{ user.nbTeams ?: 'N/A' }}</p>
+        {% elseif role == 'med_staff' %}
+          <p><strong>Medical Specialty:</strong> {{ user.medSpecialty ?: 'N/A' }}</p>
+        {% endif %}
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <button id="edit-button" class="btn btn-outline-primary">
+          <i class="bi bi-pencil"></i> Edit Profile
+        </button>
+        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to Home
+        </a>
+      </div>
+    </div>
+
+    {# Editable form (hidden by default) #}
+    <div id="profile-form" class="card shadow-sm mt-4" style="display: none;">
+      <div class="card-body">
+        {{ form_start(form) }}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ form_label(form.userFname) }}
+              {{ form_widget(form.userFname, {'attr': {'class': 'form-control'}}) }}
+              {{ form_errors(form.userFname) }}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form_label(form.userLname) }}
+              {{ form_widget(form.userLname, {'attr': {'class': 'form-control'}}) }}
+              {{ form_errors(form.userLname) }}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form_label(form.userEmail) }}
+              {{ form_widget(form.userEmail, {'attr': {'class': 'form-control'}}) }}
+              {{ form_errors(form.userEmail) }}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form_label(form.userNbr) }}
+              {{ form_widget(form.userNbr, {'attr': {'class': 'form-control'}}) }}
+              {{ form_errors(form.userNbr) }}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form_label(form.user_pwd) }}
+              {{ form_widget(form.user_pwd, {'attr': {'class': 'form-control'}}) }}
+              {{ form_errors(form.user_pwd) }}
+              <small class="form-text text-muted">{{ form_help(form.user_pwd) }}</small>
+            </div>
+            {% if form.profileImage is defined %}
+              <div class="col-md-6 mb-3">
+                {{ form_label(form.profileImage) }}
+                {{ form_widget(form.profileImage, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.profileImage) }}
+                <div class="form-check mt-2">
+                  <input type="checkbox" name="transform_to_avatar" id="transform_to_avatar" class="form-check-input">
+                  <label for="transform_to_avatar" class="form-check-label">Generate Avatar from Email</label>
+                </div>
+              </div>
+            {% endif %}
+            {% if role == 'athlete' %}
+              {% if form.athleteDoB is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.athleteDoB) }}
+                  {{ form_widget(form.athleteDoB, {'attr': {'class': 'form-control'}}) }}
+                  {{ form_errors(form.athleteDoB) }}
+                </div>
+              {% endif %}
+              {% if form.athleteGender is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.athleteGender) }}
+                  {{ form_widget(form.athleteGender, {'attr': {'class': 'form-select'}}) }}
+                  {{ form_errors(form.athleteGender) }}
+                </div>
+              {% endif %}
+              {% if form.athleteHeight is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.athleteHeight) }}
+                  {{ form_widget(form.athleteHeight, {'attr': {'class': 'form-control'}}) }}
+                  {{ form_errors(form.athleteHeight) }}
+                </div>
+              {% endif %}
+              {% if form.athleteWeight is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.athleteWeight) }}
+                  {{ form_widget(form.athleteWeight, {'attr': {'class': 'form-control'}}) }}
+                  {{ form_errors(form.athleteWeight) }}
+                </div>
+              {% endif %}
+              {% if form.isInjured is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.isInjured) }}
+                  {{ form_widget(form.isInjured, {'attr': {'class': 'form-check-input'}}) }}
+                  {{ form_errors(form.isInjured) }}
+                </div>
+              {% endif %}
+            {% elseif role == 'coach' %}
+              {% if form.nbTeams is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.nbTeams) }}
+                  {{ form_widget(form.nbTeams, {'attr': {'class': 'form-control'}}) }}
+                  {{ form_errors(form.nbTeams) }}
+                </div>
+              {% endif %}
+            {% elseif role == 'med_staff' %}
+              {% if form.medSpecialty is defined %}
+                <div class="col-md-6 mb-3">
+                  {{ form_label(form.medSpecialty) }}
+                  {{ form_widget(form.medSpecialty, {'attr': {'class': 'form-select'}}) }}
+                  {{ form_errors(form.medSpecialty) }}
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Save Changes
+            </button>
+            <button type="button" id="cancel-button" class="btn btn-outline-secondary">
+              <i class="bi bi-x"></i> Cancel
+            </button>
+          </div>
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ parent() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const profileView = document.getElementById('profile-view');
+      const profileForm = document.getElementById('profile-form');
+      const editButton = document.getElementById('edit-button');
+      const cancelButton = document.getElementById('cancel-button');
+
+      editButton.addEventListener('click', function () {
+        profileView.style.display = 'none';
+        profileForm.style.display = 'block';
+      });
+
+      cancelButton.addEventListener('click', function () {
+        profileForm.style.display = 'none';
+        profileView.style.display = 'block';
+        document.querySelector('form').reset();
+      });
+    });
+  </script>
+{% endblock %}

@@ -18,7 +18,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Entity\User;
+use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 
 class AppLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -28,17 +30,20 @@ class AppLoginAuthenticator extends AbstractLoginFormAuthenticator
     private UserPasswordHasherInterface $passwordHasher;
     private UrlGeneratorInterface $urlGenerator;
     private LoggerInterface $logger;
+    private ValidatorInterface $validator;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
         UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ValidatorInterface $validator
     ) {
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
         $this->urlGenerator = $urlGenerator;
         $this->logger = $logger;
+        $this->validator = $validator;
     }
 
     public const LOGIN_ROUTE = 'app_login';
@@ -57,18 +62,33 @@ class AppLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $email = $request->request->get('_username', '');
         $password = $request->request->get('_password', '');
+        $recaptchaResponse = $request->request->get('g-recaptcha-response', '');
 
         $this->logger->debug('Authentication attempt', [
             'email' => $email,
             'session_id' => $request->getSession()->getId(),
+            'recaptcha_response' => $recaptchaResponse ? 'Present' : 'Missing',
         ]);
-        dump(['email' => $email, 'password' => '***']);
+        dump(['email' => $email, 'password' => '***', 'recaptcha' => $recaptchaResponse ? 'Present' : 'Missing']);
+
+        // Validate reCAPTCHA
+        if (empty($recaptchaResponse)) {
+            $this->logger->error('reCAPTCHA response is empty');
+            throw new AuthenticationException('Please complete the reCAPTCHA verification.');
+        }
+
+        $constraint = new RecaptchaTrue();
+        $errors = $this->validator->validate($recaptchaResponse, $constraint);
+        if (count($errors) > 0) {
+            $this->logger->error('reCAPTCHA validation failed', ['errors' => (string) $errors]);
+            throw new AuthenticationException('Invalid reCAPTCHA. Please try again.');
+        }
 
         return new Passport(
             new UserBadge($email, function ($userIdentifier) {
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['user_email' => $userIdentifier]);
                 if ($user) {
-                    $this->entityManager->refresh($user); // Prevent Doctrine caching
+                    $this->entityManager->refresh($user);
                     $this->logger->debug('User loaded', [
                         'email' => $userIdentifier,
                         'role' => $user->getUserRole(),
@@ -109,7 +129,6 @@ class AppLoginAuthenticator extends AbstractLoginFormAuthenticator
             'session_id' => $sessionId,
         ]);
 
-        // Validate session
         if (!$session->isStarted()) {
             $session->start();
             $this->logger->warning('Session restarted', ['new_session_id' => $session->getId()]);
@@ -131,7 +150,7 @@ class AppLoginAuthenticator extends AbstractLoginFormAuthenticator
             dump(['redirect' => 'Coach to app_user_index']);
             return new RedirectResponse($this->urlGenerator->generate('app_user_index'));
         }
-        if (in_array('ROLE_ATHLETE', $roles, true) || in_array('ROLE_MEDICAL', $roles, true)) {
+        if (in_array('ROLE_ATHLETE', $roles, true) || in_array('ROLE_MED_STAFF', $roles, true)) {
             $this->logger->info('Redirecting athlete/medical', [
                 'route' => 'app_home',
                 'email' => $user instanceof User ? $user->getUserEmail() : 'Unknown',

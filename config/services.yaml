@@ -1,5 +1,7 @@
 # config/services.yaml
 parameters:
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    app.profile_image_upload_dir: '%kernel.project_dir%/public/uploads/profile_images'
 
 services:
     _defaults:
@@ -33,3 +35,6 @@ services:
             $clientSecret: '%env(GOOGLE_CLIENT_SECRET)%'
             $redirectUri: '%env(GOOGLE_REDIRECT_URI)%'
             $logger: '@logger'
+    App\Controller\UserController:
+        arguments:
+            $csrfTokenManager: '@security.csrf.token_manager'

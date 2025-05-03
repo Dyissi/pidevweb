@@ -1,0 +1,6 @@
+ewz_recaptcha:
+    public_key: '%env(RECAPTCHA_PUBLIC_KEY)%'
+    private_key: '%env(RECAPTCHA_PRIVATE_KEY)%'
+    enabled: true
+    verify_host: false # Set to true in production
+    locale_from_request: true

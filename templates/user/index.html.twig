@@ -18,6 +18,14 @@
 {% endblock %}
 
 {% block main %}
+  <style>
+    .search-container .input-group { max-width: 500px; margin: 0 auto; }
+    .form-control:focus { border-color: #007bff; box-shadow: 0 0 8px rgba(0,123,255,0.2); }
+    .table thead th a { color: white; text-decoration: none; display: block; }
+    .table tbody tr:hover { background: #f8f9fa; }
+    .spinner-border { width: 2rem; height: 2rem; }
+  </style>
+
   <div class="page-title text-center py-5">
     <div class="container">
       <h1 class="display-4 fw-bold">
@@ -35,6 +43,12 @@
       <div class="d-flex justify-content-center align-items-center mb-4">
         <h2 class="text-center">All {% if role == 'coach' %}Coaches{% elseif role == 'med_staff' %}Medical Staff{% else %}Athletes{% endif %}</h2>
       </div>
+      <div class="search-container mb-4">
+        <div class="input-group">
+          <input type="text" id="search-input" class="form-control" placeholder="Search by name..." value="{{ searchTerm|default('') }}" aria-label="Search">
+          <button class="btn btn-primary" type="button" disabled><i class="bi bi-search"></i></button>
+        </div>
+      </div>
       <div class="text-center mb-4">
         <a href="{{ path('app_user_new', {'context': context|default('front'), 'role': role|lower}) }}" class="btn btn-primary btn-lg">
           <i class="bi bi-plus-circle me-1"></i> Add New {% if role == 'coach' %}Coach{% elseif role == 'med_staff' %}Medical Staff{% else %}Athlete{% endif %}
@@ -46,10 +60,26 @@
             <table class="table table-hover text-center">
               <thead class="table-dark">
                 <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">First Name</th>
-                  <th scope="col">Last Name</th>
-                  <th scope="col">Email</th>
+                  <th scope="col">
+                    <a href="#" data-sort="id" data-dir="{{ sortBy == 'id' and sortDir == 'ASC' ? 'DESC' : 'ASC' }}">
+                      ID {% if sortBy == 'id' %}<i class="bi bi-{% if sortDir == 'ASC' %}arrow-up{% else %}arrow-down{% endif %}"></i>{% endif %}
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" data-sort="userFname" data-dir="{{ sortBy == 'userFname' and sortDir == 'ASC' ? 'DESC' : 'ASC' }}">
+                      First Name {% if sortBy == 'userFname' %}<i class="bi bi-{% if sortDir == 'ASC' %}arrow-up{% else %}arrow-down{% endif %}"></i>{% endif %}
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" data-sort="userLname" data-dir="{{ sortBy == 'userLname' and sortDir == 'ASC' ? 'DESC' : 'ASC' }}">
+                      Last Name {% if sortBy == 'userLname' %}<i class="bi bi-{% if sortDir == 'ASC' %}arrow-up{% else %}arrow-down{% endif %}"></i>{% endif %}
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" data-sort="userEmail" data-dir="{{ sortBy == 'userEmail' and sortDir == 'ASC' ? 'DESC' : 'ASC' }}">
+                      Email {% if sortBy == 'userEmail' %}<i class="bi bi-{% if sortDir == 'ASC' %}arrow-up{% else %}arrow-down{% endif %}"></i>{% endif %}
+                    </a>
+                  </th>
                   <th scope="col">Phone</th>
                   {% if role == 'athlete' %}
                     <th scope="col">Date of Birth</th>
@@ -65,7 +95,7 @@
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="user-table-body">
                 {% for user in users %}
                   <tr>
                     <td>{{ user.id }}</td>
@@ -116,4 +146,153 @@
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block javascript %}
+  {{ parent() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search-input');
+      const tableBody = document.getElementById('user-table-body');
+      let currentSort = '{{ sortBy|default('id') }}';
+      let currentDir = '{{ sortDir|default('ASC') }}';
+
+      // Fetch and render users
+      const fetchUsers = (search = '', sort = currentSort, dir = currentDir) => {
+        const url = new URL('{{ path('app_user_index', {'context': context|default('front'), 'role': role|lower}) }}', window.location.origin);
+        if (search) url.searchParams.set('search', search);
+        if (sort) url.searchParams.set('sort', sort);
+        if (dir) url.searchParams.set('dir', dir);
+        url.searchParams.set('ajax', '1'); // Explicit AJAX flag
+
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="{% if role == 'athlete' %}11{% else %}7{% endif %}" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>`;
+
+        fetch(url, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.text().then(text => {
+                throw new Error(`HTTP error ${response.status}: ${text}`);
+              });
+            }
+            return response.json();
+          })
+          .then(data => {
+            currentSort = data.sortBy;
+            currentDir = data.sortDir;
+            updateSortIndicators();
+            renderUsers(data.users, data.role, data.context);
+          })
+          .catch(error => {
+            console.error('Fetch error:', error);
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="{% if role == 'athlete' %}11{% else %}7{% endif %}" class="text-center text-muted py-4">
+                  Error loading users: ${error.message}
+                </td>
+              </tr>`;
+          });
+      };
+
+      // Render users in table
+      const renderUsers = (users, role, context) => {
+        if (users.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="{% if role == 'athlete' %}11{% else %}7{% endif %}" class="text-center text-muted py-4">
+                No ${role === 'coach' ? 'coaches' : role === 'med_staff' ? 'medical staff' : 'athletes'} found
+              </td>
+            </tr>`;
+          return;
+        }
+
+        tableBody.innerHTML = users.map(user => `
+          <tr>
+            <td>${user.id}</td>
+            <td>${user.userFname}</td>
+            <td>${user.userLname}</td>
+            <td>${user.userEmail}</td>
+            <td>${user.userNbr}</td>
+            ${role === 'athlete' ? `
+              <td>${user.athleteDoB}</td>
+              <td>${user.athleteGender}</td>
+              <td>${user.athleteHeight}</td>
+              <td>${user.athleteWeight}</td>
+              <td>
+                <span class="badge bg-${user.isInjured ? 'danger' : 'success'}">
+                  ${user.isInjured ? 'Injured' : 'Healthy'}
+                </span>
+              </td>
+            ` : role === 'coach' ? `
+              <td>${user.nbTeams}</td>
+            ` : `
+              <td>${user.medSpecialty}</td>
+            `}
+            <td>
+              <div class="d-flex justify-content-center gap-2">
+                <a href="${user.showUrl}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i> Show
+                </a>
+                <a href="${user.editUrl}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <form method="post" action="${user.deleteUrl}" onsubmit="return confirm('Are you sure you want to delete this user?');" class="d-inline">
+                  <input type="hidden" name="_token" value="${user.csrfToken}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      };
+
+      // Update sort indicators
+      const updateSortIndicators = () => {
+        document.querySelectorAll('thead th a').forEach(link => {
+          const sort = link.dataset.sort;
+          const dir = sort === currentSort ? (currentDir === 'ASC' ? 'DESC' : 'ASC') : 'ASC';
+          link.dataset.dir = dir;
+          link.innerHTML = `${link.textContent.split(' ')[0]} ${sort === currentSort ? `<i class="bi bi-${currentDir === 'ASC' ? 'arrow-up' : 'arrow-down'}"></i>` : ''}`;
+        });
+      };
+
+      // Debounce function
+      const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      };
+
+      // Search handler
+      searchInput.addEventListener('input', debounce(() => {
+        fetchUsers(searchInput.value);
+      }, 300));
+
+      // Sort handler
+      tableBody.parentElement.addEventListener('click', e => {
+        const link = e.target.closest('thead th a');
+        if (link) {
+          e.preventDefault();
+          const sort = link.dataset.sort;
+          const dir = link.dataset.dir;
+          fetchUsers(searchInput.value, sort, dir);
+        }
+      });
+
+      // Initial sort indicator update
+      updateSortIndicators();
+    });
+  </script>
 {% endblock %}

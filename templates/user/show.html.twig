@@ -19,6 +19,12 @@
     <h1 class="mb-4">{% if role == 'coach' %}Coach{% elseif role == 'med_staff' %}Medical Staff{% else %}Athlete{% endif %}: {{ user.userFname }} {{ user.userLname }}</h1>
     <div class="card shadow-sm">
       <div class="card-body">
+        {% if user.profileImageUrl %}
+            <img src="{{ user.profileImageUrl }}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+        {% else %}
+            <p>No profile image set.</p>
+        {% endif %}
+      
         <p><strong>Email:</strong> {{ user.userEmail }}</p>
         <p><strong>Phone:</strong> {{ user.userNbr ?: 'N/A' }}</p>
         {% if role == 'athlete' %}

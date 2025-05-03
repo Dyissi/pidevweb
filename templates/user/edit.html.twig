@@ -30,6 +30,11 @@
 
   <section class="section">
     <div class="container" data-aos="fade-up">
+      {% if user.profileImageUrl %}
+            <img src="{{ user.profileImageUrl }}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+      {% else %}
+            <p>No profile image set.</p>
+      {% endif %}
       {{ include('user/_form.html.twig', {'button_label': 'Update', 'role': user.userRole|lower, 'context': context, 'is_new': false}) }}
       <div class="d-flex gap-2 mt-3">
         <a href="{{ path('app_user_index', {'context': context, 'role': user.userRole|lower}) }}" class="btn btn-outline-secondary">

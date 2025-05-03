@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,6 +22,7 @@ class UserType extends AbstractType
     {
         $isNew = $options['is_new'];
         $role = $options['role'];
+        $showProfileImage = $options['show_profile_image'];
 
         $builder
             ->add('userFname', TextType::class, [
@@ -62,13 +64,27 @@ class UserType extends AbstractType
             ])
             ->add('user_pwd', PasswordType::class, [
                 'label' => 'Password',
-                'mapped' => true,
+                'mapped' => false,
                 'required' => $isNew,
                 'constraints' => $isNew ? [
                     new Assert\NotBlank(),
                 ] : [],
-                'help' => $isNew ? 'Required for new users' : 'Leave blank to keep current password',
+                'help' => $isNew ? 'Required for new users' : 'Enter a new password to change it, or leave blank to keep current',
             ]);
+        if ($showProfileImage) {
+            $builder->add('profileImage', FileType::class, [
+                'label' => 'Profile Image',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new Assert\File([
+                        'maxSize' => '5m',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
+                        'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, or GIF).',
+                    ]),
+                ],
+            ]);
+        }
 
         if ($role === 'athlete') {
             $builder
@@ -123,7 +139,6 @@ class UserType extends AbstractType
                 'label' => 'Number of Teams',
                 'required' => false,
                 'constraints' => [
-            
                     new Assert\GreaterThanOrEqual([
                         'value' => 0,
                         'message' => 'Number of teams cannot be negative.',
@@ -151,9 +166,11 @@ class UserType extends AbstractType
             'data_class' => User::class,
             'is_new' => true,
             'role' => 'athlete',
+            'show_profile_image' => false,
         ]);
         $resolver->setAllowedTypes('is_new', 'bool');
         $resolver->setAllowedTypes('role', 'string');
+        $resolver->setAllowedTypes('show_profile_image', 'bool');
         $resolver->setAllowedValues('role', ['athlete', 'coach', 'med_staff']);
     }
 }

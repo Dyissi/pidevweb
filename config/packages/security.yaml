@@ -24,6 +24,9 @@ security:
         - { path: ^/generate-hash, roles: PUBLIC_ACCESS }
         - { path: ^/create-test-user, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/verify-otp, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
         - { path: ^/user/new/front/athlete, roles: [ROLE_COACH, ROLE_ADMIN, ROLE_MED_STAFF] }
         - { path: ^/user/front/[0-9]+/edit, roles: [ROLE_COACH, ROLE_ADMIN, ROLE_MED_STAFF] }
@@ -34,6 +37,7 @@ security:
         - { path: ^/athlete, roles: ROLE_ATHLETE }
         - { path: ^/medical, roles: ROLE_MED_STAFF }
         - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/profile-image, roles: [ROLE_ATHLETE, ROLE_COACH, ROLE_MED_STAFF] }
 
 when@test:
     security:

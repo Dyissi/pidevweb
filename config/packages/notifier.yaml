@@ -2,11 +2,11 @@ framework:
     notifier:
         chatter_transports:
         texter_transports:
+            infobip: '%env(INFOBIP_DSN)%'
         channel_policy:
-            # use chat/slack, chat/telegram, sms/twilio or sms/nexmo
-            urgent: ['email']
-            high: ['email']
-            medium: ['email']
-            low: ['email']
+            urgent: ['sms', 'email']
+            high: ['sms', 'email']
+            medium: ['sms', 'email']
+            low: ['sms', 'email']
         admin_recipients:
             - { email: admin@example.com }

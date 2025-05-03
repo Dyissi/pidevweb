@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h2>Reset Your Password</h2>
+        {% for flash_error in app.flashes('error') %}
+            <div class="alert alert-danger">{{ flash_error }}</div>
+        {% endfor %}
+        {{ form_start(form) }}
+            {{ form_row(form.user_pwd) }}
+            <button type="submit" class="btn btn-primary">Reset Password</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
