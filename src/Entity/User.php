@@ -61,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "isInjured", type: "boolean", nullable: true)]
     private ?bool $isInjured = false;
 
+    #[ORM\Column(name: "profile_image_url", type: "string", length: 255, nullable: true)]
+    private ?string $profile_image_url = null;
+
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: "users")]
     #[ORM\JoinColumn(
         name: "athlete_teamId",
@@ -261,6 +264,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getProfileImageUrl(): ?string
+    {
+        return $this->profile_image_url;
+    }
+
+    public function setProfileImageUrl(?string $profile_image_url): self
+    {
+        $this->profile_image_url = $profile_image_url;
+        return $this;
+    }
+
     public function getTeam(): ?Team
     {
         return $this->team;
@@ -424,7 +438,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $data->setUser(null);
             }
         }
-
+        
         return $this;
     }
 

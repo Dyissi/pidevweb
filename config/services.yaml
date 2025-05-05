@@ -2,6 +2,8 @@
 parameters:
     # Add any parameters you want to use in your services here
     app.ninja_api_key: '%env(API_NINJAS_KEY)%'
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    app.profile_image_upload_dir: '%kernel.project_dir%/public/uploads/profile_images'
 
 services:
     _defaults:
@@ -59,3 +61,7 @@ services:
     App\Service\GeminiService:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%'
+            
+    App\Controller\UserController:
+        arguments:
+            $csrfTokenManager: '@security.csrf.token_manager'

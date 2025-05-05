@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to SPIN!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            background-color: #f8f8f8;
+            padding: 10px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome, {{ user.userFname }}!</h1>
+        </div>
+        <p>Your SPIN account has been created successfully. Here are your login details:</p>
+        <ul>
+            <li><strong>Email:</strong> {{ user.userEmail }}</li>
+            <li><strong>Password:</strong> {{ plainPassword }}</li>
+        </ul>
+        <p><strong>Important:</strong> For your security, please change your password after logging in.</p>
+        <p>
+            <a href="{{ loginUrl }}" class="button">Log In Now</a>
+        </p>
+        <p>If you didn’t create this account, please contact support at amorrions@gmail.com.</p>
+        <p>Best regards,<br>The SPIN Team</p>
+    </div>
+</body>
+</html>
