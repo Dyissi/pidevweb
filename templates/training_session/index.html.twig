@@ -172,13 +172,7 @@
             font-weight: 600;
             color: #2c3e50;
         }
-    </style>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {# FullCalendar CSS removed #}
-    <style>
+   
         .filter-btn {
             margin-right: 5px;
         }
@@ -346,7 +340,7 @@
             color: #2c3e50;
         }
     </style>
-{% endblock %}
+ {% endblock %}
 
 {% block main %}
     <div class="container py-4">
@@ -387,8 +381,16 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <h5 class="mb-2">Sort by Duration:</h5>
+                    <h5 class="mb-2">Sort by:</h5>
                     <div class="btn-group" role="group">
+                        <a href="{{ path('app_training_session_index', {'filter': 'upcoming'}) }}" 
+                           class="btn btn-outline-secondary filter-btn {{ current_filter == 'upcoming' ? 'active' : '' }}">
+                            Upcoming
+                        </a>
+                        <a href="{{ path('app_training_session_index', {'filter': 'past'}) }}" 
+                           class="btn btn-outline-secondary filter-btn {{ current_filter == 'past' ? 'active' : '' }}">
+                            Past
+                        </a>
                         <a href="{{ path('app_training_session_index', {'filter': 'longest'}) }}" 
                            class="btn btn-outline-secondary filter-btn {{ current_filter == 'longest' ? 'active' : '' }}">
                             Longest
@@ -574,8 +576,7 @@
     </div>
 {% endblock %}
 
-{% block javascript %}
-    {{ parent() }}
+
 {% block javascript %}
     {{ parent() }}
     <script>

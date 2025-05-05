@@ -7,41 +7,40 @@
 
         <h1 style="text-align: center; margin-bottom: 2rem;">My Injuries and Recovery Plans</h1>
 
-       <h2>Injuries</h2>
-{% if injuries is not empty %}
-    <ul style="list-style: none; padding: 0;">
-        {% for injury in injuries %}
-            <li style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: white;">
-                <div style="flex: 1; padding-right: 1rem;">
-                    <p> <strong>Injury Type:</strong> {{ injury.injuryType }}</p>
-                    <p> <strong>Description:</strong> {{ injury.injuryDescription }}</p>
-                    <p><strong>Severity:</strong> {{ injury.injurySeverity }}</p>
-                    <p><strong>Date:</strong> {{ injury.injuryDate|date('Y-m-d') }}</p>
-                </div>
-               {% if injury.image %}
-    <img src="{{ asset('frontOffice/img/' ~ injury.image) }}" 
-         alt="Injury Image" 
-         width="120" 
-         style="border-radius: 8px; object-fit: cover;" />
-{% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No injuries found.</p>
-{% endif %}
-
+        <h2>Injuries</h2>
+        {% if injuries is not empty %}
+            <ul style="list-style: none; padding: 0;">
+                {% for injury in injuries %}
+                    <li style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: white;">
+                        <div style="flex: 1; padding-right: 1rem;">
+                            <p><strong>Injury Type:</strong> {{ injury.injuryType }}</p>
+                            <p><strong>Description:</strong> {{ injury.injuryDescription }}</p>
+                            <p><strong>Severity:</strong> {{ injury.injurySeverity }}</p>
+                            <p><strong>Date:</strong> {{ injury.injuryDate|time_diff }} ({{ injury.injuryDate|date('Y-m-d') }})</p>
+                        </div>
+                        {% if injury.image %}
+                            <img src="{{ asset('frontOffice/img/' ~ injury.image) }}" 
+                                 alt="Injury Image" 
+                                 width="120" 
+                                 style="border-radius: 8px; object-fit: cover;" />
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No injuries found.</p>
+        {% endif %}
 
         <h2 style="margin-top: 2rem;">Recovery Plans</h2>
         {% if recoveryplans is not empty %}
             <ul style="list-style: none; padding: 0;">
                 {% for plan in recoveryplans %}
                     <li style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: white;">
-                      <p><strong>Injury:</strong> {{ plan.injury.injuryType }}</p> 
-                        <p> <strong>Recovery Goal:</strong> {{ plan.recoveryGoal }}</p>
-                        <p> <strong>Description:</strong> {{ plan.recoveryDescription }}</p>
-                        <p><strong>Start Date:</strong> {{ plan.recoveryStartDate|date('Y-m-d') }}</p>
-                        <p><strong>End Date:</strong> {{ plan.recoveryEndDate|date('Y-m-d') }}</p>
+                        <p><strong>Injury:</strong> {{ plan.injury.injuryType }}</p>
+                        <p><strong>Recovery Goal:</strong> {{ plan.recoveryGoal }}</p>
+                        <p><strong>Description:</strong> {{ plan.recoveryDescription }}</p>
+                        <p><strong>Start Date:</strong> {{ plan.recoveryStartDate|time_diff }} ({{ plan.recoveryStartDate|date('Y-m-d') }})</p>
+                        <p><strong>End Date:</strong> {{ plan.recoveryEndDate|time_diff }} ({{ plan.recoveryEndDate|date('Y-m-d') }})</p>
                     </li>
                 {% endfor %}
             </ul>

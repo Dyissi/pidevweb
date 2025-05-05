@@ -2,7 +2,6 @@
 
 {% block hero %}
 
-
 {% block body %}
 <section id="injury-index" class="py-5">
   <div class="container" data-aos="fade-up">
@@ -48,7 +47,7 @@
         {% for injury in injuries %}
           <tr>
             <td>{{ injury.injuryId }}</td>
-            <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : 'No Date' }}</td>
+            <td>{{ injury.injuryDate ? (injury.injuryDate|time_diff ~ ' (' ~ injury.injuryDate|date('Y-m-d') ~ ')') : 'No Date' }}</td>
             <td>{{ injury.injurySeverity }}</td>
             <td>{{ injury.injuryDescription }}</td>
             <td>{{ injury.injuryType }}</td>

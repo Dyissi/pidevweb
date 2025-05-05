@@ -34,8 +34,8 @@ class DataType extends AbstractType
                 'class' => User::class,
                 'query_builder' => function () {
                     return $this->userRepository->createQueryBuilder('u')
-                        ->where('u.user_role = :role')  // Exactly matches your DB column
-                        ->setParameter('role', 'athlete'); // Exact value from database
+                        ->where('u.user_role = :role')  
+                        ->setParameter('role', 'athlete'); 
                 },
                 'choice_label' => fn(User $user) => $user->getUserFname() . ' ' . $user->getUserLname(),
                 'placeholder' => 'Select an athlete',

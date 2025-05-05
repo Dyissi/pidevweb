@@ -19,7 +19,7 @@
           </tr>
           <tr>
             <th>Date</th>
-            <td>{{ injury.injuryDate ? injury.injuryDate|date('Y-m-d') : '' }}</td>
+            <td>{{ injury.injuryDate ? (injury.injuryDate|time_diff ~ ' (' ~ injury.injuryDate|date('Y-m-d') ~ ')') : '' }}</td>
           </tr>
           <tr>
             <th>Severity</th>

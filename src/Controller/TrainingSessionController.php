@@ -34,16 +34,12 @@ final class TrainingSessionController extends AbstractController
         $filter = $request->query->get('filter', 'all');
         $limit = $request->query->getInt('limit', 10);
 
-        // Get base query
-        $query = $trainingSessionRepository->createQueryBuilder('s');
-        if ($focus !== 'all') {
-            $query->andWhere('s.sessionFocus = :focus')->setParameter('focus', $focus);
-        }
-        // No duration filter in query for now (could be added if needed)
-        $query->orderBy('s.sessionStartTime', 'DESC');
+        // Get filtered data from repository
+        $sessions = $trainingSessionRepository->findFiltered($filter, $focus);
 
+        // Create pagination
         $pagination = $paginator->paginate(
-            $query,
+            $sessions,
             $request->query->getInt('page', 1),
             $limit
         );

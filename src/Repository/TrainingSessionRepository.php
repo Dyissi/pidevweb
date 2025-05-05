@@ -36,10 +36,17 @@ class TrainingSessionRepository extends ServiceEntityRepository
                  ->getResult();
     }
 
-    public function findFiltered(?string $filter = null): array
+    public function findFiltered(?string $filter = null, ?string $focus = null): array
     {
         $qb = $this->createQueryBuilder('t');
 
+        // Apply focus filter if provided
+        if ($focus && $focus !== 'all') {
+            $qb->andWhere('t.sessionFocus = :focus')
+               ->setParameter('focus', $focus);
+        }
+
+        // Apply sorting and time-based filters
         switch ($filter) {
             case 'upcoming':
                 $qb->andWhere('t.sessionStartTime >= :now')

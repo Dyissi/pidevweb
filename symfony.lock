@@ -65,6 +65,21 @@
     "knplabs/knp-paginator-bundle": {
         "version": "v6.8.0"
     },
+    "knplabs/knp-time-bundle": {
+        "version": "v2.4.0"
+    },
+    "nucleos/dompdf-bundle": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.1",
+            "ref": "ac77a0c751bdccab42ddc73d7290719b31ecb691"
+        },
+        "files": [
+            "./config/packages/nucleos_dompdf.yaml"
+        ]
+    },
     "php-http/discovery": {
         "version": "1.20",
         "recipe": {

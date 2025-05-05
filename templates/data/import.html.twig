@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c
 {% extends 'base.html.twig' %}
 
 {% block title %}Import Performance Data{% endblock %}
 
-<<<<<<< HEAD
 {% block stylesheets %}
     {{ parent() }}
     <style>
@@ -72,23 +67,3 @@ performanceSpeed,performanceAgility,performanceNbrGoals,performanceAssists,perfo
         {{ form_end(form) }}
     </div>
 {% endblock %} 
-=======
-{% block main %}
-    <div class="container py-4">
-        <h1>Import Performance Data</h1>
-        
-        {{ form_start(form) }}
-            <div class="mb-3">
-                {{ form_label(form.csv_file) }}
-                {{ form_widget(form.csv_file) }}
-                <div class="form-text">
-                    CSV format: performanceSpeed,performanceAgility,performanceNbrGoals,performanceAssists,performanceDateRecorded,performanceNbrFouls
-                </div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Import</button>
-            <a href="{{ path('app_data_index') }}" class="btn btn-secondary">Cancel</a>
-        {{ form_end(form) }}
-    </div>
-{% endblock %}
->>>>>>> 4c2ad4bf81b3ff4fdd639e3bffbd9c82647eb00c
