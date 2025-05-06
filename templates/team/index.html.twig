@@ -60,7 +60,7 @@
       background: #e7f1ff;
       border: none;
       border-radius: 10px;
-      color:rgb(0, 133, 109);
+      color: rgb(0, 133, 109);
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
       animation: fadeIn 0.5s ease;
     }
@@ -127,24 +127,21 @@
 
         <div class="filter-card mb-5">
           <div class="card-body p-4">
-            <form method="get" action="{{ path('app_team_index') }}" class="row g-3 align-items-center">
+            <form method="get" action="{{ path('app_team_index') }}" class="row g-3 align-items-center" id="team-filter-form">
               <div class="col-md-6">
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-search"></i></span>
-                  <input type="text" name="search" value="{{ searchTerm|default('') }}" class="form-control" placeholder="Search by team name..." aria-label="Search teams">
+                  <input type="text" name="search" value="{{ searchTerm|default('') }}" class="form-control" placeholder="Search by team name..." aria-label="Search teams" id="search-input">
                 </div>
               </div>
-              <div class="col-md-4">
-                <select name="sport" class="form-select">
+              <div class="col-md-6">
+                <select name="sport" class="form-select" id="sport-select">
                   <option value="">All Sports</option>
                   <option value="Basketball" {% if filterTeamSport == 'Basketball' %}selected{% endif %}>Basketball</option>
                   <option value="Football" {% if filterTeamSport == 'Football' %}selected{% endif %}>Football</option>
                   <option value="Volleyball" {% if filterTeamSport == 'Volleyball' %}selected{% endif %}>Volleyball</option>
                   <option value="Handball" {% if filterTeamSport == 'Handball' %}selected{% endif %}>Handball</option>
                 </select>
-              </div>
-              <div class="col-md-2 text-end">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-2"></i>Filter</button>
               </div>
             </form>
           </div>
@@ -206,7 +203,7 @@
                       </td>
                     </tr>
                   {% else %}
-                    <tr>
+                    <-ArithmeticError>
                       <td colspan="7" class="text-center text-muted py-5">
                         {% if searchTerm or filterTeamSport %}
                           No teams match your filters
@@ -219,10 +216,36 @@
                 </tbody>
               </table>
             </div>
-          
           </div>
         </div>
       </div>
     </section>
+
+    <script>
+      // Debounce function to limit the rate of function execution
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Function to submit the form
+      function submitForm() {
+        document.getElementById('team-filter-form').submit();
+      }
+
+      // Debounced form submission
+      const debouncedSubmit = debounce(submitForm, 300);
+
+      // Add event listeners
+      document.getElementById('search-input').addEventListener('keyup', debouncedSubmit);
+      document.getElementById('sport-select').addEventListener('change', submitForm);
+    </script>
   </div>
 {% endblock %}

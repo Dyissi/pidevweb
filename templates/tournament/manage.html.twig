@@ -55,20 +55,6 @@
           </ul>
         </div>
       </div>
-
-      <div class="mt-4">
-        <h3>Assign Winner</h3>
-        <form method="post">
-          <select name="assign_winner" class="form-select mb-3">
-            <option value="" disabled selected>Select a winner</option>
-            {% for teamId in teamsInTournament %}
-              {% set team = allTeams|filter(t => t.id == teamId)|first %}
-              <option value="{{ team.id }}">{{ team.teamName }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit" class="btn btn-primary">Assign Winner</button>
-        </form>
-      </div>
     {% else %}
       <div class="alert alert-info mt-4">
         This tournament has ended and a winner has been assigned. No further changes can be made.

@@ -1,19 +1,12 @@
 <div class="card shadow-sm">
   <div class="card-body">
-  {{ form_start(form,{'attr':{'novalidate' : 'novalidate'} } )  }}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
       <div class="row g-3">
         <div class="col-md-6">
           {{ form_label(form.teamName, null, {'label_attr': {'class': 'form-label'}}) }}
           {{ form_widget(form.teamName, {'attr': {'class': 'form-control'}}) }}
           <small class="form-text text-danger">
             {{ form_errors(form.teamName) }}
-          </small>
-        </div>
-        <div class="col-md-6">
-          {{ form_label(form.teamNbAthletes, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.teamNbAthletes, {'attr': {'class': 'form-control'}}) }}
-          <small class="form-text text-danger">
-            {{ form_errors(form.teamNbAthletes) }}
           </small>
         </div>
         <div class="col-md-6">

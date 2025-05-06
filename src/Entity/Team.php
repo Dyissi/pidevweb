@@ -19,7 +19,7 @@ class Team
     private string $teamName;
 
     #[ORM\Column(name: "teamNbAthletes", type: "integer")]
-    private int $teamNbAthletes;
+    private int $teamNbAthletes = 0;
 
     #[ORM\Column(name: "teamTypeOfSport", type: "string", length: 255)]
     private string $teamTypeOfSport;
@@ -36,10 +36,15 @@ class Team
     #[ORM\OneToMany(mappedBy: "team", targetEntity: User::class)]
     private Collection $users;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "coachId", referencedColumnName: "user_id", nullable: false, onDelete: "RESTRICT")]
+    private User $coach;
+
     public function __construct()
     {
         $this->results = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->teamNbAthletes = 0;
     }
 
     public function getId(): int
@@ -132,13 +137,30 @@ class Team
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
             $user->setTeam($this);
+            $this->teamNbAthletes++;
         }
         return $this;
     }
 
     public function removeUser(User $user): self
     {
-        $this->users->removeElement($user);
+        if ($this->users->removeElement($user)) {
+            if ($user->getTeam() === $this) {
+                $user->setTeam(null);
+                $this->teamNbAthletes--;
+            }
+        }
+        return $this;
+    }
+
+    public function getCoach(): User
+    {
+        return $this->coach;
+    }
+
+    public function setCoach(User $coach): self
+    {
+        $this->coach = $coach;
         return $this;
     }
 }

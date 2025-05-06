@@ -1,6 +1,6 @@
 <div class="card shadow-sm">
   <div class="card-body">
-    {{ form_start(form,{'attr':{'novalidate' : 'novalidate'} } )  }}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
       <div class="row g-3">
         <div class="col-md-6">
           {{ form_label(form.tournamentName, null, {'label_attr': {'class': 'form-label'}}) }}
@@ -10,8 +10,8 @@
           </small>
         </div>
         <div class="col-md-6">
-          {{ form_label(form.tournamentLocation, null, {'label_attr': {'class': 'form-label'}}) }}
-          {{ form_widget(form.tournamentLocation, {'attr': {'class': 'form-control'}}) }}
+          {{ form_label(form.tournamentLocation, 'Tournament Location', {'label_attr': {'class': 'form-label'}}) }}
+          {{ form_widget(form.tournamentLocation, {'attr': {'class': 'form-control', 'id': 'tournament_location', 'placeholder': 'Enter or select a location'}}) }}
           <small class="form-text text-danger">
             {{ form_errors(form.tournamentLocation) }}
           </small>
@@ -37,6 +37,9 @@
             {{ form_errors(form.tournamentTOS) }}
           </small>
         </div>
+        <div class="col-12">
+          <div id="map" style="height: 500px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+        </div>
         <div class="col-12 text-center">
           <button type="submit" class="btn btn-primary">
             <i class="bi bi-save"></i> {{ button_label|default('Save') }}
@@ -47,5 +50,6 @@
         </div>
       </div>
     {{ form_end(form) }}
+    <script src="{{ asset('frontOffice/js/autocomplete.js') }}"></script>
   </div>
 </div>

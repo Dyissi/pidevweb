@@ -23,6 +23,10 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\EventSubscriber\TournamentCalendarSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+    
     # Twilio Service
     App\Service\TwilioService:
         arguments:

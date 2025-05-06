@@ -45,14 +45,140 @@
               </tr>
             </tbody>
           </table>
-          <a href="{{ path('app_tournament_index') }}" class="btn btn-secondary mt-3">Back to List</a>
-          <a href="{{ path('app_tournament_edit', {'id': tournament.id}) }}" class="btn btn-primary mt-3">Edit</a>
-          <a href="{{ path('app_tournament_manage', {'id': tournament.id}) }}" class="btn btn-warning mt-3">
-            Manage Tournament
-          </a>
-          {{ include('tournament/_delete_form.html.twig') }}
+          <!-- Map Section -->
+          <div id="tournament-map" style="height: 500px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+          <div id="map-error" class="text-danger mt-2" style="display: none;"></div>
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-between mt-3 align-items-center">
+            <a href="{{ path('app_tournament_index') }}" class="btn btn-secondary">Back to List</a>
+            <div class="d-flex gap-2">
+              <a href="{{ path('app_tournament_edit', {'id': tournament.id}) }}" class="btn btn-primary">Edit</a>
+              <a href="{{ path('app_tournament_manage', {'id': tournament.id}) }}" class="btn btn-warning">Manage Tournament</a>
+              {% if tournament.tournamentNbteams >= 2 %}
+                <a href="{{ path('app_tournament_bracket', {'id': tournament.id}) }}" class="btn btn-success">
+                  <i class="bi bi-diagram-3"></i> View Bracket
+                </a>
+              {% endif %}
+              {{ include('tournament/_delete_form.html.twig') }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block javascript %}
+  {{ parent() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mapDiv = document.getElementById('tournament-map');
+      const errorDiv = document.getElementById('map-error');
+      const location = {{ tournament.tournamentLocation|json_encode|raw }};
+
+      if (!mapDiv) {
+        console.error('Map element #tournament-map not found');
+        if (errorDiv) {
+          errorDiv.textContent = 'Map container not found.';
+          errorDiv.style.display = 'block';
+        }
+        return;
+      }
+
+      // Initialize map
+      let map;
+      try {
+        // Check if map is already initialized
+        if (mapDiv._leaflet_id) {
+          mapDiv._leaflet_id = null;
+          while (mapDiv.firstChild) {
+            mapDiv.removeChild(mapDiv.firstChild);
+          }
+          console.log('Cleared existing Leaflet map data on #tournament-map');
+        }
+        map = L.map('tournament-map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap> contributors'
+        }).addTo(map);
+      } catch (error) {
+        console.error('Error initializing Leaflet map:', error);
+        if (errorDiv) {
+          errorDiv.textContent = 'Failed to initialize map.';
+          errorDiv.style.display = 'block';
+        }
+        return;
+      }
+
+      // Function to geocode address
+      const geocodeAddress = async (query) => {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1`,
+            {
+              headers: { 'User-Agent': 'SPIN-Sports-App (your.email@example.com)' }
+            }
+          );
+          if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+          return await response.json();
+        } catch (error) {
+          console.error('Error geocoding address:', query, error);
+          return [];
+        }
+      };
+
+      // Geocode location
+      if (location) {
+        geocodeAddress(location).then(results => {
+          if (results.length > 0 && results[0].lat && results[0].lon) {
+            const lat = results[0].lat;
+            const lon = results[0].lon;
+            map.setView([lat, lon], 15);
+            L.marker([lat, lon])
+              .addTo(map)
+              .bindPopup(location)
+              .openPopup();
+            console.log('Geocoded address:', location, 'to:', lat, lon);
+          } else {
+            // Try simplified address (first component before comma)
+            const simplified = location.split(',')[0].trim();
+            if (simplified && simplified !== location) {
+              console.log('Retrying with simplified address:', simplified);
+              geocodeAddress(simplified).then(fallbackResults => {
+                if (fallbackResults.length > 0 && fallbackResults[0].lat && fallbackResults[0].lon) {
+                  const lat = fallbackResults[0].lat;
+                  const lon = fallbackResults[0].lon;
+                  map.setView([lat, lon], 15);
+                  L.marker([lat, lon])
+                    .addTo(map)
+                    .bindPopup(location)
+                    .openPopup();
+                  console.log('Geocoded simplified address:', simplified, 'to:', lat, lon);
+                } else {
+                  map.setView([0, 0], 1);
+                  if (errorDiv) {
+                    errorDiv.textContent = 'Could not locate address on map. Showing default view.';
+                    errorDiv.style.display = 'block';
+                  }
+                  console.warn('No geocoding results for address:', location, 'or simplified:', simplified);
+                }
+              });
+            } else {
+              map.setView([0, 0], 1);
+              if (errorDiv) {
+                errorDiv.textContent = 'Could not locate address on map. Showing default view.';
+                errorDiv.style.display = 'block';
+              }
+              console.warn('No geocoding results for address:', location);
+            }
+          }
+        });
+      } else {
+        map.setView([0, 0], 1);
+        if (errorDiv) {
+          errorDiv.textContent = 'No location specified. Showing default view.';
+          errorDiv.style.display = 'block';
+        }
+      }
+    });
+  </script>
 {% endblock %}
