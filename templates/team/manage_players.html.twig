@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Players for {{ team.teamName }}{% endblock %}
+{% block description %}Add or remove athletes for {{ team.teamName }} in the SPIIN Sports system{% endblock %}
+{% block keywords %}team, {{ team.teamName }}, athletes, SPIIN{% endblock %}
+
+{% block body_class %}team-manage-players-page{% endblock %}
+
+{% block main %}
+  <div class="container py-5">
+    <h1 class="mb-4">Manage Players for {{ team.teamName }}</h1>
+
+    <div class="row">
+      <!-- Add Players Section -->
+      <div class="col-md-6">
+        <h3>Add Available Athletes</h3>
+        {% if availableAthletes|length > 0 %}
+          <form method="post" action="{{ path('app_team_manage_players', {'id': team.id}) }}" id="add-players-form">
+            <input type="hidden" name="add_players" value="1">
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th><input type="checkbox" class="select-all" data-target="add" /></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for athlete in availableAthletes %}
+                        <tr>
+                          <td>
+                            <input type="checkbox" name="athletes[]" value="{{ athlete.id }}" class="athlete-checkbox add-checkbox" />
+                          </td>
+                          <td>{{ athlete.getFullName() }}</td>
+                          <td>{{ athlete.userEmail }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Add Selected Players
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        {% else %}
+          <div class="alert alert-info">
+            No available athletes to add. All athletes are assigned or not registered.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Remove Players Section -->
+      <div class="col-md-6">
+        <h3>Remove Team Athletes</h3>
+        {% if teamAthletes|length > 0 %}
+          <form method="post" action="{{ path('app_team_remove_players', {'id': team.id}) }}" id="remove-players-form">
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th><input type="checkbox" class="select-all" data-target="remove" /></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for athlete in teamAthletes %}
+                        <tr>
+                          <td>
+                            <input type="checkbox" name="athletes[]" value="{{ athlete.id }}" class="athlete-checkbox remove-checkbox" />
+                          </td>
+                          <td>{{ athlete.getFullName() }}</td>
+                          <td>{{ athlete.userEmail }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-person-dash"></i> Remove Selected Players
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        {% else %}
+          <div class="alert alert-info">
+            No athletes are currently assigned to this team.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <a href="{{ path('app_team_show', {'id': team.id}) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Team
+      </a>
+    </div>
+
+    <script>
+      document.querySelectorAll('.select-all').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+          const target = this.getAttribute('data-target');
+          const checkboxes = document.querySelectorAll('.' + target + '-checkbox');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+      });
+
+      document.getElementById('add-players-form').addEventListener('submit', function(event) {
+        const checkboxes = document.querySelectorAll('.add-checkbox:checked');
+        if (checkboxes.length === 0) {
+          event.preventDefault();
+          alert('Please select at least one athlete to add.');
+        }
+      });
+
+      document.getElementById('remove-players-form').addEventListener('submit', function(event) {
+        const checkboxes = document.querySelectorAll('.remove-checkbox:checked');
+        if (checkboxes.length === 0) {
+          event.preventDefault();
+          alert('Please select at least one athlete to remove.');
+        }
+      });
+    </script>
+  </div>
+{% endblock %}

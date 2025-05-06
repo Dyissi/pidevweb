@@ -35,8 +35,11 @@ class Tournament
 
     #[ORM\Column(name: "tournamentWinner", type: "integer", nullable: true)]
     private ?int $tournamentWinner = null;
+    #[ORM\Column(name: "bracketData", type: "json", nullable: true)]
+    private ?array $bracketData = null;
 
     #[ORM\OneToMany(mappedBy: "tournament", targetEntity: Results::class, orphanRemoval: true)]
+    
     private Collection $results;
 
     public function __construct()
@@ -143,6 +146,16 @@ class Tournament
     public function removeResult(Results $result): self
     {
         $this->results->removeElement($result);
+        return $this;
+    }
+    public function getBracketData(): ?array
+    {
+        return $this->bracketData;
+    }
+
+    public function setBracketData(?array $bracketData): self
+    {
+        $this->bracketData = $bracketData;
         return $this;
     }
 }

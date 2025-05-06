@@ -1,0 +1,3 @@
+calendar:
+    # No configuration needed for basic usage
+    # FullCalendar options are set in index.html.twig

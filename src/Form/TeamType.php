@@ -25,14 +25,6 @@ class TeamType extends AbstractType
                 ],
                 'attr' => ['placeholder' => 'Enter team name'],
             ])
-            ->add('teamNbAthletes', null, [
-                'label' => 'Number of Athletes',
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Number of athletes cannot be blank.']),
-                    new Assert\PositiveOrZero(['message' => 'Number of athletes cannot be negative.']),
-                ],
-                'attr' => ['placeholder' => 'Enter number of athletes'],
-            ])
             ->add('teamTypeOfSport', ChoiceType::class, [
                 'label' => 'Sport',
                 'choices' => [

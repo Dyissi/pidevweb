@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Team - SPIIN Sports{% endblock %}
+
+{% block main %}
+<style>
+    #my-team .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+        background: #ffffff;
+    }
+    #my-team .card-header {
+        background: linear-gradient(45deg, #709775, #D68C45);
+        color: #ffffff;
+        font-weight: 600;
+        border-bottom: none;
+    }
+    #my-team .card-body {
+        padding: 1.5rem;
+    }
+    #my-team .table thead th {
+        background: #f8f9fa;
+        color: #1a3c34;
+        border-bottom: 2px solid #dee2e6;
+    }
+    #my-team .table tbody tr:hover {
+        background: #f1f9ff;
+    }
+    #my-team .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+    #my-team .badge.bg-success {
+        background-color: #28a745 !important;
+    }
+    #my-team .btn-primary {
+        background: linear-gradient(45deg, #709775, #D68C45);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    #my-team .btn-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    }
+    #my-team .qr-code-img {
+        max-width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-top: 50px;
+        
+    }
+    @media (max-width: 768px) {
+        #my-team .qr-code-img {
+            max-width: 150px;
+        }
+        #my-team .btn-primary {
+            width: 100%;
+        }
+    }
+    #my-team .card-body.text-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    }
+</style>
+
+<section id="my-team" class="section">
+    <div class="container" data-aos="fade-up">
+        <h2 class="mb-4">My Team</h2>
+
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if team %}
+            <!-- Team Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 style="color:white">{{ team.teamName }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Sport:</strong> {{ team.teamTypeOfSport }}</p>
+                    <p><strong>Number of Athletes:</strong> {{ team.teamNbAthletes }}</p>
+                    <p><strong>Wins:</strong> {{ team.teamWins }}</p>
+                    <p><strong>Losses:</strong> {{ team.teamLosses }}</p>
+                </div>
+            </div>
+
+            <!-- Tournaments Won -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 style="color:white">Tournaments Won</h3>
+                </div>
+                <div class="card-body">
+                    {% if tournamentsWon|length > 0 %}
+                        <ul class="list-group">
+                            {% for result in tournamentsWon %}
+                                <li class="list-group-item">
+                                    {{ result.tournament.tournamentName }} ({{ result.tournament.tournamentStartDate|date('Y-m-d') }})
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No tournaments won yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Teammates -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 style="color:white">Teammates</h3>
+                </div>
+                <div class="card-body">
+                    {% if teammates|length > 0 %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Injury Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for teammate in teammates %}
+                                    <tr>
+                                        <td>{{ teammate.userFname }}</td>
+                                        <td>{{ teammate.userLname }}</td>
+                                        <td>
+                                            {% if teammate.isInjured %}
+                                                <span class="badge bg-danger">Injured</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Healthy</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No teammates found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Coach Contact QR Code -->
+            {% if coachVCard %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 style="color:white">Coach Contact</h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <p>Scan this QR code to save your coach's contact information:</p>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ coachVCard|url_encode }}" alt="Coach Contact QR Code" class="qr-code-img mb-3">
+                        <br>
+                        <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ coachVCard|url_encode }}" download="coach-contact-qr.png" class="btn btn-primary">
+                            <i class="bi bi-download me-2"></i>Download QR Code
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning text-center mb-4">
+                    No coach contact information available.
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

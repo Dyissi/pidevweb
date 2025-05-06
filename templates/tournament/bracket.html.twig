@@ -1,0 +1,691 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ tournament.tournamentName }} Bracket{% endblock %}
+{% block main %}
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-dark">{{ tournament.tournamentName }} Bracket</h2>
+            <p class="text-muted" id="bracket-status">
+                {% if isValidTeamCount and bracketData and bracketData.teams is iterable and bracketData.teams|length > 0 %}
+                    {% if bracketData.winner and bracketData.winner != 'null' and bracketData.winner != '' %}
+                        🏆 Congratulations to {{ bracketData.winner }} for winning the tournament! 🏆
+                    {% else %}
+                        Single Elimination Bracket
+                    {% endif %}
+                {% else %}
+                    {% if not isValidTeamCount %}
+                        {% if teamCount < 2 %}
+                            Insufficient teams assigned. Please assign 2, 4, 8, or 16 teams.
+                        {% elseif teamCount > 16 %}
+                            Too many teams assigned. The maximum is 16 teams.
+                        {% else %}
+                            Invalid number of teams. Please assign 2, 4, 8, or 16 teams.
+                        {% endif %}
+                        <br>
+                        <a href="{{ path('app_tournament_manage', {'id': tournament.id}) }}" class="btn btn-primary mt-3">Manage Teams</a>
+                    {% else %}
+                        No teams assigned
+                    {% endif %}
+                {% endif %}
+            </p>
+        </div>
+        {% if isValidTeamCount and bracketData and bracketData.teams is iterable and teams is not empty and bracketData.teams|length > 0 %}
+            <div id="bracket" class="bracket-container"></div>
+            <div id="final-winner" class="text-center mt-5" style="display: none;">
+                <h3 class="display-6 fw-bold text-success">Tournament Champion 🏆</h3>
+                <p id="final-winner-name" class="lead text-dark"></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="modal fade" id="winnerModal" tabindex="-1" aria-labelledby="winnerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="winnerModalLabel">Select Match Winner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Select the winner for <strong id="matchTeams"></strong>:</p>
+                    <select id="winnerSelect" class="form-select">
+                        <option value="" disabled selected>Choose a team</option>
+                    </select>
+                    <input type="hidden" id="modalRound" value="">
+                    <input type="hidden" id="modalMatch" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitWinner">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="championModal" tabindex="-1" aria-labelledby="championModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="championModalLabel">Select Tournament Champion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Select the champion from the finalists:</p>
+                    <select id="championSelect" class="form-select">
+                        <option value="" disabled selected>Choose a team</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="submitChampion">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.css">
+    <style>
+        .bracket-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 1400px;
+            overflow-x: auto;
+            position: relative;
+        }
+        .jQBracket {
+            font-family: 'Arial', sans-serif;
+            min-width: 600px;
+        }
+        .team {
+            background: linear-gradient(45deg, #007bff, #00d4ff) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .team.winner {
+            background: linear-gradient(45deg, #28a745, #34d058) !important;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        }
+        .label {
+            font-size: 15px !important;
+            text-align: center;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            height: 32px;
+            line-height: 32px;
+        }
+        .score {
+            background: #e9ecef !important;
+            color: #333 !important;
+            border-radius: 6px !important;
+            padding: 6px !important;
+            font-size: 13px !important;
+        }
+        .assign-winner-btn {
+            background: #ffffff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 160px;
+            height: 32px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .assign-winner-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            color: #007bff;
+        }
+        .connector {
+            border-color: #6c757d !important;
+            border-width: 2px !important;
+        }
+        .champion-card {
+            background: #f8f9fa;
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 15px;
+            width: 210px;
+            position: absolute;
+            z-index: 10;
+            text-align: center;
+        }
+        .champion-card .label {
+            font-size: 15px !important;
+            height: 32px;
+            line-height: 32px;
+        }
+        .modal-content {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: none;
+        }
+        .modal-header {
+            background: #f8f9fa;
+            border-bottom: none;
+        }
+        .modal-title {
+            color: #1a3c34;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #00d4ff);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        .btn-secondary {
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+        .btn-secondary:hover {
+            transform: scale(1.05);
+        }
+        .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #00c4cc);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-info:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(23,162,184,0.3);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #34d058);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-success:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        }
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            transition: border-color 0.3s ease;
+        }
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0,123,255,0.2);
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .bracket-container {
+                padding: 15px;
+            }
+            .label {
+                font-size: 13px !important;
+                height: 28px;
+                line-height: 28px;
+            }
+            .score {
+                font-size: 12px !important;
+                padding: 4px !important;
+            }
+            .jQBracket {
+                min-width: 100%;
+            }
+            .assign-winner-btn {
+                font-size: 11px;
+                width: 160px;
+                height: 28px;
+            }
+            .champion-card {
+                padding: 10px;
+                width: 180px;
+            }
+        }
+    </style>
+    <script>
+        $(function() {
+            {% if isValidTeamCount and bracketData and bracketData.teams is iterable and teams is not empty and bracketData.teams|length > 0 %}
+                console.log('[DEBUG] Teams from Twig:', {{ teamsJson|raw }});
+                console.log('[DEBUG] Initial Bracket Data:', {{ bracketData|json_encode|raw }});
+
+                // Team mapping for ID to name
+                const teamMap = {
+                    {% for team in teams %}
+                        '{{ team.id|format('%s')|escape }}': '{{ team.teamName|escape('js') }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                };
+                console.log('[DEBUG] Team Map:', teamMap);
+
+                // Initialize first round teams
+                const firstRoundTeams = [
+                    {% if bracketData.teams is iterable and bracketData.teams|length > 0 and bracketData.teams[0] is iterable %}
+                        {% for match in bracketData.teams[0] %}
+                            {% if match is iterable %}
+                                ["{{ match[0]|default('TBD')|escape('js') }}", "{{ match[1]|default('TBD')|escape('js') }}"]
+                            {% else %}
+                                ["TBD", "TBD"]
+                            {% endif %}
+                            {% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        []
+                    {% endif %}
+                ];
+                console.log('[DEBUG] First Round Teams:', firstRoundTeams);
+
+                // Calculate total rounds and matches
+                const teamCount = {{ teams|length }};
+                const totalRounds = Math.ceil(Math.log2(teamCount));
+                const totalMatchesInFinalRound = 1; // Only one match in the final round for winners
+                console.log('[DEBUG] Team Count:', teamCount, 'Total Rounds:', totalRounds);
+
+                // Initialize bracket data with champion placeholder
+                let bracketData = {
+                    teams: firstRoundTeams,
+                    results: {{ bracketData.results|default('[]')|json_encode|raw }},
+                    finalWinner: {{ bracketData.winner|default('null')|json_encode|raw }}
+                };
+                console.log('[DEBUG] Initial Bracket Data (JS):', bracketData);
+
+                // Ensure results is an array
+                if (!Array.isArray(bracketData.results)) {
+                    console.warn('[DEBUG] bracketData.results is not an array, initializing as empty array');
+                    bracketData.results = [];
+                }
+
+                // Convert results to numeric values if the array is not empty
+                if (bracketData.results.length > 0) {
+                    bracketData.results = bracketData.results.map(round => {
+                        if (!Array.isArray(round)) {
+                            console.warn('[DEBUG] Round is not an array, returning empty array:', round);
+                            return [];
+                        }
+                        return round.map(match => {
+                            if (!Array.isArray(match)) {
+                                console.warn('[DEBUG] Match is not an array, returning [0, 0]:', match);
+                                return [0, 0];
+                            }
+                            return match.map(score => {
+                                const parsedScore = parseInt(score) || 0;
+                                console.log('[DEBUG] Parsing score:', score, '->', parsedScore);
+                                return parsedScore;
+                            });
+                        });
+                    });
+                }
+
+                // Ensure results array is properly initialized if empty or invalid, including champion slot
+                if (bracketData.results.length === 0 || !bracketData.results.every(round => Array.isArray(round))) {
+                    let matchCount = firstRoundTeams.length;
+                    bracketData.results = [];
+                    for (let round = 0; round <= totalRounds; round++) {
+                        const roundMatches = round === totalRounds - 1 ? totalMatchesInFinalRound : (round === totalRounds ? 1 : matchCount);
+                        const roundResults = new Array(roundMatches).fill([0, 0]);
+                        bracketData.results.push(roundResults);
+                        console.log('[DEBUG] Initialized round', round, 'with', roundMatches, 'matches:', roundResults);
+                        if (round < totalRounds - 1) matchCount = Math.ceil(matchCount / 2);
+                    }
+                    // Add champion as a pseudo-result
+                    bracketData.results[totalRounds][0] = [0, 0]; // Placeholder for champion assignment
+                }
+                console.log('[DEBUG] Initialized Bracket Data:', bracketData);
+
+                // Function to get teams for a given round and match
+                function getMatchTeams(round, matchIndex) {
+                    console.log('[DEBUG] getMatchTeams called for round:', round, 'matchIndex:', matchIndex);
+                    if (round === 0) {
+                        const teams = bracketData.teams[matchIndex] || ['TBD', 'TBD'];
+                        console.log('[DEBUG] Round 0 teams:', teams);
+                        return teams;
+                    }
+
+                    const prevRound = round - 1;
+                    const prevMatch1Index = matchIndex * 2;
+                    const prevMatch2Index = prevMatch1Index + 1;
+
+                    // Validate match indices for the previous round
+                    if (prevMatch1Index >= bracketData.results[prevRound].length || prevMatch2Index >= bracketData.results[prevRound].length) {
+                        console.log('[DEBUG] Invalid previous match indices for round:', round, 'match:', matchIndex);
+                        return ['TBD', 'TBD'];
+                    }
+
+                    console.log('[DEBUG] Previous round:', prevRound, 'prevMatch1Index:', prevMatch1Index, 'prevMatch2Index:', prevMatch2Index);
+
+                    const team1 = getWinner(prevRound, prevMatch1Index);
+                    const team2 = getWinner(prevRound, prevMatch2Index);
+                    console.log('[DEBUG] Teams for round', round, 'match', matchIndex, ':', [team1, team2]);
+                    return [team1, team2];
+                }
+
+                // Helper function to get winner of a match
+                function getWinner(roundIdx, matchIdx) {
+                    console.log('[DEBUG] getWinner called for round:', roundIdx, 'matchIdx:', matchIdx);
+                    if (roundIdx < 0 || !bracketData.results[roundIdx] || matchIdx >= bracketData.results[roundIdx].length) {
+                        console.log('[DEBUG] getWinner: Invalid round or match, returning TBD');
+                        return 'TBD';
+                    }
+
+                    const scores = bracketData.results[roundIdx][matchIdx];
+                    const matchTeams = roundIdx === 0 ? bracketData.teams[matchIdx] : getMatchTeams(roundIdx, matchIdx);
+                    console.log('[DEBUG] getWinner: Scores:', scores, 'Match Teams:', matchTeams);
+
+                    if (scores[0] > scores[1]) {
+                        console.log('[DEBUG] getWinner: Team 1 wins:', matchTeams[0]);
+                        return matchTeams[0];
+                    } else if (scores[1] > scores[0]) {
+                        console.log('[DEBUG] getWinner: Team 2 wins:', matchTeams[1]);
+                        return matchTeams[1];
+                    }
+                    console.log('[DEBUG] getWinner: No winner yet, returning TBD');
+                    return 'TBD';
+                }
+
+                // Function to save bracket data to the server
+                function saveBracketData() {
+                    console.log('[DEBUG] Saving bracket data to server:', bracketData);
+                    $.post('{{ path('app_tournament_bracket', {'id': tournament.id}) }}', {
+                        bracket_data: JSON.stringify({
+                            teams: [firstRoundTeams],
+                            results: bracketData.results,
+                            winner: bracketData.finalWinner
+                        })
+                    }, function(response) {
+                        console.log('[DEBUG] Bracket data saved to server:', response);
+                    }).fail(function(xhr) {
+                        console.error('[DEBUG] Failed to save bracket data. Error:', xhr.responseText);
+                        alert('Failed to save bracket data. Error: ' + xhr.responseText);
+                    });
+                }
+
+                // Function to initialize or update the bracket
+                function initBracket() {
+                    console.log('[DEBUG] Initializing bracket');
+                    $('#bracket').empty().bracket({
+                        init: {
+                            teams: bracketData.teams,
+                            results: bracketData.results
+                        },
+                        teamWidth: 160,
+                        scoreWidth: 50,
+                        matchMargin: 70,
+                        roundMargin: 100,
+                        skipConsolationRound: true // Skip consolation (losers) matches
+                    });
+                    console.log('[DEBUG] Bracket initialized, DOM:', $('#bracket').html());
+
+                    // Replace TBD with buttons in rounds > 0
+                    console.log('[DEBUG] Starting TBD replacement with buttons');
+                    $('.round').each(function(roundIndex) {
+                        console.log('[DEBUG] Processing round:', roundIndex);
+                        if (roundIndex === 0) {
+                            console.log('[DEBUG] Skipping round 0 for TBD replacement');
+                            return;
+                        }
+
+                        $(this).find('.match').each(function(matchIndex) {
+                            // Skip matches beyond the final match in the last round
+                            if (roundIndex === totalRounds - 1 && matchIndex >= totalMatchesInFinalRound) {
+                                console.log('[DEBUG] Skipping extra match in final round:', roundIndex, 'match:', matchIndex);
+                                $(this).remove(); // Remove the match from DOM
+                                return;
+                            }
+
+                            console.log('[DEBUG] Processing match:', matchIndex, 'in round:', roundIndex);
+                            $(this).find('.team').each(function(teamIndex) {
+                                const $teamLabel = $(this).find('.label');
+                                console.log('[DEBUG] $teamLabel object:', $teamLabel, 'Length:', $teamLabel.length);
+                                const teamName = $teamLabel.text().trim();
+                                console.log('[DEBUG] Team label text at round:', roundIndex, 'match:', matchIndex, 'teamIndex:', teamIndex, 'is:', teamName);
+
+                                const expectedTeams = getMatchTeams(roundIndex, matchIndex);
+                                console.log('[DEBUG] Expected teams from getMatchTeams:', expectedTeams);
+                                const expectedTeam = expectedTeams[teamIndex];
+                                console.log('[DEBUG] Expected team at index', teamIndex, 'is:', expectedTeam);
+
+                                if (expectedTeam === 'TBD') {
+                                    console.log('[DEBUG] Found TBD position, replacing with button');
+                                    const prevRound = roundIndex - 1;
+                                    const prevMatchIndex = (matchIndex * 2) + teamIndex;
+                                    console.log('[DEBUG] Corresponding previous match: round', prevRound, 'match', prevMatchIndex);
+
+                                    const $button = $('<button class="assign-winner-btn">Set Winner</button>');
+                                    console.log('[DEBUG] Created button:', $button[0]);
+                                    $teamLabel.empty();
+                                    console.log('[DEBUG] Team label emptied, new HTML:', $teamLabel.html());
+                                    $teamLabel.append($button);
+                                    console.log('[DEBUG] Button appended to teamLabel, new HTML:', $teamLabel.html());
+
+                                    $button.on('click', function(e) {
+                                        console.log('[DEBUG] Assign Winner button clicked for round:', roundIndex, 'match:', matchIndex, 'team:', teamIndex);
+                                        e.stopPropagation();
+                                        const prevMatchTeams = getMatchTeams(prevRound, prevMatchIndex);
+                                        console.log('[DEBUG] Previous match teams:', prevMatchTeams);
+
+                                        if (prevMatchTeams[0] !== 'TBD' && prevMatchTeams[1] !== 'TBD') {
+                                            $('#matchTeams').text(`${prevMatchTeams[0]} vs ${prevMatchTeams[1]}`);
+                                            let team1Id = null, team2Id = null;
+                                            for (const [id, name] of Object.entries(teamMap)) {
+                                                if (name === prevMatchTeams[0]) team1Id = id;
+                                                if (name === prevMatchTeams[1]) team2Id = id;
+                                            }
+                                            console.log('[DEBUG] Team IDs for modal - Team 1:', team1Id, 'Team 2:', team2Id);
+
+                                            if (team1Id && team2Id) {
+                                                $('#winnerSelect').html(`
+                                                    <option value="" disabled selected>Choose a team</option>
+                                                    <option value="${team1Id}">${prevMatchTeams[0]}</option>
+                                                    <option value="${team2Id}">${prevMatchTeams[1]}</option>
+                                                `);
+                                                console.log('[DEBUG] Modal select updated with teams');
+                                                $('#modalRound').val(prevRound);
+                                                $('#modalMatch').val(prevMatchIndex);
+                                                $('#winnerModal').modal('show');
+                                                $('#winnerModal').on('shown.bs.modal', function() {
+                                                    $('#winnerSelect').focus();
+                                                });
+                                                console.log('[DEBUG] Winner modal shown for round:', prevRound, 'match:', prevMatchIndex);
+                                            } else {
+                                                console.error('[DEBUG] Error: Could not find team IDs for teams:', prevMatchTeams);
+                                                alert('Error: Could not find team IDs.');
+                                            }
+                                        } else {
+                                            console.warn('[DEBUG] Previous round has TBD teams:', prevMatchTeams);
+                                            alert('Previous round has TBD teams. Please ensure all teams are assigned.');
+                                        }
+                                    });
+                                    console.log('[DEBUG] Click handler bound to button');
+                                } else {
+                                    console.log('[DEBUG] Position not TBD, leaving as is:', expectedTeam);
+                                }
+                            });
+                        });
+                    });
+                    console.log('[DEBUG] Finished TBD replacement with buttons, final DOM:', $('#bracket').html());
+
+                    // Add and position champion card dynamically connected to the final round
+                    const $lastRound = $('.round').last();
+                    const $lastMatch = $lastRound.find('.match').first();
+                    const finalTeams = getMatchTeams(totalRounds - 1, 0);
+                    console.log('[DEBUG] Final teams:', finalTeams);
+
+                    const championText = bracketData.finalWinner && bracketData.finalWinner !== 'null' ? `Champion: ${bracketData.finalWinner}` : 'Champion: TBD';
+                    const $championCard = $('<div class="champion-card"><div class="team"><div class="label" style="width: 160px;">' + championText + '</div></div><button id="assign-winner-btn" class="assign-winner-btn mt-2">Assign Winner</button></div>');
+
+                    // Dynamically position the champion card
+                    const lastRoundOffset = $lastRound.position();
+                    const lastRoundWidth = $lastRound.width();
+                    const bracketOffset = $('#bracket').position();
+                    const lastMatchOffset = $lastMatch.position();
+                    const connectorLength = 50; // Length of the connector line
+
+                    $championCard.css({
+                        left: lastRoundOffset.left + lastRoundWidth + connectorLength, // Position right of the last round
+                        top: lastMatchOffset.top + (230 / 2) - ($championCard.height() / 2) // Center vertically relative to final match (230 is match height)
+                    });
+                    $('#bracket').append($championCard);
+
+                    // Add connector line
+                    const $connector = $('<div class="connector" style="position: absolute; width: ' + connectorLength + 'px; border-top: 2px solid #6c757d;"></div>');
+                    $connector.css({
+                        left: lastRoundOffset.left + lastRoundWidth, // Start at the right edge of the last round
+                        top: lastMatchOffset.top + (230 / 2), // Center of final match height
+                        height: 0 // Horizontal line only
+                    });
+                    $('#bracket').append($connector);
+
+                    // Show or hide Assign Winner button based on whether a champion is set
+                    if (bracketData.finalWinner && bracketData.finalWinner !== 'null') {
+                        $('#assign-winner-btn').hide();
+                    } else {
+                        $('#assign-winner-btn').show();
+                    }
+
+                    // Bind Assign Winner button
+                    $('#assign-winner-btn').on('click', function(e) {
+                        console.log('[DEBUG] Assign Winner button clicked for champion card');
+                        e.stopPropagation();
+                        if (finalTeams[0] !== 'TBD' && finalTeams[1] !== 'TBD') {
+                            $('#matchTeams').text(`${finalTeams[0]} vs ${finalTeams[1]}`);
+                            let team1Id = null, team2Id = null;
+                            for (const [id, name] of Object.entries(teamMap)) {
+                                if (name === finalTeams[0]) team1Id = id;
+                                if (name === finalTeams[1]) team2Id = id;
+                            }
+                            console.log('[DEBUG] Team IDs for modal - Team 1:', team1Id, 'Team 2:', team2Id);
+
+                            if (team1Id && team2Id) {
+                                $('#winnerSelect').html(`
+                                    <option value="" disabled selected>Choose a team</option>
+                                    <option value="${team1Id}">${finalTeams[0]}</option>
+                                    <option value="${team2Id}">${finalTeams[1]}</option>
+                                `);
+                                console.log('[DEBUG] Modal select updated with teams');
+                                $('#modalRound').val(totalRounds - 1);
+                                $('#modalMatch').val(0);
+                                $('#winnerModal').modal('show');
+                                $('#winnerModal').on('shown.bs.modal', function() {
+                                    $('#winnerSelect').focus();
+                                });
+                                console.log('[DEBUG] Winner modal shown for final round');
+                            } else {
+                                console.error('[DEBUG] Error: Could not find team IDs for teams:', finalTeams);
+                                alert('Error: Could not find team IDs.');
+                            }
+                        } else {
+                            console.warn('[DEBUG] Final match not decided yet:', finalTeams);
+                            alert('Please ensure the final match teams are determined.');
+                        }
+                    });
+
+                    // Update champion card if winner is already set
+                    if (bracketData.finalWinner && bracketData.finalWinner !== 'null') {
+                        $championCard.find('.label').text(`Champion: ${bracketData.finalWinner}`);
+                    }
+                }
+
+                // Handle winner selection
+                $('#submitWinner').on('click', function() {
+                    console.log('[DEBUG] Submit Winner button clicked');
+                    const winnerId = $('#winnerSelect').val();
+                    const round = parseInt($('#modalRound').val());
+                    const matchIndex = parseInt($('#modalMatch').val());
+                    console.log('[DEBUG] Winner selection - Winner ID:', winnerId, 'Round:', round, 'Match:', matchIndex);
+
+                    if (winnerId && !isNaN(round) && !isNaN(matchIndex)) {
+                        const winnerName = teamMap[winnerId];
+                        console.log('[DEBUG] Winner selected:', winnerName);
+
+                        // Update results for the current match
+                        const teams = getMatchTeams(round, matchIndex);
+                        bracketData.results[round][matchIndex] = [
+                            winnerName === teams[0] ? 1 : 0,
+                            winnerName === teams[1] ? 1 : 0
+                        ];
+                        console.log('[DEBUG] Updated results for round', round, 'match', matchIndex, ':', bracketData.results[round][matchIndex]);
+
+                        // Save to server after each match update
+                        saveBracketData();
+
+                        // Re-initialize bracket
+                        console.log('[DEBUG] Re-initializing bracket after winner selection');
+                        initBracket();
+                        $('#winnerModal').modal('hide');
+                        console.log('[DEBUG] Winner modal hidden');
+
+                        // If this is the final round, update champion assignment
+                        if (round === totalRounds - 1) {
+                            const finalWinner = winnerName;
+                            bracketData.finalWinner = finalWinner;
+                            $('#bracket-status').text(`🏆 Congratulations to ${finalWinner} for winning the tournament! 🏆`);
+                            $('#final-winner').show();
+                            $('#final-winner-name').text(finalWinner);
+                            console.log('[DEBUG] Updated champion display to:', finalWinner);
+
+                            // Save final winner to server
+                            saveBracketData();
+                        }
+                    } else {
+                        console.warn('[DEBUG] Invalid winner selection data - Winner ID:', winnerId, 'Round:', round, 'Match:', matchIndex);
+                        alert('Please select a winner and ensure match data is valid.');
+                    }
+                });
+
+                // Handle champion selection (optional, can be removed if not needed separately)
+                $('#submitChampion').on('click', function() {
+                    console.log('[DEBUG] Submit Champion button clicked');
+                    const championId = $('#championSelect').val();
+                    if (championId) {
+                        const championName = teamMap[championId];
+                        console.log('[DEBUG] Champion selected:', championName);
+                        bracketData.finalWinner = championName;
+                        $('#bracket-status').text(`🏆 Congratulations to ${championName} for winning the tournament! 🏆`);
+                        $('#final-winner').show();
+                        $('#final-winner-name').text(championName);
+                        console.log('[DEBUG] Updated champion display to:', championName);
+                        // Save to server
+                        saveBracketData();
+                        $('#championModal').modal('hide');
+                        console.log('[DEBUG] Champion modal hidden');
+                    } else {
+                        console.warn('[DEBUG] No champion selected');
+                        alert('Please select a champion.');
+                    }
+                });
+
+                // Initial setup
+                console.log('[DEBUG] Starting initial bracket setup');
+                initBracket();
+                console.log('[DEBUG] Initial bracket setup complete');
+            {% else %}
+                console.error('[DEBUG] Bracket data or teams not available or invalid team count.');
+            {% endif %}
+        });
+    </script>
+{% endblock %}
