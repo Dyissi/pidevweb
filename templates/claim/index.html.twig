@@ -3,74 +3,415 @@
 {% block title %}Claim index{% endblock %}
 
 {% block main %}
-     
+<style>
+.uniform-width {
+    min-width: 120px;
+    text-align: center;
+}
+.icon-button {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-group {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+}
+.d-flex-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.sort-arrow {
+    font-size: 0.8rem;
+}
+.flash-update {
+    animation: flashHighlight 1.5s ease-in-out;
+}
+@keyframes flashHighlight {
+    0% { background-color: #d4edda; }
+    100% { background-color: transparent; }
+}
+.bg-critical {
+    background-color: #B00020 !important;
+    color: #fff !important;
+}
+.bg-harsh {
+    background-color: #D32F2F !important;
+    color: #fff !important;
+}
+.bg-urgent {
+    background-color: #F57C00 !important;
+    color: #fff !important;
+}
+.bg-concerned {
+    background-color: #FFCA28 !important;
+    color: #000 !important;
+}
+.bg-neutral {
+    background-color: #BDBDBD !important;
+    color: #000 !important;
+}
+.bg-unknown {
+    background-color: #424242 !important;
+    color: #fff !important;
+}
+.status-badge {
+    padding: 0.35em 0.75em;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+}
 
-    <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-table me-1"></i>
-                     List of claims
-            </div>
-        <div class="card-body">
-            <table id="datatablesSimple">
-        <thead>
-            <tr>
-                <th>Claim Description</th>
-                <th>Claim Status</th>
-                <th>Claim Date</th>
-                <th>Claim Category</th>
-                <th>Submitter</th>
-                <th>Target</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tfoot>
-             <tr>
-                <th>Claim Description</th>
-                <th>Claim Status</th>
-                <th>Claim Date</th>
-                <th>Claim Category</th>
-                <th>Submitter</th>
-                <th>Target</th>
-                <th>Actions</th>
-            </tr>
-        </tfoot>
-        <tbody>
-        {% for claim in claims %}
-            <tr>
-                <td>{{ claim.claimDescription }}</td>
-                <td>{{ claim.claimStatus }}</td>
-                <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
-                <td>{{ claim.claimCategory }}</td>
-                <td>{{ claim.idUser ? claim.idUser.userFname ~ ' ' ~ claim.idUser.userLname : '' }}</td>
-                <td>{{ claim.idUserToClaim ? claim.idUserToClaim.userFname ~ ' ' ~ claim.idUserToClaim.userLname : '' }}</td>
+.status-approved {
+    color: #155724;
+    background-color: #d4f8e8;
+    border-color: #b7e4c7;
+}
 
-                <td>
-    <a href="{{ path('app_claim_show', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-primary">Show</a>
-    <a href="{{ path('app_claim_edit', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-warning">Edit</a>
-    
-    <form method="post" action="{{ path('app_claim_delete', {'claimId': claim.claimId}) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ claim.claimId) }}">
-        <button class="btn btn-sm btn-danger">Delete</button>
-    </form>
+.status-rejected {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
 
-    {% if claim.hasActionSubmitted() %}
-        <span class="badge bg-success">Action Submitted</span>
-    {% else %}
-        <a href="{{ path('app_claimaction_new') }}?claimId={{ claim.claimId }}" class="btn btn-sm btn-outline-success">
-            <i class="fas fa-plus-circle"></i> Add Action
-        </a>
-    {% endif %}
-</td>
+.status-in-review {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
 
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+</style>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-table me-1"></i> List of claims
+        </div>
+        <div>
+            <a href="{{ path('app_claim_export_csv') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </a>
+        </div>
     </div>
 
+    <div class="card-body">
+
+        {# Filter Form #}
+        <form id="filter-form" method="get" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <input type="text" name="submitter" value="{{ app.request.get('submitter') }}" class="form-control" placeholder="Search by Submitter Name">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="In Review" {{ app.request.get('status') == 'In Review' ? 'selected' : '' }}>In Review</option>
+                    <option value="Approved" {{ app.request.get('status') == 'Approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="Rejected" {{ app.request.get('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    <option value="Misconduct" {{ app.request.get('category') == 'Misconduct' ? 'selected' : '' }}>Misconduct</option>
+                    <option value="Policy Violation" {{ app.request.get('category') == 'Policy Violation' ? 'selected' : '' }}>Policy Violation</option>
+                    <option value="Health Issue" {{ app.request.get('category') == 'Health Issue' ? 'selected' : '' }}>Health Issue</option>
+                </select>
+            </div>
+        </form>
+
+        {# Bulk Action Form #}
+        <form method="post" action="{{ path('app_claim_bulk_action') }}" id="bulk-action-form">
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <select name="bulk_action" id="bulk_action" class="form-select d-inline-block w-auto">
+                        <option value="">Bulk Action</option>
+                        <option value="approve">Approve</option>
+                        <option value="reject">Reject</option>
+                        <option value="delete">Delete</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </div>
+
+            <table class="table table-striped">
+               <thead>
+    {% set baseParams = app.request.query.all %}
+    {% set currentSort = app.request.get('sort')|replace({'c.': ''}) %}
+    {% set currentDirection = app.request.get('direction', 'ASC') %}
+    <tr>
+        <th><input type="checkbox" id="select-all"></th>
+
+        {# Claim Description #}
+        <th>
+            <a href="{{ path('app_claim_index', baseParams|merge({
+                sort: 'c.claimDescription',
+                direction: currentSort == 'claimDescription' and currentDirection == 'ASC' ? 'DESC' : 'ASC'
+            })) }}">
+                Claim Description
+                {% if currentSort == 'claimDescription' %}
+                    <span class="sort-arrow">{{ currentDirection == 'ASC' ? '↑' : '↓' }}</span>
+                {% endif %}
+            </a>
+        </th>
+
+        {# 🔊 New Audio Column (not sortable) #}
+        <th></th>
+        <th></th>
+        {# Remaining columns #}
+        {% for field, label in {
+            'claimStatus': 'Claim Status',
+            'claimDate': 'Claim Date',
+            'claimCategory': 'Claim Category'
+        } %}
+            <th>
+                <a href="{{ path('app_claim_index', baseParams|merge({
+                    sort: 'c.' ~ field,
+                    direction: currentSort == field and currentDirection == 'ASC' ? 'DESC' : 'ASC'
+                })) }}">
+                    {{ label }}
+                    {% if currentSort == field %}
+                        <span class="sort-arrow">{{ currentDirection == 'ASC' ? '↑' : '↓' }}</span>
+                    {% endif %}
+                </a>
+            </th>
+        {% endfor %}
+
+        
+        <th>Submitter</th>
+        <th>Target</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+
+
+                <tbody>
+    {% for claim in claims %}
+        <turbo-frame id="claim_{{ claim.claimId }}">
+            <tr>
+                <td><input type="checkbox" name="selected_claims[]" value="{{ claim.claimId }}"></td>
+                <td>
+    {{ claim.claimDescription }}
+     <td >
+    {% set sentiment = sentiments[claim.claimId] ?? null %}
+    {% if sentiment %}
+        {% set score = sentiment.score %}
+
+        {% if score >= 0.95 %}
+            {% set icon = 'fa-circle-exclamation' %}
+            {% set color = 'critical' %}
+        {% elseif score >= 0.85 %}
+            {% set icon = 'fa-triangle-exclamation' %}
+            {% set color = 'harsh' %}
+        {% elseif score >= 0.70 %}
+            {% set icon = 'fa-bolt' %}
+            {% set color = 'urgent' %}
+        {% elseif score >= 0.50 %}
+            {% set icon = 'fa-face-frown' %}
+            {% set color = 'concerned' %}
+        {% else %}
+            {% set icon = 'fa-circle-question' %}
+            {% set color = 'neutral' %}
+        {% endif %}
+
+        <span class="badge bg-{{ color }}" title="Score: {{ score|number_format(2) }}">
+            <i class="fas {{ icon }}"></i>
+        </span>
+    {% else %}
+        <span class="badge bg-unknown">N/A</span>
+    {% endif %}
+</td>
+     <td>
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm ms-2"
+            onclick="playTTS('{{ path('app_speak_text', { text: claim.claimDescription }) }}')"
+            title="Listen to description">
+        <i class="fas fa-volume-up"></i>
+    </button>
+</td>
+
+
+
+
+</td>
+
+
+
+                <td>
+    {% if claim.claimStatus == 'Approved' %}
+        <span class="status-badge status-approved"><i class="fas fa-check-circle me-1"></i>{{ claim.claimStatus }}</span>
+    {% elseif claim.claimStatus == 'Rejected' %}
+        <span class="status-badge status-rejected"><i class="fas fa-times-circle me-1"></i>{{ claim.claimStatus }}</span>
+    {% elseif claim.claimStatus == 'In Review' %}
+        <span class="status-badge status-in-review"><i class="fas fa-hourglass-half me-1"></i>{{ claim.claimStatus }}</span>
+    {% else %}
+        {{ claim.claimStatus }}
+    {% endif %}
+</td>
+                <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
+                <td>{{ claim.claimCategory }}</td>
+               
+                <td>{{ claim.idUser ? claim.idUser.userFname ~ ' ' ~ claim.idUser.userLname : '' }}</td>
+                <td>{{ claim.idUserToClaim ? claim.idUserToClaim.userFname ~ ' ' ~ claim.idUserToClaim.userLname : '' }}</td>
+                <td class="d-flex-actions">
+                    <a href="{{ path('app_claim_show', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-primary icon-button" title="Show">
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    <a href="{{ path('app_claim_edit', {'claimId': claim.claimId}) }}" class="btn btn-sm btn-warning icon-button" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form method="post" action="{{ path('app_claim_delete', {'claimId': claim.claimId}) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ claim.claimId) }}">
+                        <button class="btn btn-sm btn-danger icon-button" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+
+                    {% if claim.claimStatus == 'In Review' %}
+                        <div class="btn-group uniform-width">
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form method="post"
+                                          action="{{ path('app_claim_approve', {'claimId': claim.claimId}) }}"
+                                          data-turbo-frame="claim_{{ claim.claimId }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ claim.claimId) }}">
+                                        <button class="dropdown-item text-success" type="submit">Approve</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form method="post"
+                                          action="{{ path('app_claim_reject', {'claimId': claim.claimId}) }}"
+                                          data-turbo-frame="claim_{{ claim.claimId }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ claim.claimId) }}">
+                                        <button class="dropdown-item text-danger" type="submit">Reject</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% elseif claim.claimStatus == 'Approved' or claim.claimStatus == 'Rejected' %}
+    <div class="btn-group uniform-width">
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" disabled>
+            Manage
+        </button>
+    </div>
+                    {% endif %}
+
+                    {% if claim.hasActionSubmitted() %}
+                        <span class="badge bg-primary">Action Submitted</span>
+                    {% else %}
+                        {% if claim.claimStatus != 'In Review' and claim.claimStatus != 'Rejected' %}
+                            <a href="{{ path('app_claimaction_new') }}?claimId={{ claim.claimId }}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-plus-circle"></i> Add Action
+                            </a>
+                        {% else %}
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-plus-circle"></i> Add Action
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        </turbo-frame>
+    {% else %}
+        <tr>
+            <td colspan="8" class="text-center">No claims found.</td>
+        </tr>
+    {% endfor %}
+</tbody>
+
+            </table>
+        </form>
+
+        {# Pagination Controls #}
+        <div class="d-flex justify-content-center mt-4">
+            {{ knp_pagination_render(claims, '@KnpPaginator/Pagination/bootstrap5_pagination.html.twig') }}
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+document.addEventListener('DOMContentLoaded', function () {
+    const filterForm = document.getElementById('filter-form');
+    const inputs = filterForm.querySelectorAll('input, select');
+
+    inputs.forEach(input => {
+        input.addEventListener('input', function () {
+            filterForm.submit();
+        });
+        input.addEventListener('change', function () {
+            filterForm.submit();
+        });
+    });
+
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('input[name="selected_claims[]"]');
+
+    selectAll.addEventListener('change', function () {
+        checkboxes.forEach(cb => {
+            cb.checked = selectAll.checked;
+        });
+    });
+
+    const bulkForm = document.getElementById('bulk-action-form');
+    const bulkActionSelect = document.getElementById('bulk_action');
+    const bulkApplyButton = bulkForm.querySelector('button[type="submit"]');
+
+    function toggleBulkButton() {
+        bulkApplyButton.disabled = (bulkActionSelect.value === '');
+    }
+
+    bulkActionSelect.addEventListener('change', toggleBulkButton);
+    toggleBulkButton();
+
+    bulkForm.addEventListener('submit', function (e) {
+        const selectedClaims = document.querySelectorAll('input[name="selected_claims[]"]:checked');
+        const action = bulkActionSelect.value;
+
+        if (selectedClaims.length === 0 || !action) {
+            e.preventDefault();
+            alert('Please select at least one claim and an action.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to ${action} ${selectedClaims.length} claim(s)?`)) {
+            e.preventDefault();
+        }
+    });
+});
+
+
+</script>
+<audio id="ttsPlayer" style="display: none;" controls></audio>
+
+<script>
+function playTTS(url) {
+    const audio = document.getElementById('ttsPlayer');
+    audio.src = url;
+    // audio.style.display = 'block'; // ❌ Remove or comment this line to keep it hidden
+    audio.play().catch(error => {
+        console.error('Playback error:', error);
+        alert('Failed to play audio.');
+    });
+
+    // Auto-hide when finished (not strictly needed if it's always hidden)
+    audio.onended = () => {
+        audio.style.display = 'none';
+    };
+}
+</script>
 {% endblock %}

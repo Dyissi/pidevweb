@@ -1,0 +1,73 @@
+<tr is="turbo-frame" id="claim_{{ claim.claimId }}">
+    <td>{{ claim.claimDescription }}</td>
+    <td>
+        {% if claim.claimStatus == 'Approved' %}
+            <span class="badge bg-success">
+                <i class="fas fa-check-circle me-1"></i>Approved
+            </span>
+        {% elseif claim.claimStatus == 'Rejected' %}
+            <span class="badge bg-danger">
+                <i class="fas fa-times-circle me-1"></i>Rejected
+            </span>
+        {% elseif claim.claimStatus == 'In Review' %}
+            <span class="badge bg-warning text-dark">
+                <i class="fas fa-hourglass-half me-1"></i>In Review
+            </span>
+        {% else %}
+            <span class="badge bg-secondary">{{ claim.claimStatus }}</span>
+        {% endif %}
+    </td>
+    <td>{{ claim.claimDate ? claim.claimDate|date('Y-m-d') : '' }}</td>
+    <td>
+        <div class="d-flex align-items-center">
+            <span style="width: 20px;" class="d-inline-flex justify-content-center">
+                {% if claim.claimCategory == 'Health Issue' %}
+                    <i class="fas fa-notes-medical text-danger"></i>
+                {% elseif claim.claimCategory == 'Misconduct' %}
+                    <i class="fas fa-user-slash text-warning"></i>
+                {% elseif claim.claimCategory == 'Policy Violation' %}
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                {% endif %}
+            </span>
+            <span class="ms-2">{{ claim.claimCategory }}</span>
+        </div>
+    </td>
+    <td>
+        {% if claim.idUserToClaim %}
+            {{ claim.idUserToClaim.userFname }} {{ claim.idUserToClaim.userLname }}
+        {% else %}
+            <em>Unknown</em>
+        {% endif %}
+    </td>
+    <td class="align-middle" data-controller="claim-action-toggle">
+        {% if claim.claimStatus == 'Approved' and claim.claimactions is not empty %}
+            <div class="d-flex align-items-baseline gap-2">
+                <i class="fas fa-eye text-info" style="min-width: 18px;"></i>
+                <button type="button"
+                        class="btn btn-sm btn-info shadow-sm py-0"
+                        style="line-height: 1.5; padding-top: 0.25rem; padding-bottom: 0.25rem;"
+                        data-action="click->claim-action-toggle#toggle">
+                    View Action
+                </button>
+            </div>
+            <div class="claim-action-wrapper" data-claim-action-toggle-target="content">
+                <div class="claim-action-card text-start">
+                    <div class="mb-2"><strong>Type:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionType }}</span></div>
+                    <div class="mb-2"><strong>From:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionStartDate|date('Y-m-d') }}</span></div>
+                    <div class="mb-2"><strong>To:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionEndDate|date('Y-m-d') }}</span></div>
+                    <div><strong>Notes:</strong> <span class="text-muted">{{ claim.claimactions.first.claimActionNotes }}</span></div>
+                </div>
+            </div>
+        {% elseif claim.claimStatus == 'Approved' %}
+            <div class="d-flex align-items-baseline gap-2">
+                <i class="fas fa-hourglass-half text-muted" style="min-width: 18px;"></i>
+                <span class="text-muted">No action submitted.</span>
+            </div>
+        {% else %}
+            <div class="d-flex align-items-baseline gap-2">
+                <i class="fas fa-hourglass-half text-muted" style="min-width: 18px;"></i>
+                <span class="text-muted ms-2">Pending</span>
+            </div>
+        {% endif %}
+    </td>
+</tr>

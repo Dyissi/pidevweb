@@ -57,18 +57,31 @@
   </style>
     
   <!--Bootstrap ithink -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     
     <!-- Main CSS File -->
 {% block stylesheet %}
   <link href="{{ asset('frontOffice/css/custom.css') }}" rel="stylesheet"> 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link href="{{ asset('frontOffice/css/main.css') ~ '?v=' ~ random() }}" rel="stylesheet">
-{% endblock %}
+  {% endblock %}
+
+{{ encore_entry_link_tags('app') }}
+ {{ encore_entry_script_tags('app') }}
 {% endblock %}
 </head>
 
 <body class="index-page">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="mercureToast" class="toast align-items-center text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="mercureToastBody">
+                <!-- Dynamic message -->
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
     {% block header %}
 
   <header id="header" class="header d-flex align-items-center sticky-top">
@@ -111,7 +124,12 @@
                 <li><a href="{{ path('app_user_new') }}">Add New Athlete</a></li>
             </ul>
         </li>
-        <li><a href="{{ path('app_claim_new') }}">Claims<br></a></li>
+        <li class="dropdown"><a href="#"><span>Manage Claims</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+                <li><a href="{{ path('app_claim_new') }}">Add A Claim</a></li>
+                <li><a href="{{ path('app_my_claims') }}">View My Claims</a></li>
+            </ul>
+        </li>
               <li class="dropdown"><a href="#"><span>Insights</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
           <ul>
           
@@ -381,7 +399,63 @@
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Preloader -->
-  <div id="preloader"></div>
+ 
+
+{% if app.user %}
+<script type="module">
+console.log("🚀 Initializing Mercure...");
+
+// --- JSON Notifications ---
+const notifUrl = new URL("http://localhost:54654/.well-known/mercure");
+notifUrl.searchParams.append("topic", "/user/notifications/{{ app.user.id }}");
+
+const notifSource = new EventSource(notifUrl.toString());
+
+notifSource.onmessage = (event) => {
+    console.log("📬 Notification received:", event.data);
+
+    try {
+        const data = JSON.parse(event.data);
+        const message = data.summary || 'You have a new notification.';
+
+        // Browser notification
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+
+        new Notification('🔔 Notification', {
+            body: message,
+            icon: '{{ asset("frontOffice/img/favicon.png") }}'
+        });
+
+        // Bootstrap toast
+        const toastBody = document.getElementById('mercureToastBody');
+        const toastEl = document.getElementById('mercureToast');
+        if (toastBody && toastEl) {
+            toastBody.textContent = message;
+            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 10000 });
+            toast.show();
+        }
+
+    } catch (e) {
+        console.error("⚠️ Error parsing JSON message:", e);
+    }
+};
+
+notifSource.onerror = (err) => {
+    console.error("❌ Mercure notification stream error:", err);
+};
+
+
+</script>
+{% endif %}
+
+
+
+
+
+
+
 
   <!-- Vendor JS Files -->
   {% block javascript %}
@@ -390,7 +464,8 @@
   <script src="{{ asset('frontOffice/vendor/php-email-form/validate.js') }}"></script>
   <script src="{{ asset('frontOffice/vendor/aos/aos.js') }}"></script>
   <script src="{{ asset('frontOffice/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('frontOffice/vendor/purecounter/purecounter_vanilla.js') }}f"></script>
+  <script src="{{ asset('frontOffice/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+
   <script src="{{ asset('frontOffice/vendor/swiper/swiper-bundle.min.js') }}"></script>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <script src="{{ asset('frontOffice/js/main.js') }}"></script>
@@ -399,6 +474,7 @@
 
   <!-- Main JS File -->
   <script src="{{ asset('frontOffice/js/main.js') }}"></script>
+ 
   {% endblock %}
 
 </body>

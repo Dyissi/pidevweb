@@ -1,0 +1,46 @@
+{% set pagination = pagination is defined ? pagination : _context %}
+
+{% if pagination.pageCount > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {# Previous Page #}
+        {% if pagination.current > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pagination.route, pagination.query|merge({(pagination.pageParameterName): pagination.current - 1})) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        {% endif %}
+
+        {# Pages Loop #}
+        {% for page in pagination.pagesInRange %}
+            {% if page != pagination.current %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path(pagination.route, pagination.query|merge({(pagination.pageParameterName): page})) }}">{{ page }}</a>
+                </li>
+            {% else %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ page }}</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {# Next Page #}
+        {% if pagination.current < pagination.pageCount %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pagination.route, pagination.query|merge({(pagination.pageParameterName): pagination.current + 1})) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
