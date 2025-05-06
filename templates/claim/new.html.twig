@@ -11,63 +11,177 @@
             <h5 class="mb-0">Claim Information</h5>
         </div>
         <div class="card-body">
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {{ form_start(form, {
+                attr: {
+                    novalidate: 'novalidate',
+                    'data-turbo': 'false'
+                }
+            }) }}
 
-                <div class="mb-3">
-                    <h6 class="section-title">📝 Claim Details</h6>
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            {{ form_row(form.claimCategory, {
-                                'label': 'Category',
-                                'attr': {'class': 'form-select'}
-                            }) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(form.claimDate, {
-                                'label': 'Date',
-                                'attr': {'class': 'form-control'}
-                            }) }}
-                        </div>
+            {% if form_errors(form) %}
+                <div class="alert alert-danger">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <h6 class="section-title">📝 Claim Details</h6>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        {{ form_row(form.claimCategory, {
+                            'label': 'Category',
+                            'attr': {'class': 'form-select'}
+                        }) }}
                     </div>
-                    {{ form_row(form.claimDescription, {
-                        'label': 'Description',
+                    <div class="col-md-6">
+                        {{ form_row(form.claimDate, {
+                            'label': 'Date',
+                            'attr': {'class': 'form-control'}
+                        }) }}
+                    </div>
+                </div>
+
+                <div class="mt-3 position-relative">
+                    <label for="claimDescription" class="form-label">Description</label>
+                    <button type="button"
+        class="btn btn-outline-secondary btn-sm position-absolute top-0 end-0"
+        id="recordBtn"
+        style="z-index: 2; padding: 2px 6px; font-size: 0.75rem;">
+    <i class="bi bi-mic" style="font-size: 0.85rem;"></i>
+    <span id="recordStatus" style="font-size: 0.75rem;">Start</span>
+</button>
+
+                    {{ form_widget(form.claimDescription, {
+                        'id': 'claimDescription',
                         'attr': {
-                            'class': 'form-control',
-                            'rows': 4,
-                            'placeholder': 'Please provide detailed information...'
+                            'id': 'claimDescription',
+                            'class': 'form-control pe-5' ~ (form.claimDescription.vars.errors|length > 0 ? ' is-invalid' : ''),
+                            'rows': 4
                         }
                     }) }}
+                    {{ form_errors(form.claimDescription) }}
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <h6 class="section-title">👥 Involved Parties</h6>
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            {{ form_row(form.id_user, {
-                                'label': 'Submitted By',
-                                'attr': {'class': 'form-select', 'disabled': true}
-                            }) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(form.id_user_to_claim, {
-                                'label': 'Claim Against',
-                                'attr': {'class': 'form-select'}
-                            }) }}
-                        </div>
+            <div class="mb-3">
+                <h6 class="section-title">👥 Involved Parties</h6>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        {{ form_row(form.id_user, {
+                            'label': 'Submitted By',
+                            'attr': {'class': 'form-select', 'disabled': true}
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.id_user_to_claim, {
+                            'label': 'Claim Against',
+                            'attr': {'class': 'form-select'}
+                        }) }}
                     </div>
                 </div>
+            </div>
 
-                <div class="d-flex justify-content-between mt-3">
-                    <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Back
-                    </a>
-                    <button class="btn btn-primary" type="submit">
-                        <i class="bi bi-save me-1"></i>Submit
-                    </button>
-                </div>
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{{ path('app_my_claims') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-save me-1"></i>Submit
+                </button>
+            </div>
 
             {{ form_end(form) }}
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let isRecording = false;
+    let recorder = null;
+    let stream = null;
+    const recordBtn = document.getElementById('recordBtn');
+    const recordStatus = document.getElementById('recordStatus');
+    const descriptionField = document.getElementById('claimDescription');
+
+    if (!recordBtn || !recordStatus || !descriptionField) {
+        console.error('One or more required DOM elements not found.');
+        return;
+    }
+
+    recordBtn.addEventListener('click', async () => {
+        if (!navigator.mediaDevices || !window.MediaRecorder) {
+            alert("Your browser does not support audio recording.");
+            return;
+        }
+
+        if (isRecording) {
+            alert("Recording is already in progress.");
+            return;
+        }
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            const chunks = [];
+
+            recorder.ondataavailable = event => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                }
+            };
+
+            recorder.onstop = async () => {
+                isRecording = false;
+                recordBtn.disabled = false;
+                recordStatus.textContent = 'Start';
+
+                stream.getTracks().forEach(track => track.stop());
+
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                console.log("Uploading audio blob", blob);
+
+                const formData = new FormData();
+                formData.append('audio', blob);
+
+                try {
+                    const response = await fetch('{{ path('app_assembly_transcribe') }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    console.log("Transcription response:", data);
+
+                    if (data.text) {
+                        descriptionField.value += (descriptionField.value ? '\n' : '') + data.text;
+                    } else {
+                        alert("Transcription failed.");
+                    }
+
+                } catch (err) {
+                    console.error("Transcription request error:", err);
+                    alert("An error occurred during transcription.");
+                }
+            };
+
+            recorder.start();
+            isRecording = true;
+            recordStatus.textContent = 'Recording...';
+            recordBtn.disabled = true;
+
+            setTimeout(() => {
+                if (isRecording) {
+                    recorder.stop();
+                    recordStatus.textContent = 'Processing...';
+                }
+            }, 5000);
+
+        } catch (err) {
+            console.error("Microphone access error:", err);
+            alert("Microphone access denied or unavailable.");
+        }
+    });
+});
+</script>
 {% endblock %}

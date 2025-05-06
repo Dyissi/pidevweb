@@ -1,5 +1,15 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle';
+// ✅ Start Turbo
+import { start, renderStreamMessage } from '@hotwired/turbo';
+start();
 
-const app = startStimulusApp();
-// register any custom, 3rd party controllers here
-// app.register('some_controller_name', SomeImportedController);
+// ✅ Expose Turbo and renderStreamMessage globally (if needed)
+import * as Turbo from '@hotwired/turbo';
+window.Turbo = Turbo;
+window.renderStreamMessage = renderStreamMessage; // 👈 Add this line
+
+// ✅ Stimulus setup
+import { Application } from '@hotwired/stimulus';
+import ClaimActionToggleController from './controllers/claim_action_toggle_controller';
+
+const application = Application.start();
+application.register('claim-action-toggle', ClaimActionToggleController);

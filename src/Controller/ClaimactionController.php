@@ -10,6 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
+use Psr\Log\LoggerInterface;
 
 #[Route('/claimaction')]
 final class ClaimactionController extends AbstractController
@@ -27,44 +31,58 @@ final class ClaimactionController extends AbstractController
     }
 
     #[Route('/new', name: 'app_claimaction_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $claimaction = new Claimaction();
+public function new(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    \Symfony\Component\Notifier\ChatterInterface $chatter
+): Response {
+    $claimaction = new Claimaction();
+    $claimIdFromUrl = $request->query->get('claimId');
+    $claim = null;
 
-        // 👇 Get the claimId from the URL (if present)
-        $claimIdFromUrl = $request->query->get('claimId');
-        $claim = null;
-
-        if ($claimIdFromUrl) {
-            $claim = $entityManager->getRepository(Claim::class)->find($claimIdFromUrl);
-            if ($claim) {
-                $claimaction->setClaim($claim); // Set the Claim before binding the form
-            }
+    if ($claimIdFromUrl) {
+        $claim = $entityManager->getRepository(Claim::class)->find($claimIdFromUrl);
+        if ($claim) {
+            $claimaction->setClaim($claim);
         }
-
-        $form = $this->createForm(ClaimactionType::class, $claimaction, [
-            'claim_fixed' => (bool) $claimIdFromUrl,
-        ]);
-
-        $form->handleRequest($request);
-
-        // Re-ensure claim is set even if form doesn't include the field
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!$claimaction->getClaim() && $claim) {
-                $claimaction->setClaim($claim);
-            }
-
-            $entityManager->persist($claimaction);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Claim action created successfully!');
-            return $this->redirectToRoute('app_claim_index');
-        }
-
-        return $this->render('claimaction/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
+
+    $form = $this->createForm(ClaimactionType::class, $claimaction, [
+        'claim_fixed' => (bool) $claimIdFromUrl,
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        if (!$claimaction->getClaim() && $claim) {
+            $claimaction->setClaim($claim);
+        }
+
+        $entityManager->persist($claimaction);
+        $entityManager->flush();
+
+        // 🔔 Notify the claim submitter
+        $submitter = $claim?->getIdUser();
+        if ($submitter) {
+            $userId = $submitter->getId();
+            $notes = $claimaction->getClaimActionNotes();
+
+            $message = (new ChatMessage("📢 A new action has been added to your claim: \"$notes\""))
+                ->transport('mercure')
+                ->options(new \Symfony\Component\Notifier\Bridge\Mercure\MercureOptions(["/user/notifications/$userId"]));
+
+            $chatter->send($message);
+        }
+
+        $this->addFlash('success', 'Claim action created and notification sent!');
+        return $this->redirectToRoute('app_claim_index');
+    }
+
+    return $this->render('claimaction/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
 
     #[Route('/{claimActionId}', name: 'app_claimaction_show', methods: ['GET'])]
     public function show(Claimaction $claimaction): Response

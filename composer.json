@@ -1,7 +1,7 @@
 {
     "type": "project",
     "license": "proprietary",
-    "minimum-stability": "stable",
+    "minimum-stability": "rc",
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
@@ -14,6 +14,7 @@
         "doctrine/orm": "^3.3",
         "google/apiclient": "2.13",
         "knplabs/knp-paginator-bundle": "^6.8",
+        "league/csv": "^9.23",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
         "symfony/asset": "6.4.*",
@@ -24,8 +25,12 @@
         "symfony/flex": "^2",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
+        "symfony/http-client": "6.4.*",
         "symfony/intl": "6.4.*",
         "symfony/mailer": "6.4.*",
+        "symfony/mercure": "^0.6.5",
+        "symfony/mercure-bundle": "^0.3.9",
+        "symfony/mercure-notifier": "6.4.*",
         "symfony/mime": "6.4.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "6.4.*",
@@ -39,9 +44,13 @@
         "symfony/string": "6.4.*",
         "symfony/translation": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
-        "symfony/ux-turbo": "^2.23",
+        "symfony/ux-icons": "^2.24",
+        "symfony/ux-turbo": "^2.24",
+        "symfony/ux-twig-component": "^2.24",
+        "symfony/ux-typed": "^2.24",
         "symfony/validator": "6.4.*",
         "symfony/web-link": "6.4.*",
+        "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
@@ -106,5 +115,4 @@
             "require": "6.4.*"
         }
     }
-    
 }

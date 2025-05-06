@@ -6,8 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\ClaimRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ClaimRepository::class)]
 class Claim
 {
     #[ORM\Id]
@@ -34,12 +35,11 @@ class Claim
     
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "submittedClaims")]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "user_id", nullable: true)]
-    private User $id_user;
+    private ?User $id_user = null;
     
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "receivedClaims")]
     #[ORM\JoinColumn(name: "id_user_to_claim", referencedColumnName: "user_id", nullable: true)]
-    private User $id_user_to_claim;
-    
+    private ?User $id_user_to_claim = null;
 
     #[ORM\OneToMany(mappedBy: "claim", targetEntity: Claimaction::class)]
     private Collection $claimactions;
@@ -50,7 +50,6 @@ class Claim
         $this->claimStatus = 'In Review';
     }
 
-    // Getters and Setters
     public function getClaimId(): int
     {
         return $this->claimId;
@@ -145,7 +144,6 @@ class Claim
     public function removeClaimaction(Claimaction $claimaction): self
     {
         if ($this->claimactions->removeElement($claimaction)) {
-            // set the owning side to null (unless already changed)
             if ($claimaction->getClaim() === $this) {
                 $claimaction->setClaim(null);
             }
@@ -157,5 +155,4 @@ class Claim
     {
         return !$this->claimactions->isEmpty();
     }
-
 }
