@@ -22,7 +22,26 @@ SPIN is a Symfony 6.4 web/desktop application built by **Fullstack Attack** to s
 - **Backend:** Symfony 6.4, PHP 8.2  
 - **Frontend:** Twig, Stimulus, Bootstrap  
 - **Database:** MySQL  
-- **APIs:** JWT Auth, AI via Python microservices
+- **Authentication:** JWT (LexikJWTAuthenticationBundle)  
+- **AI Integration:** Python microservices, DeepAI, Gemini API  
+- **PDF & Charts:** DomPDF (Nucleos), Google Charts (CMEN)  
+- **Calendar & Scheduling:** tattali/calendar-bundle  
+- **Security & Validation:** Google ReCAPTCHA (EWZ), InfoBip, Twilio  
+- **Real-Time & Notifications:** Mercure, Messenger (Doctrine transport)  
+- **Extras:** VichUploader, Geocoder, Paginator, Serializer (JMS), UX Components , OpenStreetMap
+- 
+- ### 🔌 Integrated APIs
+- 🤖 **DeepAI** – Image & text processing  
+- 🔐 **LexikJWT** – JWT authentication  
+- 🌐 **Google ReCAPTCHA** – Spam protection  
+- 🗓️ **Google Calendar API** – Calendar sync  
+- ☎️ **Twilio / InfoBip** – SMS notifications  
+- 📢 **Mercure** – Real-time updates  
+- 🧠 **Gemini API** – AI features  
+- 🔊 **ElevenLabs / AssemblyAI** – Voice & audio processing  
+- 🧮 **Workout API (API Ninjas)** – Fitness analytics  
+- 🤗 **HuggingFace** – (Planned integration for NLP/ML)
+
 
 ---
 
