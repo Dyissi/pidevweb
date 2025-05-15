@@ -29,7 +29,7 @@ SPIN is a Symfony 6.4 web/desktop application built by **Fullstack Attack** to s
 - **Security & Validation:** Google ReCAPTCHA (EWZ), InfoBip, Twilio  
 - **Real-Time & Notifications:** Mercure, Messenger (Doctrine transport)  
 - **Extras:** VichUploader, Geocoder, Paginator, Serializer (JMS), UX Components , OpenStreetMap
-- 
+  
 - ### 🔌 Integrated APIs
 - 🤖 **DeepAI** – Image & text processing  
 - 🔐 **LexikJWT** – JWT authentication  
